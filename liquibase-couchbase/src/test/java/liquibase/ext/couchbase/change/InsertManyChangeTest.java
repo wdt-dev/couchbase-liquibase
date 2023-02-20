@@ -16,8 +16,8 @@ import static org.mockito.internal.util.collections.Iterables.firstOf;
 
 class InsertManyChangeTest {
 
-    private final Document DOC_1 = new Document("id1", "{key:value}");
-    private final Document DOC_2 = new Document("id2", "{key2:value2}");
+    private final Document DOC_1 = new Document("id1", "{\"key\":\"value\"}");
+    private final Document DOC_2 = new Document("id2", "{\"key2\":\"value2\"}");
     private DatabaseChangeLog changeLog;
 
     @BeforeEach
