@@ -1,21 +1,20 @@
 package system.changelog;
 
-import com.couchbase.client.java.Scope;
+import com.couchbase.client.java.ReactiveScope;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryScanConsistency;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import liquibase.Liquibase;
 import liquibase.changelog.ChangeSet;
 import liquibase.exception.ValidationFailedException;
 import liquibase.ext.couchbase.provider.ContextServiceProvider;
 import liquibase.ext.couchbase.provider.ServiceProvider;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import system.LiquiBaseSystemTest;
+
 import static com.couchbase.client.java.query.QueryOptions.queryOptions;
 import static common.constants.ChangeLogSampleFilePaths.CHANGELOG_DUPLICATE_TEST_XML;
 import static common.constants.ChangeLogSampleFilePaths.CHANGELOG_TEST_XML;
@@ -28,7 +27,18 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 public class HistoryServiceSystemTest extends LiquiBaseSystemTest {
     private static final String separator = System.lineSeparator();
     private static final ServiceProvider serviceProvider = new ContextServiceProvider(database);
-    private static final Scope scope = cluster.bucket(serviceProvider.getServiceBucketName()).scope(DEFAULT_SERVICE_SCOPE);
+    private static final ReactiveScope scope = cluster.bucket(serviceProvider.getServiceBucketName()).scope(
+            DEFAULT_SERVICE_SCOPE);
+
+    @BeforeAll
+    static void cleanBeforeAllTests() {
+        cleanAllChangeLogs();
+    }
+
+    private static void cleanAllChangeLogs() {
+        QueryOptions queryOptions = queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS);
+        scope.query("DELETE FROM DATABASECHANGELOG", queryOptions);
+    }
 
     @BeforeEach
     void initBeforeEach() {
@@ -37,20 +47,9 @@ public class HistoryServiceSystemTest extends LiquiBaseSystemTest {
         createTestCollection();
     }
 
-    @BeforeAll
-    static void cleanBeforeAllTests() {
-        cleanAllChangeLogs();
-    }
-
-
     @AfterEach
     void cleanChangeLogs() {
         cleanAllChangeLogs();
-    }
-
-    private static void cleanAllChangeLogs() {
-        QueryOptions queryOptions = queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS);
-        scope.query("DELETE FROM DATABASECHANGELOG", queryOptions);
     }
 
     @Test
@@ -60,18 +59,13 @@ public class HistoryServiceSystemTest extends LiquiBaseSystemTest {
 
         liquibase.update();
 
-        assertThat(scope)
-                .hasDocument(changeSet(1))
-                .withExecType(ChangeSet.ExecType.EXECUTED)
-                .withOrder(1);
-        assertThat(scope)
-                .hasDocument(changeSet(2))
-                .withExecType(ChangeSet.ExecType.EXECUTED)
-                .withOrder(2);
+        assertThat(scope).hasDocument(changeSet(1)).withExecType(ChangeSet.ExecType.EXECUTED).withOrder(1);
+        assertThat(scope).hasDocument(changeSet(2)).withExecType(ChangeSet.ExecType.EXECUTED).withOrder(2);
     }
 
     private String changeSet(Integer changeSetNum) {
-        return String.format("liquibase/ext/couchbase/changelog/changelog.changelog-test.xml::%s::dmitry", changeSetNum);
+        return String.format("liquibase/ext/couchbase/changelog/changelog.changelog-test.xml::%s::dmitry",
+                changeSetNum);
     }
 
 
@@ -91,15 +85,13 @@ public class HistoryServiceSystemTest extends LiquiBaseSystemTest {
     void Should_throw_duplicate_error_when_changesets_are_equal_and_check_that_collection_exists() {
         Liquibase liquibase = liquiBase(CHANGELOG_DUPLICATE_TEST_XML);
 
-        assertThatExceptionOfType(ValidationFailedException.class)
-                .isThrownBy(liquibase::update)
-                .withMessage("Validation Failed:%s" +
-                        "     1 changesets had duplicate identifiers%s" +
-                        "          liquibase/ext/couchbase/changelog/changelog" +
-                        ".changelog-duplicate-test.xml::3::dmitry%s", separator, separator, separator);
+        assertThatExceptionOfType(ValidationFailedException.class).isThrownBy(liquibase::update).withMessage(
+                "Validation Failed:%s" + "     1 changesets had duplicate identifiers%s" + "          " +
+                        "liquibase/ext/couchbase/changelog/changelog" + ".changelog-duplicate-test.xml::3::dmitry%s",
+                separator, separator, separator);
 
-        assertThat(cluster.bucket(serviceProvider.getServiceBucketName()))
-                .hasCollectionInScope(CHANGE_LOG_COLLECTION, scope.name());
+        assertThat(cluster.bucket(serviceProvider.getServiceBucketName())).hasCollectionInScope(CHANGE_LOG_COLLECTION,
+                scope.name());
     }
 
 }

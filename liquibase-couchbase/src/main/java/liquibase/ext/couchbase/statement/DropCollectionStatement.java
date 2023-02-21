@@ -40,7 +40,8 @@ public class DropCollectionStatement extends CouchbaseStatement {
 
     @Override
     public void execute(CouchbaseConnection connection) {
-        //TODO remove when all statements move to execute with cluster and we refactor NoSqlExecutor
+        // TODO remove when all statements move to execute with cluster and we refactor NoSqlExecutor
         execute(new ClusterOperator(connection.getCluster()));
     }
+
 }

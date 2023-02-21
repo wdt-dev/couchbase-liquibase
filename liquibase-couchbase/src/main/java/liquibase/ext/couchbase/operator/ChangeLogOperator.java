@@ -1,38 +1,37 @@
 package liquibase.ext.couchbase.operator;
 
 import com.couchbase.client.core.deps.com.fasterxml.jackson.databind.JsonNode;
-import com.couchbase.client.java.Collection;
-import com.couchbase.client.java.Scope;
+import com.couchbase.client.java.ReactiveCollection;
+import com.couchbase.client.java.ReactiveScope;
 import com.couchbase.client.java.manager.query.CreatePrimaryQueryIndexOptions;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryScanConsistency;
 import liquibase.changelog.RanChangeSet;
 import liquibase.ext.couchbase.changelog.CouchbaseChangeLog;
-import liquibase.ext.couchbase.provider.ContextServiceProvider;
-import liquibase.ext.couchbase.provider.ServiceProvider;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.mapper.ChangeSetMapper;
+import liquibase.ext.couchbase.provider.ContextServiceProvider;
+import liquibase.ext.couchbase.provider.ServiceProvider;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.couchbase.client.java.manager.query.CreatePrimaryQueryIndexOptions.createPrimaryQueryIndexOptions;
 import static com.couchbase.client.java.query.QueryOptions.queryOptions;
+import static java.util.Objects.requireNonNull;
 import static liquibase.ext.couchbase.provider.ServiceProvider.CHANGE_LOG_COLLECTION;
 
 /**
- *
- * Will move to a separate module in the future. Right now it provides
- * required functionality for the history service.
- *
+ * Will move to a separate module in the future. Right now it provides required functionality for the history service.
  */
 
 public class ChangeLogOperator {
 
     private static final String SELECT_ALL_CHANGELOGS_N1QL = "SELECT DATABASECHANGELOG.* from DATABASECHANGELOG " +
             "ORDER BY orderExecuted ASC";
-    private static final String SELECT_LAST_ORDER_N1QL = "SELECT orderExecuted from DATABASECHANGELOG " +
-            "order by orderExecuted DESC LIMIT 1";
+    private static final String SELECT_LAST_ORDER_N1QL = "SELECT orderExecuted from DATABASECHANGELOG " + "order by " +
+            "orderExecuted DESC LIMIT 1";
     private static final int NO_ORDER = 0;
 
     private final CouchbaseLiquibaseDatabase database;
@@ -44,9 +43,8 @@ public class ChangeLogOperator {
     }
 
     public void createChangeLogCollection() {
-        Scope scope = serviceProvider.getScopeOfCollection(CHANGE_LOG_COLLECTION);
-        CreatePrimaryQueryIndexOptions indexOptions = createPrimaryQueryIndexOptions()
-                .scopeName(scope.name())
+        ReactiveScope scope = serviceProvider.getScopeOfCollection(CHANGE_LOG_COLLECTION);
+        CreatePrimaryQueryIndexOptions indexOptions = createPrimaryQueryIndexOptions().scopeName(scope.name())
                 .collectionName(CHANGE_LOG_COLLECTION)
                 .ignoreIfExists(true)
                 .indexName("liquibase-changelog-primary-index");
@@ -59,32 +57,28 @@ public class ChangeLogOperator {
         id.append(changeLog.getId()).append("::");
         id.append(changeLog.getAuthor());
 
-        Collection collection = serviceProvider.getServiceCollection(CHANGE_LOG_COLLECTION);
+        ReactiveCollection collection = serviceProvider.getServiceCollection(CHANGE_LOG_COLLECTION);
         collection.insert(id.toString(), changeLog);
     }
 
     public int findLastOrderExecuted() {
-        Scope scope = serviceProvider.getScopeOfCollection(CHANGE_LOG_COLLECTION);
+        ReactiveScope scope = serviceProvider.getScopeOfCollection(CHANGE_LOG_COLLECTION);
 
         QueryOptions queryOptions = queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS);
-        List<JsonNode> rows = scope.query(SELECT_LAST_ORDER_N1QL, queryOptions)
-                .rowsAs(JsonNode.class);
+        Flux<JsonNode> rows = requireNonNull(scope.query(SELECT_LAST_ORDER_N1QL, queryOptions).block()).rowsAs(
+                JsonNode.class);
 
-        return rows.stream()
-                .map(jsonNode -> jsonNode.get("orderExecuted").asInt())
-                .findFirst()
-                .orElse(NO_ORDER);
+        return rows.toStream().map(jsonNode -> jsonNode.get("orderExecuted").asInt()).findFirst().orElse(NO_ORDER);
     }
 
     public List<RanChangeSet> getAllChangeLogs() {
-        Scope scope = serviceProvider.getScopeOfCollection(CHANGE_LOG_COLLECTION);
+        ReactiveScope scope = serviceProvider.getScopeOfCollection(CHANGE_LOG_COLLECTION);
 
         QueryOptions queryOptions = queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS);
-        List<CouchbaseChangeLog> changeLogs = scope.query(SELECT_ALL_CHANGELOGS_N1QL, queryOptions)
-                .rowsAs(CouchbaseChangeLog.class);
+        Flux<CouchbaseChangeLog> changeLogs = requireNonNull(
+                scope.query(SELECT_ALL_CHANGELOGS_N1QL, queryOptions).block()).rowsAs(CouchbaseChangeLog.class);
 
-        return changeLogs.stream()
-                .map(ChangeSetMapper::mapToRanChangeSet).collect(Collectors.toList());
+        return changeLogs.toStream().map(ChangeSetMapper::mapToRanChangeSet).collect(Collectors.toList());
     }
 
 }

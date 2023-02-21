@@ -1,43 +1,37 @@
 package common.matchers;
 
-import com.couchbase.client.java.Collection;
-
+import com.couchbase.client.java.ReactiveCollection;
+import liquibase.ext.couchbase.types.Document;
+import lombok.NonNull;
 import org.assertj.core.api.AbstractAssert;
 
 import java.util.List;
 
-import liquibase.ext.couchbase.types.Document;
-import lombok.NonNull;
+import static java.util.Objects.requireNonNull;
 
-public class CouchbaseCollectionAssert extends AbstractAssert<CouchbaseCollectionAssert, Collection> {
+public class CouchbaseCollectionAssert extends AbstractAssert<CouchbaseCollectionAssert, ReactiveCollection> {
 
-    private CouchbaseCollectionAssert(Collection collection) {
+    private CouchbaseCollectionAssert(ReactiveCollection collection) {
         super(collection, CouchbaseCollectionAssert.class);
     }
 
-    public static CouchbaseCollectionAssert assertThat(@NonNull Collection actual) {
+    public static CouchbaseCollectionAssert assertThat(@NonNull ReactiveCollection actual) {
         return new CouchbaseCollectionAssert(actual);
     }
 
     public CouchbaseCollectionAssert hasDocument(@NonNull String id) {
-        if (!actual.exists(id).exists()) {
-            failWithMessage("Collection [<%s>] doesn't contains document with ID [<%s>] in scope [<%s>]",
-                    actual.name(),
-                    id,
-                    actual.scopeName()
-            );
+        if (!requireNonNull(actual.exists(id).block()).exists()) {
+            failWithMessage("Collection [<%s>] doesn't contains document with ID [<%s>] in scope [<%s>]", actual.name(),
+                    id, actual.scopeName());
         }
 
         return this;
     }
 
     public CouchbaseCollectionAssert hasNoDocument(@NonNull String id) {
-        if (actual.exists(id).exists()) {
-            failWithMessage("Collection [<%s>] contains document with ID [<%s>] in scope [<%s>]",
-                    actual.name(),
-                    id,
-                    actual.scopeName()
-            );
+        if (requireNonNull(actual.exists(id).block()).exists()) {
+            failWithMessage("Collection [<%s>] contains document with ID [<%s>] in scope [<%s>]", actual.name(), id,
+                    actual.scopeName());
         }
 
         return this;
@@ -59,14 +53,13 @@ public class CouchbaseCollectionAssert extends AbstractAssert<CouchbaseCollectio
 
     public CouchBaseDocumentAssert extractingDocument(@NonNull String id) {
         hasDocument(id);
-
-        return new CouchBaseDocumentAssert(actual.get(id).contentAsObject());
+        return new CouchBaseDocumentAssert(requireNonNull(actual.get(id).block()).contentAsObject());
     }
 
 
     public CouchbaseCollectionAssert containDocuments(List<Document> testDocuments) {
         testDocuments.forEach((doc) -> extractingDocument(doc.getId()).itsContentEquals(doc.getContent()));
-
         return this;
     }
+
 }

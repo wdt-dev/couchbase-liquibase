@@ -1,7 +1,8 @@
 package liquibase.ext.couchbase.operator;
 
 import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.ReactiveBucket;
+import com.couchbase.client.java.ReactiveCollection;
 import com.couchbase.client.java.manager.collection.CollectionSpec;
 import com.couchbase.client.java.manager.collection.ScopeSpec;
 import lombok.Getter;
@@ -11,21 +12,20 @@ import lombok.RequiredArgsConstructor;
 import static com.couchbase.client.java.manager.collection.CollectionSpec.create;
 
 /**
- * A part of a facade package for Couchbase Java SDK.
- * Provides access to {@link Bucket} common operations and state checks.
+ * A part of a facade package for Couchbase Java SDK. Provides access to {@link Bucket} common operations and state
+ * checks.
  */
 @RequiredArgsConstructor
 public class BucketOperator {
 
-    //TODO split to BucketValidator and Bucket
+    // TODO split to BucketValidator and Bucket
 
     @Getter
-    protected final Bucket bucket;
+
+    protected final ReactiveBucket bucket;
 
     public CollectionOperator getCollectionOperator(String collectionName, String scopeName) {
-        return new CollectionOperator(
-                bucket.scope(scopeName).collection(collectionName)
-        );
+        return new CollectionOperator(bucket.scope(scopeName).collection(collectionName));
     }
 
     public void dropScope(String scopeName) {
@@ -33,7 +33,7 @@ public class BucketOperator {
     }
 
     public boolean hasScope(String name) {
-        return bucket.collections().getAllScopes().stream().anyMatch(scopeSpec -> scopeSpec.name().equals(name));
+        return bucket.collections().getAllScopes().toStream().anyMatch(scopeSpec -> scopeSpec.name().equals(name));
     }
 
     public boolean hasCollectionInScope(@NonNull String collectionName, @NonNull String scopeName) {
@@ -60,22 +60,23 @@ public class BucketOperator {
         dropCollection(name, bucket.defaultScope().name());
     }
 
-    public Collection getCollection(String collectionName, String scopeName) {
+    public ReactiveCollection getCollection(String collectionName, String scopeName) {
         return getBucket().scope(scopeName).collection(collectionName);
     }
 
-    public Collection getCollectionFromDefaultScope(String name) {
+    public ReactiveCollection getCollectionFromDefaultScope(String name) {
         return getCollection(name, bucket.defaultScope().name());
     }
 
     private boolean presentsInScope(String collectionName, String scopeName) {
         return bucket.collections()
                 .getAllScopes()
-                .stream()
+                .toStream()
                 .map(ScopeSpec::collections)
                 .flatMap(java.util.Collection::stream)
                 .filter(it -> it.scopeName().equals(scopeName))
                 .map(CollectionSpec::name)
                 .anyMatch(collectionName::equals);
     }
+
 }

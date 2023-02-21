@@ -8,12 +8,11 @@
 
     <changeSet id="5" author="roman.oborin">
         <ext:upsertOne>
-            <ext:bucketName>demoBucket</ext:bucketName>
-            <ext:scopeName>demoScope</ext:scopeName>
-            <ext:collectionName>demoCollection</ext:collectionName>
-            <ext:id>1</ext:id>
-            <ext:document>{"name": "Roman", "age": "6"}</ext:document>
-        </ext:upsertOne>
+			<ext:bucketName>demoBucket</ext:bucketName>
+			<ext:scopeName>demoScope</ext:scopeName>
+			<ext:collectionName>demoCollection</ext:collectionName>
+			<ext:document>{"name": "Roman", "age": "6"}</ext:document>
+		</ext:upsertOne>
 
         <ext:upsertMany>
             <ext:bucketName>demoBucket</ext:bucketName>

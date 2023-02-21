@@ -1,16 +1,15 @@
 package integration.statement;
 
-import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.ReactiveCollection;
 import com.couchbase.client.java.transactions.error.TransactionFailedException;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import common.TransactionStatementTest;
 import liquibase.ext.couchbase.operator.BucketOperator;
 import liquibase.ext.couchbase.operator.CollectionOperator;
 import liquibase.ext.couchbase.statement.UpsertOneStatement;
 import liquibase.ext.couchbase.types.Keyspace;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import static common.constants.TestConstants.DEFAULT_COLLECTION;
 import static common.constants.TestConstants.DEFAULT_SCOPE;
 import static common.constants.TestConstants.TEST_BUCKET;
@@ -37,12 +36,12 @@ class UpsertOneStatementIT extends TransactionStatementTest {
 
     @Test
     void Should_insert_one_document() {
-        UpsertOneStatement statement = new UpsertOneStatement(TEST_KEYSPACE, document(TEST_ID,
-                TEST_DOCUMENT.toString()));
+        UpsertOneStatement statement = new UpsertOneStatement(TEST_KEYSPACE,
+                document(TEST_ID, TEST_DOCUMENT.toString()));
 
         doInTransaction(statement.asTransactionAction(clusterOperator));
 
-        Collection collection = bucketOperator.getCollection(TEST_COLLECTION, TEST_SCOPE);
+        ReactiveCollection collection = bucketOperator.getCollection(TEST_COLLECTION, TEST_SCOPE);
         assertThat(collection).hasDocument(TEST_ID);
         testCollectionOperator.removeDoc(TEST_ID);
     }
@@ -50,12 +49,12 @@ class UpsertOneStatementIT extends TransactionStatementTest {
     @Test
     void Should_update_document_if_exists() {
         testCollectionOperator.insertDoc(TEST_ID, TEST_DOCUMENT);
-        UpsertOneStatement statement = new UpsertOneStatement(TEST_KEYSPACE, document(TEST_ID,
-                TEST_DOCUMENT_2.toString()));
+        UpsertOneStatement statement = new UpsertOneStatement(TEST_KEYSPACE,
+                document(TEST_ID, TEST_DOCUMENT_2.toString()));
 
         doInTransaction(statement.asTransactionAction(clusterOperator));
 
-        Collection collection = bucketOperator.getCollection(TEST_COLLECTION, TEST_SCOPE);
+        ReactiveCollection collection = bucketOperator.getCollection(TEST_COLLECTION, TEST_SCOPE);
         assertThat(collection).extractingDocument(TEST_ID).itsContentEquals(TEST_DOCUMENT_2);
         testCollectionOperator.removeDoc(TEST_ID);
     }
@@ -67,23 +66,20 @@ class UpsertOneStatementIT extends TransactionStatementTest {
         String uncreatedKey2 = "uncreated2";
         String uncreatedKey3 = "uncreated2";
 
-        UpsertOneStatement statement1 = new UpsertOneStatement(keyspace, document(uncreatedKey1, TEST_DOCUMENT.toString()));
-        UpsertOneStatement statement2 = new UpsertOneStatement(keyspace, document(uncreatedKey2, TEST_DOCUMENT.toString()));
-        UpsertOneStatement statement3 = new UpsertOneStatement(keyspace, document(uncreatedKey3, TEST_DOCUMENT.toString()));
+        UpsertOneStatement statement1 = new UpsertOneStatement(keyspace,
+                document(uncreatedKey1, TEST_DOCUMENT.toString()));
+        UpsertOneStatement statement2 = new UpsertOneStatement(keyspace,
+                document(uncreatedKey2, TEST_DOCUMENT.toString()));
+        UpsertOneStatement statement3 = new UpsertOneStatement(keyspace,
+                document(uncreatedKey3, TEST_DOCUMENT.toString()));
 
-        assertThatExceptionOfType(TransactionFailedException.class)
-                .isThrownBy(() -> {
-                    doInFailingTransaction(statement1.asTransactionAction(clusterOperator),
-                            statement2.asTransactionAction(clusterOperator),
-                            statement3.asTransactionAction(clusterOperator)
-                    );
-                });
+        assertThatExceptionOfType(TransactionFailedException.class).isThrownBy(() -> {
+            doInFailingTransaction(statement1.asTransactionAction(clusterOperator),
+                    statement2.asTransactionAction(clusterOperator), statement3.asTransactionAction(clusterOperator));
+        });
 
-        Collection collection = bucketOperator.getCollectionFromDefaultScope(DEFAULT_COLLECTION);
-        assertThat(collection)
-                .hasNoDocument(uncreatedKey1)
-                .hasNoDocument(uncreatedKey2)
-                .hasNoDocument(uncreatedKey3);
+        ReactiveCollection collection = bucketOperator.getCollectionFromDefaultScope(DEFAULT_COLLECTION);
+        assertThat(collection).hasNoDocument(uncreatedKey1).hasNoDocument(uncreatedKey2).hasNoDocument(uncreatedKey3);
     }
 
 }

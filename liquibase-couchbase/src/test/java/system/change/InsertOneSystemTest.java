@@ -1,10 +1,7 @@
 package system.change;
 
-import com.couchbase.client.java.Collection;
-import com.couchbase.client.java.Scope;
-
-import org.junit.jupiter.api.Test;
-
+import com.couchbase.client.java.ReactiveCollection;
+import com.couchbase.client.java.ReactiveScope;
 import common.matchers.ChangeLogAssert;
 import common.matchers.CouchbaseCollectionAssert;
 import liquibase.Liquibase;
@@ -15,7 +12,9 @@ import liquibase.ext.couchbase.operator.CollectionOperator;
 import liquibase.ext.couchbase.provider.ContextServiceProvider;
 import liquibase.ext.couchbase.provider.ServiceProvider;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Test;
 import system.LiquiBaseSystemTest;
+
 import static common.constants.ChangeLogSampleFilePaths.INSERT_ONE_2_CHANGESETS_ONE_SUCCESSFULL_TEST_XML;
 import static common.constants.ChangeLogSampleFilePaths.INSERT_ONE_BROKEN_TEST_XML;
 import static common.constants.TestConstants.TEST_COLLECTION;
@@ -28,11 +27,12 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 public class InsertOneSystemTest extends LiquiBaseSystemTest {
 
     private static final BucketOperator bucketOperator = new BucketOperator(getBucket());
-    private static final CollectionOperator testCollectionOperator =
-            new CollectionOperator(bucketOperator.getCollection(TEST_COLLECTION, TEST_SCOPE));
-    private static final Collection collection = bucketOperator.getCollection(TEST_COLLECTION, TEST_SCOPE);
+    private static final CollectionOperator testCollectionOperator = new CollectionOperator(
+            bucketOperator.getCollection(TEST_COLLECTION, TEST_SCOPE));
+    private static final ReactiveCollection collection = bucketOperator.getCollection(TEST_COLLECTION, TEST_SCOPE);
     private static final ServiceProvider serviceProvider = new ContextServiceProvider(database);
-    private static final Scope scope = cluster.bucket(serviceProvider.getServiceBucketName()).scope(DEFAULT_SERVICE_SCOPE);
+    private static final ReactiveScope scope = cluster.bucket(serviceProvider.getServiceBucketName()).scope(
+            DEFAULT_SERVICE_SCOPE);
 
     @Test
     @SneakyThrows
@@ -42,12 +42,9 @@ public class InsertOneSystemTest extends LiquiBaseSystemTest {
 
         Liquibase liquibase = liquiBase(INSERT_ONE_BROKEN_TEST_XML);
 
-        assertThatExceptionOfType(LiquibaseException.class)
-                .isThrownBy(liquibase::update);
+        assertThatExceptionOfType(LiquibaseException.class).isThrownBy(liquibase::update);
 
-        assertThat(collection)
-                .hasDocument(existingKey)
-                .hasNoDocument("newKey");
+        assertThat(collection).hasDocument(existingKey).hasNoDocument("newKey");
 
         testCollectionOperator.removeDoc(existingKey);
     }
@@ -64,27 +61,26 @@ public class InsertOneSystemTest extends LiquiBaseSystemTest {
 
         Liquibase liquibase = liquiBase(INSERT_ONE_2_CHANGESETS_ONE_SUCCESSFULL_TEST_XML);
 
-        assertThatExceptionOfType(LiquibaseException.class)
-                .isThrownBy(liquibase::update);
+        assertThatExceptionOfType(LiquibaseException.class).isThrownBy(liquibase::update);
 
         CouchbaseCollectionAssert.assertThat(collection)
                 .hasDocument(existingKey)
                 .hasDocument(successfullyCreatedKey)
                 .hasNoDocument("notCreated");
 
-        ChangeLogAssert.assertThat(scope)
-                .hasDocument(changeSet(1))
-                .withExecType(ChangeSet.ExecType.EXECUTED);
+        ChangeLogAssert.assertThat(scope).hasDocument(changeSet(1)).withExecType(ChangeSet.ExecType.EXECUTED);
 
-        ChangeLogAssert.assertThat(scope)
-                .hasNoDocument(changeSet(2));
+        ChangeLogAssert.assertThat(scope).hasNoDocument(changeSet(2));
 
         testCollectionOperator.removeDoc(existingKey);
         testCollectionOperator.removeDoc(successfullyCreatedKey);
     }
 
     private String changeSet(Integer changeSetNum) {
-        return String.format("liquibase/ext/couchbase/insert/" +
-                "changelog.insert-one-2-changesets-with-one-broken.test.xml::%s::dmitry", changeSetNum);
+        return String.format(
+                "liquibase/ext/couchbase/insert/" + "changelog.insert-one-2-changesets-with-one-broken.test" +
+                        ".xml::%s::dmitry",
+                changeSetNum);
     }
+
 }

@@ -1,11 +1,7 @@
 package liquibase.ext.couchbase.statement;
 
 import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.client.java.transactions.TransactionAttemptContext;
-
-import java.util.List;
-import java.util.Map;
-
+import com.couchbase.client.java.transactions.ReactiveTransactionAttemptContext;
 import liquibase.ext.couchbase.operator.ClusterOperator;
 import liquibase.ext.couchbase.types.Document;
 import liquibase.ext.couchbase.types.Keyspace;
@@ -13,9 +9,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * A statement to insert many instances of a {@link Document} inside one transaction into a keyspace
- *
  * @see Document
  * @see CouchbaseStatement
  * @see Keyspace
@@ -30,12 +28,10 @@ public class InsertManyStatement extends CouchbaseTransactionStatement {
     private final List<Document> documents;
 
     @Override
-    public void doInTransaction(TransactionAttemptContext transaction, ClusterOperator clusterOperator) {
+    public void doInTransaction(ReactiveTransactionAttemptContext transaction, ClusterOperator clusterOperator) {
         Map<String, JsonObject> contentList = clusterOperator.checkDocsAndTransformToJsons(documents);
-        clusterOperator.getBucketOperator(keyspace.getBucket())
-                .getCollectionOperator(keyspace.getCollection(), keyspace.getScope())
-                .insertDocsTransactionally(transaction, contentList);
+        clusterOperator.getBucketOperator(keyspace.getBucket()).getCollectionOperator(keyspace.getCollection(),
+                keyspace.getScope()).insertDocsTransactionally(transaction, contentList);
     }
 
 }
-

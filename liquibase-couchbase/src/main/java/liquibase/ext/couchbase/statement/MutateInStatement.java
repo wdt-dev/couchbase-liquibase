@@ -1,7 +1,6 @@
 package liquibase.ext.couchbase.statement;
 
-import com.couchbase.client.java.Collection;
-
+import com.couchbase.client.java.ReactiveCollection;
 import liquibase.ext.couchbase.database.CouchbaseConnection;
 import liquibase.ext.couchbase.operator.BucketOperator;
 import liquibase.ext.couchbase.operator.ClusterOperator;
@@ -22,7 +21,7 @@ public class MutateInStatement extends CouchbaseStatement {
     public void execute(ClusterOperator clusterOperator) {
         Keyspace keyspace = mutate.getKeyspace();
         BucketOperator bucketOperator = clusterOperator.getBucketOperator(keyspace.getBucket());
-        Collection collection = bucketOperator.getCollection(keyspace.getCollection(), keyspace.getScope());
+        ReactiveCollection collection = bucketOperator.getCollection(keyspace.getCollection(), keyspace.getScope());
 
         collection.mutateIn(mutate.getId(), mutate.getSpecs());
     }

@@ -8,13 +8,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- *
  * A statement to drop primary index for a keyspace
- *
  * @see CouchbaseStatement
- * @see DropPrimaryQueryIndexOptions
+ * @see DropPrimaryIndexStatement
  * @see Keyspace
- *
  */
 
 @Getter
@@ -27,4 +24,5 @@ public class DropPrimaryIndexStatement extends CouchbaseStatement {
     public void execute(CouchbaseConnection connection) {
         new ClusterOperator(connection.getCluster()).dropPrimaryIndex(keyspace);
     }
+
 }

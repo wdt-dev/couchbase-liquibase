@@ -52,7 +52,7 @@ class CreatePrimaryQueryIndexStatementIT extends BucketTestCase {
                 new CreatePrimaryQueryIndexStatement(TEST_BUCKET, createOptions());
         statement.execute(database.getConnection());
         assertEquals(MANUALLY_CREATED_INDEX,
-                cluster.queryIndexes().getAllIndexes(TEST_BUCKET).get(0).name());
+                cluster.queryIndexes().getAllIndexes(TEST_BUCKET).blockFirst().name());
     }
 
     @Test

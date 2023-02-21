@@ -1,6 +1,6 @@
 package common.operators;
 
-import com.couchbase.client.java.Bucket;
+import com.couchbase.client.java.ReactiveBucket;
 import liquibase.ext.couchbase.operator.BucketOperator;
 
 import java.util.Random;
@@ -10,15 +10,13 @@ import static com.couchbase.client.java.manager.collection.CollectionSpec.create
 public class TestBucketOperator extends BucketOperator {
     private final Random random;
 
-    public TestBucketOperator(Bucket bucket) {
+    public TestBucketOperator(ReactiveBucket bucket) {
         super(bucket);
         random = new Random();
     }
 
     public TestCollectionOperator getCollectionOperator(String collectionName, String scopeName) {
-        return new TestCollectionOperator(
-                bucket.scope(scopeName).collection(collectionName)
-        );
+        return new TestCollectionOperator(bucket.scope(scopeName).collection(collectionName));
     }
 
     public String createTestScope(String prefix) {
@@ -32,4 +30,5 @@ public class TestBucketOperator extends BucketOperator {
         bucket.collections().createCollection(create(collectionName, scopeName));
         return collectionName;
     }
+
 }

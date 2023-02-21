@@ -11,6 +11,7 @@ import liquibase.ext.couchbase.types.Keyspace;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
 
 import java.util.Arrays;
 import java.util.List;
@@ -71,10 +72,11 @@ class CreateQueryIndexStatementIT extends BucketTestCase {
 
         statement.execute(database.getConnection());
 
-        List<QueryIndex> indexesForBucket = clusterOperator.getQueryIndexesForBucket(bucketName);
-        assertEquals(1, indexesForBucket.size());
-        //check that the index target column hasn't been overridden
-        String indexTargetField = indexesForBucket.stream().findFirst()
+        Flux<QueryIndex> indexesForBucket = clusterOperator.getQueryIndexesForBucket(bucketName);
+        assertEquals(1L, indexesForBucket.count().block());
+        // check that the index target column hasn't been overridden
+        String indexTargetField = indexesForBucket.toStream()
+                .findFirst()
                 .map(QueryIndex::indexKey)
                 .map(x -> x.get(0))
                 .map(String.class::cast)
@@ -114,4 +116,5 @@ class CreateQueryIndexStatementIT extends BucketTestCase {
     private CreateQueryIndexStatement statementForKeyspace(String indexToCreate, Keyspace keyspace) {
         return new CreateQueryIndexStatement(indexToCreate, keyspace, true, true, 0, FIELDS);
     }
+
 }

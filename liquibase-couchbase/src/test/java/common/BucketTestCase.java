@@ -1,6 +1,6 @@
 package common;
 
-import com.couchbase.client.java.Bucket;
+import com.couchbase.client.java.ReactiveBucket;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.couchbase.client.java.manager.collection.CollectionSpec.create;
@@ -25,7 +25,7 @@ public class BucketTestCase extends CouchbaseContainerizedTest {
         createTestCollection();
     }
 
-    protected static Bucket getBucket() {
+    protected static ReactiveBucket getBucket() {
         return cluster.bucket(TEST_BUCKET);
     }
 

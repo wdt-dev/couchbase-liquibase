@@ -36,6 +36,7 @@
                 <configuration>
                     <propertyFile>src\main\resources\liquibase\liquibase.properties</propertyFile>
                     <changeLogFile>src/main/resources/liquibase/changelog/stress-test-10k-insert-5k-upsert.xml</changeLogFile>
+<!--                    <changeLogFile>src/main/resources/liquibase/changelog/1K-insert.xml</changeLogFile>-->
                 </configuration>
                 <dependencies>
                     <dependency>

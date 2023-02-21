@@ -9,12 +9,9 @@ import lombok.RequiredArgsConstructor;
 import java.util.Optional;
 
 /**
- *
  * A statement that checks if a document exists by key.
- *
  * @see liquibase.ext.couchbase.precondition.DocumentExistsByKeyPrecondition
  * @see CouchbaseStatement
- *
  */
 
 @Data
@@ -29,18 +26,17 @@ public class DocumentExistsByKeyStatement extends CouchbaseStatement {
         String collectionName = keyspace.getCollection();
         String scopeName = keyspace.getScope();
 
-        return Optional.ofNullable(connection.getCluster())
-                .map(ClusterOperator::new)
-                .filter(clusterOperator -> clusterOperator.isBucketExists(bucket))
-                .map(clusterOperator -> clusterOperator.getBucketOperator(bucket))
-                .filter(bucketOperator -> bucketOperator.hasCollectionInScope(collectionName, scopeName))
-                .map(bucketOperator -> bucketOperator.getCollectionOperator(collectionName, scopeName))
-                .map(collectionOperator -> collectionOperator.docExists(key))
-                .orElse(false);
+        return Optional.ofNullable(connection.getCluster()).map(ClusterOperator::new).filter(
+                clusterOperator -> clusterOperator.isBucketExists(bucket)).map(
+                clusterOperator -> clusterOperator.getBucketOperator(bucket)).filter(
+                bucketOperator -> bucketOperator.hasCollectionInScope(collectionName, scopeName)).map(
+                bucketOperator -> bucketOperator.getCollectionOperator(collectionName, scopeName)).map(
+                collectionOperator -> collectionOperator.docExists(key)).orElse(false);
     }
 
     @Override
     public void execute(CouchbaseConnection connection) {
         throw new UnsupportedOperationException();
     }
+
 }

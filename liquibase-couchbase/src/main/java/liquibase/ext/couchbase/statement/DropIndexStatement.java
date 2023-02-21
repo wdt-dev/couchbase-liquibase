@@ -16,7 +16,7 @@ import static java.lang.String.format;
  * A statement to drop secondary index for a keyspace
  *
  * @see CouchbaseStatement
- * @see DropQueryIndexOptions
+ * @see com.couchbase.client.java.manager.query.DropQueryIndexOptions
  * @see Keyspace
  */
 

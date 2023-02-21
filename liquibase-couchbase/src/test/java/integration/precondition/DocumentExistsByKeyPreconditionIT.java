@@ -1,14 +1,12 @@
 package integration.precondition;
 
-import com.couchbase.client.java.Bucket;
-
+import com.couchbase.client.java.ReactiveBucket;
 import common.BucketTestCase;
 import liquibase.ext.couchbase.exception.precondition.DocumentNotExistsPreconditionException;
-
+import liquibase.ext.couchbase.precondition.DocumentExistsByKeyPrecondition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import liquibase.ext.couchbase.precondition.DocumentExistsByKeyPrecondition;
 import static common.constants.TestConstants.TEST_BUCKET;
 import static common.constants.TestConstants.TEST_COLLECTION;
 import static common.constants.TestConstants.TEST_SCOPE;
@@ -17,8 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class DocumentExistsByKeyPreconditionIT extends BucketTestCase {
 
-    private static Bucket bucket;
     private static final DocumentExistsByKeyPrecondition precondition = new DocumentExistsByKeyPrecondition();
+    private static ReactiveBucket bucket;
 
     @BeforeEach
     void setUpLocal() {
@@ -46,9 +44,10 @@ class DocumentExistsByKeyPreconditionIT extends BucketTestCase {
 
         precondition.setKey(notExistedKey);
 
-        assertThatExceptionOfType(DocumentNotExistsPreconditionException.class)
-                .isThrownBy(() -> precondition.check(database, null, null, null))
-                .withMessage("Key %s does not exist in bucket %s in scope %s and " +
-                        "collection %s", notExistedKey, TEST_BUCKET, TEST_SCOPE, TEST_COLLECTION);
+        assertThatExceptionOfType(DocumentNotExistsPreconditionException.class).isThrownBy(
+                () -> precondition.check(database, null, null, null)).withMessage(
+                "Key %s does not exist in bucket %s in scope %s and " + "collection %s", notExistedKey, TEST_BUCKET,
+                TEST_SCOPE, TEST_COLLECTION);
     }
+
 }

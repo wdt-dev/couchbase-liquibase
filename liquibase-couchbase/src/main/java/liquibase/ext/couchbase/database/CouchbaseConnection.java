@@ -21,18 +21,9 @@ package liquibase.ext.couchbase.database;
  */
 
 import com.couchbase.client.core.util.ConnectionString;
-import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.Cluster;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.sql.Driver;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-
+import com.couchbase.client.java.ReactiveBucket;
+import com.couchbase.client.java.ReactiveCluster;
+import com.couchbase.client.java.transactions.config.TransactionsConfig;
 import liquibase.Scope;
 import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
@@ -41,11 +32,23 @@ import liquibase.ext.couchbase.executor.TransactionalStatementQueue;
 import liquibase.util.StringUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import reactor.core.publisher.Mono;
+
+import java.sql.Driver;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+
 import static com.couchbase.client.core.util.Validators.notNull;
 import static com.couchbase.client.core.util.Validators.notNullOrEmpty;
 import static com.couchbase.client.java.ClusterOptions.clusterOptions;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static liquibase.ext.couchbase.database.Constants.BUCKET_PARAM;
@@ -54,36 +57,38 @@ import static liquibase.ext.couchbase.database.Constants.COUCHBASE_PRODUCT_NAME;
 import static liquibase.ext.couchbase.database.Constants.COUCHBASE_PRODUCT_SHORT_NAME;
 
 /**
- * Main access point to the Couchbase database from Liquibase.
- * Provides access to the {@link Cluster} and {@link Bucket} instances. The latter is available only
- * if the bucket name is specified in the connection URL.<br><br>
- * Currently, doesn't support transactions and most of ths SQL-specific things like {@link #attached(Database)}
- * and {@link #nativeSQL(String)}.
+ * Main access point to the Couchbase database from Liquibase. Provides access to the {@link ReactiveCluster} and
+ * {@link ReactiveBucket} instances. The latter is available only if the bucket name is specified in the connection
+ * URL.<br><br> Currently, doesn't support transactions and most of ths SQL-specific things like
+ * {@link #attached(Database)} and {@link #nativeSQL(String)}.
  */
 
 @Data
 @NoArgsConstructor
 public class CouchbaseConnection implements DatabaseConnection {
 
-    private final TransactionalStatementQueue transactionalStatementQueue =
-            Scope.getCurrentScope().getSingleton(TransactionalStatementQueue.class);
+    private final TransactionalStatementQueue transactionalStatementQueue = Scope.getCurrentScope().getSingleton(
+            TransactionalStatementQueue.class);
     private ConnectionString connectionString;
-    private Cluster cluster;
-    private Bucket database;
+    private ReactiveCluster cluster;
+    private ReactiveBucket database;
+
+    private static Optional<String> getAndTrimProperty(Properties driverProperties, String user) {
+        return Optional.ofNullable(driverProperties).map(props -> StringUtil.trimToNull(props.getProperty(user)));
+    }
 
     @Override
     public boolean supports(String url) {
-        return ofNullable(url)
-                .map(String::toLowerCase)
-                .map(x -> x.startsWith(COUCHBASE_PRODUCT_SHORT_NAME))
-                .orElse(false);
+        return ofNullable(url).map(String::toLowerCase).map(x -> x.startsWith(COUCHBASE_PRODUCT_SHORT_NAME)).orElse(
+                false);
     }
 
     @Override
     public String getCatalog() throws DatabaseException {
         try {
-            return ofNullable(database).map(Bucket::name).orElse(StringUtils.EMPTY);
-        } catch (final Exception e) {
+            return ofNullable(database).map(ReactiveBucket::name).orElse(StringUtils.EMPTY);
+        }
+        catch (final Exception e) {
             throw new DatabaseException(e);
         }
     }
@@ -95,13 +100,9 @@ public class CouchbaseConnection implements DatabaseConnection {
 
     @Override
     public void rollback() {
-        //TODO investigate why it's called several times during 1 changeset and called every time even if there is no error
+        // TODO investigate why it's called several times during 1 changeset and called every time even if there is no
+        // error
         transactionalStatementQueue.clear();
-    }
-
-    @Override
-    public void setAutoCommit(boolean b) {
-        //TODO investigate
     }
 
     public String getDatabaseProductName() {
@@ -129,12 +130,10 @@ public class CouchbaseConnection implements DatabaseConnection {
     }
 
 
-    //TODO Still questionable , should we allow null connection string?
+    // TODO Still questionable , should we allow null connection string?
     private List<String> getHosts() {
         notNull(connectionString, "Connection string");
-        return Optional.of(connectionString)
-                .map(this::extractHosts)
-                .orElse(emptyList());
+        return Optional.of(connectionString).map(this::extractHosts).orElse(emptyList());
     }
 
     @Override
@@ -157,36 +156,38 @@ public class CouchbaseConnection implements DatabaseConnection {
     }
 
     @Override
-    public void open(final String url, final Driver driverObject, final Properties driverProperties)
-            throws DatabaseException {
+    public void open(final String url,
+                     final Driver driverObject,
+                     final Properties driverProperties) throws DatabaseException {
 
         try {
             String processedUrl = StringUtils.trimToEmpty(url);
 
             if (StringUtils.containsNone(processedUrl, '@')) {
-                final String user = getAndTrimProperty(driverProperties, "user")
-                        .orElseThrow(() -> new IllegalArgumentException("Username not specified neither in parameters " +
-                                "nor in connection string"));
+                final String user = getAndTrimProperty(driverProperties, "user").orElseThrow(
+                        () -> new IllegalArgumentException(
+                                "Username not specified neither in parameters " + "nor in connection string"));
                 String[] parts = processedUrl.split("://");
                 processedUrl = parts[0] + "://" + user + '@' + parts[1];
             }
             Map<String, String> params = new HashMap<>();
-            ofNullable(driverProperties)
-                    .map(x -> x.get(BUCKET_PARAM))
-                    .map(String.class::cast)
-                    .ifPresent(val -> params.put(BUCKET_PARAM, val));
+            ofNullable(driverProperties).map(x -> x.get(BUCKET_PARAM)).map(String.class::cast).ifPresent(
+                    val -> params.put(BUCKET_PARAM, val));
             connectionString = ConnectionString.create(processedUrl).withParams(params);
 
             final String password = getAndTrimProperty(driverProperties, "password").orElse(null);
 
-            cluster = ((CouchbaseClientDriver) driverObject)
-                    .connect(connectionString.original(), clusterOptions(connectionString.username(), password));
+            cluster = ((CouchbaseClientDriver) driverObject).connect(connectionString.original(),
+                            clusterOptions(requireNonNull(connectionString.username()), requireNonNull(password)).environment(
+                                    env -> env.transactionsConfig(TransactionsConfig.timeout(Duration.ofSeconds(120)))))
+                    .reactive();
 
             if (connectionString.params().containsKey(BUCKET_PARAM)) {
                 final String dbName = connectionString.params().get(BUCKET_PARAM);
                 database = cluster.bucket(dbName);
             }
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
             throw new DatabaseException("Could not open connection to database: " + getBucketName(url), e);
         }
     }
@@ -195,10 +196,11 @@ public class CouchbaseConnection implements DatabaseConnection {
     public void close() throws DatabaseException {
         try {
             if (!isClosed()) {
-                cluster.close();
+                cluster.core().close();
                 cluster = null;
             }
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
             throw new DatabaseException(e);
         }
     }
@@ -208,16 +210,23 @@ public class CouchbaseConnection implements DatabaseConnection {
         if (transactionalStatementQueue.isEmpty()) {
             return;
         }
-
-        cluster.transactions().run(ctx -> transactionalStatementQueue.forEach(it -> it.accept(ctx)));
+        cluster.transactions().run(ctx -> {
+            transactionalStatementQueue.forEach(it -> it.accept(ctx));
+            return Mono.empty();
+        });
         transactionalStatementQueue.clear();
     }
+
 
     @Override
     public boolean getAutoCommit() {
         return false;
     }
 
+    @Override
+    public void setAutoCommit(boolean b) {
+        // TODO investigate
+    }
 
     @Override
     public int getPriority() {
@@ -225,20 +234,12 @@ public class CouchbaseConnection implements DatabaseConnection {
     }
 
     private List<String> extractHosts(ConnectionString s) {
-        return s.hosts().stream()
-                .map(ConnectionString.UnresolvedSocket::host)
-                .collect(toList());
-    }
-
-    private static Optional<String> getAndTrimProperty(Properties driverProperties, String user) {
-        return Optional.ofNullable(driverProperties).map(props -> StringUtil.trimToNull(props.getProperty(user)));
+        return s.hosts().stream().map(ConnectionString.UnresolvedSocket::host).collect(toList());
     }
 
     private String getBucketName(String url) {
-        return ofNullable(connectionString)
-                .map(ConnectionString::params)
-                .map(x -> x.get(BUCKET_PARAM))
-                .map(String.class::cast)
-                .orElse(url);
+        return ofNullable(connectionString).map(ConnectionString::params).map(x -> x.get(BUCKET_PARAM)).map(
+                String.class::cast).orElse(url);
     }
+
 }

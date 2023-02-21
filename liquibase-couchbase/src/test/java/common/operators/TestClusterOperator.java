@@ -1,6 +1,6 @@
 package common.operators;
 
-import com.couchbase.client.java.Cluster;
+import com.couchbase.client.java.ReactiveCluster;
 import liquibase.ext.couchbase.operator.ClusterOperator;
 
 import java.util.List;
@@ -9,16 +9,14 @@ import java.util.Random;
 public class TestClusterOperator extends ClusterOperator {
     private final Random random;
 
-    public TestClusterOperator(Cluster cluster) {
+    public TestClusterOperator(ReactiveCluster cluster) {
         super(cluster);
         random = new Random();
     }
 
     public TestBucketOperator getBucketOperator(String bucketName) {
         requireBucketExists(bucketName);
-        return new TestBucketOperator(
-                cluster.bucket(bucketName)
-        );
+        return new TestBucketOperator(cluster.bucket(bucketName));
     }
 
     public String createTestIndex(String prefix, String bucketName, List<String> fields) {
@@ -30,4 +28,5 @@ public class TestClusterOperator extends ClusterOperator {
     public String getTestIndexId(String prefix) {
         return prefix + "_" + random.nextInt(10000);
     }
+
 }

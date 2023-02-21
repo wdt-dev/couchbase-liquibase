@@ -20,6 +20,7 @@ public class TransactionStatementTest extends BucketTestCase {
             for (CouchbaseTransactionAction statement : statements) {
                 statement.accept(transaction);
             }
+            return null;
         });
     }
 
