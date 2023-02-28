@@ -61,7 +61,7 @@ public class CouchbaseExecutor extends NoSqlExecutor {
                 reactiveTransactionalStatementQueue.add(action);
             }
             else {
-                CouchbaseTransactionAction action = buildTransactionalAction((CouchbaseTransactionStatement) sql);
+                CouchbaseTransactionAction action = buildTransactionalAction(transactionStatement);
                 transactionalStatementQueue.add(action);
             }
             return;
