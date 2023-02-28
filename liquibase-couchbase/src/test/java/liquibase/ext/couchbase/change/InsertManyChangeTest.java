@@ -1,5 +1,6 @@
 package liquibase.ext.couchbase.change;
 
+import liquibase.ext.couchbase.types.DataType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,8 +19,8 @@ import static org.mockito.internal.util.collections.Iterables.firstOf;
 
 class InsertManyChangeTest {
 
-    private final Document DOC_1 = document("id1", "{key:value}", "Json");
-    private final Document DOC_2 = document("id2", "{key2:value2}", "Json");
+    private final Document DOC_1 = document("id1", "{key:value}", DataType.JSON);
+    private final Document DOC_2 = document("id2", "{key2:value2}", DataType.JSON);
     private DatabaseChangeLog changeLog;
 
     @BeforeEach

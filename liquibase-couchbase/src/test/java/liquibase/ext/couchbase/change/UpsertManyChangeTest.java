@@ -5,6 +5,7 @@ import liquibase.changelog.ChangeSet;
 import liquibase.changelog.DatabaseChangeLog;
 import liquibase.ext.couchbase.changelog.ChangeLogProvider;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
+import liquibase.ext.couchbase.types.DataType;
 import liquibase.ext.couchbase.types.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,8 +17,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.internal.util.collections.Iterables.firstOf;
 
 class UpsertManyChangeTest {
-    public final Document DOC_1 = document("id1","{key:value}","Json");
-    public final Document DOC_2 = document("id2","{key2:value2}","Json");
+    public final Document DOC_1 = document("id1", "{key:value}", DataType.JSON);
+    public final Document DOC_2 = document("id2", "{key2:value2}", DataType.JSON);
     private DatabaseChangeLog changeLog;
 
     @BeforeEach

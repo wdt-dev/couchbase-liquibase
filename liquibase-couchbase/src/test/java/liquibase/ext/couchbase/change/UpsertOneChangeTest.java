@@ -1,5 +1,6 @@
 package liquibase.ext.couchbase.change;
 
+import liquibase.ext.couchbase.types.DataType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ import static org.mockito.internal.util.collections.Iterables.firstOf;
 public class UpsertOneChangeTest {
 
     private ChangeLogProvider changeLogProvider;
-    private final Document doc = new Document().id(TEST_ID).type("Json").data("{key:value}");
+    private final Document doc = Document.document(TEST_ID, "{key:value}", DataType.JSON);
 
     @BeforeEach
     void setUp() {

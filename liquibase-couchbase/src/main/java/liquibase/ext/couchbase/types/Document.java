@@ -3,6 +3,7 @@ package liquibase.ext.couchbase.types;
 import com.couchbase.client.java.json.JsonObject;
 import liquibase.serializer.AbstractLiquibaseSerializable;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
  */
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Document extends AbstractLiquibaseSerializable {
@@ -34,35 +36,11 @@ public class Document extends AbstractLiquibaseSerializable {
     }
 
     public static Document document(String id, String content, DataType type) {
-        return new Document(id, new Value(content, type));
-    }
-
-    public Document data(String data) {
-        this.value.setData(data);
-        return this;
-    }
-
-    public Document id(String id) {
-        this.setId(id);
-        return this;
-    }
-
-    public Document type(String type) {
-        this.value.setType(type);
-        return this;
-    }
-
-    public Document value(Value value) {
-        this.setValue(value);
-        return this;
-    }
-
-    public static Document document(String id, String content, String type) {
-        return new Document().id(id).data(content).type(type);
+        return Document.builder().id(id).value(new Value(content, type)).build();
     }
 
     public static Document document(String id, Value value) {
-        return new Document().id(id).value(value);
+        return Document.builder().id(id).value(value).build();
     }
 
     public Object getContentAsObject() {

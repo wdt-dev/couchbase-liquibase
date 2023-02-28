@@ -5,6 +5,7 @@ import com.couchbase.client.java.json.JsonObject;
 import liquibase.ext.couchbase.exception.MutateInTypeUnsupportedException;
 import liquibase.serializer.AbstractLiquibaseSerializable;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
  * @see liquibase.serializer.LiquibaseSerializable
  */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
