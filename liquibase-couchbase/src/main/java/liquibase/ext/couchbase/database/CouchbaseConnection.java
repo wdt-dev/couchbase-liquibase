@@ -26,6 +26,21 @@ import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.ClusterOptions;
 import com.couchbase.client.java.transactions.config.TransactionOptions;
 import com.couchbase.client.java.transactions.error.TransactionFailedException;
+
+import liquibase.ext.couchbase.exception.TransactionalReactiveStatementExecutionException;
+import liquibase.ext.couchbase.executor.TransactionalReactiveStatementQueue;
+import liquibase.ext.couchbase.types.CouchbaseReactiveTransactionAction;
+import org.apache.commons.lang3.StringUtils;
+
+import java.sql.Driver;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+
 import liquibase.Scope;
 import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
@@ -69,9 +84,12 @@ import static liquibase.ext.couchbase.database.Constants.COUCHBASE_PRODUCT_SHORT
 @NoArgsConstructor
 public class CouchbaseConnection implements DatabaseConnection {
 
+    public static final int TRANSACTION_WAIT_TIME = 20; //TODO to properties
+    public static final int REACTIVE_TRANSACTION_PARALLEL_THREADS = 16; //TODO to properties
     private final TransactionalStatementQueue transactionalStatementQueue = Scope.getCurrentScope()
             .getSingleton(TransactionalStatementQueue.class);
-    private final TransactionOptions transactionOptions = transactionOptions().timeout(TRANSACTION_TIMEOUT.getCurrentValue());
+    private final TransactionalReactiveStatementQueue transactionalReactiveStatementQueue = Scope.getCurrentScope()
+            .getSingleton(TransactionalReactiveStatementQueue.class);
     private ConnectionString connectionString;
     private Cluster cluster;
     private Bucket database;
@@ -102,6 +120,7 @@ public class CouchbaseConnection implements DatabaseConnection {
     @Override
     public void rollback() {
         transactionalStatementQueue.clear();
+        transactionalReactiveStatementQueue.clear();
     }
 
     @Override
@@ -209,17 +228,46 @@ public class CouchbaseConnection implements DatabaseConnection {
 
     @Override
     public void commit() {
+        executeTransactions();
+        executeTransactionsReactive();
+    }
+
+    private void executeTransactions() {
         if (transactionalStatementQueue.isEmpty()) {
             return;
         }
 
         try {
+            TransactionOptions options = transactionOptions().timeout(ofMinutes(TRANSACTION_WAIT_TIME));
             cluster.transactions()
-                    .run(ctx -> transactionalStatementQueue.forEach(it -> it.accept(ctx)), transactionOptions);
+                    .run(ctx -> transactionalStatementQueue.stream().parallel().forEach(it -> it.accept(ctx)), options);
         } catch (TransactionFailedException e) {
             throw new TransactionalStatementExecutionException(e);
         } finally {
             transactionalStatementQueue.clear();
+        }
+    }
+
+    private void executeTransactionsReactive() {
+        if (transactionalReactiveStatementQueue.isEmpty()) {
+            return;
+        }
+
+        try {
+            TransactionOptions options = transactionOptions().timeout(ofMinutes(TRANSACTION_WAIT_TIME));
+            Flux<CouchbaseReactiveTransactionAction> statements = Flux.fromIterable(transactionalReactiveStatementQueue);
+            cluster.reactive().transactions()
+                    .run(ctx -> statements
+                            .parallel(REACTIVE_TRANSACTION_PARALLEL_THREADS)
+                            .runOn(Schedulers.boundedElastic())
+                            .concatMap(action -> action.apply(ctx))
+                            .sequential()
+                            .then(), options)
+                    .block();
+        } catch (TransactionFailedException e) {
+            throw new TransactionalReactiveStatementExecutionException(e);
+        } finally {
+            transactionalReactiveStatementQueue.clear();
         }
     }
 

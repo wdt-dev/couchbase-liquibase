@@ -11,6 +11,7 @@ import liquibase.ext.couchbase.exception.TransactionalStatementExecutionExceptio
 import liquibase.ext.couchbase.operator.ClusterOperator;
 import liquibase.ext.couchbase.statement.CouchbaseStatement;
 import liquibase.ext.couchbase.statement.CouchbaseTransactionStatement;
+import liquibase.ext.couchbase.types.CouchbaseReactiveTransactionAction;
 import liquibase.ext.couchbase.types.CouchbaseTransactionAction;
 import liquibase.logging.Logger;
 import liquibase.servicelocator.LiquibaseService;
@@ -18,6 +19,7 @@ import liquibase.sql.visitor.SqlVisitor;
 import liquibase.statement.SqlStatement;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -35,9 +37,11 @@ public class CouchbaseExecutor extends NoSqlExecutor {
 
     public static final String EXECUTOR_NAME = "jdbc";
     private final Logger log = Scope.getCurrentScope()
-        .getLog(getClass());
+            .getLog(getClass());
     private final TransactionalStatementQueue transactionalStatementQueue = Scope.getCurrentScope()
-        .getSingleton(TransactionalStatementQueue.class);
+            .getSingleton(TransactionalStatementQueue.class);
+    private static final TransactionalReactiveStatementQueue reactiveTransactionalStatementQueue = Scope.getCurrentScope()
+            .getSingleton(TransactionalReactiveStatementQueue.class);
 
 
     @Override
@@ -49,19 +53,28 @@ public class CouchbaseExecutor extends NoSqlExecutor {
         }
 
         if (sql instanceof CouchbaseTransactionStatement) {
-            CouchbaseTransactionAction statement = buildTransactionalAction((CouchbaseTransactionStatement) sql);
-            transactionalStatementQueue.add(statement);
+            ClusterOperator clusterOperator = new ClusterOperator(getDatabase().getConnection()
+                    .getCluster());
+            CouchbaseTransactionStatement transactionStatement = (CouchbaseTransactionStatement) sql;
+            if (transactionStatement.isReactive()) {
+                CouchbaseReactiveTransactionAction action = transactionStatement.asTransactionReactiveAction(clusterOperator);
+                reactiveTransactionalStatementQueue.add(action);
+            }
+            else {
+                CouchbaseTransactionAction action = buildTransactionalAction((CouchbaseTransactionStatement) sql);
+                transactionalStatementQueue.add(action);
+            }
             return;
         }
 
         throw new IllegalArgumentException("Couchbase cannot execute " + sql.getClass()
-            .getName() + " statements");
+                .getName() + " statements");
     }
 
     private void doExecute(CouchbaseStatement sql) {
         try {
             ClusterOperator clusterOperator = new ClusterOperator(getDatabase().getConnection()
-                .getCluster());
+                    .getCluster());
             sql.execute(clusterOperator);
         } catch (final Exception e) {
             throw new StatementExecutionException(sql.getClass(), e);
@@ -71,7 +84,7 @@ public class CouchbaseExecutor extends NoSqlExecutor {
     private CouchbaseTransactionAction buildTransactionalAction(CouchbaseTransactionStatement sql) {
         try {
             ClusterOperator clusterOperator = new ClusterOperator(getDatabase().getConnection()
-                .getCluster());
+                    .getCluster());
             return sql.asTransactionAction(clusterOperator);
         } catch (final TransactionFailedException e) {
             throw new TransactionalStatementExecutionException(sql.getClass(), e);

@@ -1,14 +1,19 @@
 package liquibase.ext.couchbase.statement;
 
+import com.couchbase.client.java.transactions.ReactiveTransactionAttemptContext;
 import com.couchbase.client.java.transactions.TransactionAttemptContext;
-
-import java.util.function.Consumer;
-
 import liquibase.ext.couchbase.database.CouchbaseConnection;
 import liquibase.ext.couchbase.executor.TransactionalStatementQueue;
 import liquibase.ext.couchbase.operator.ClusterOperator;
+import liquibase.ext.couchbase.types.CouchbaseReactiveTransactionAction;
 import liquibase.ext.couchbase.types.CouchbaseTransactionAction;
 import liquibase.statement.SqlStatement;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.reactivestreams.Publisher;
+
+import java.util.function.Consumer;
 
 /**
  * A baseline for all Couchbase statements which should be executed inside one transaction (DML). Uses {@link ClusterOperator} to execute
@@ -19,13 +24,25 @@ import liquibase.statement.SqlStatement;
  * @see ClusterOperator
  */
 
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public abstract class CouchbaseTransactionStatement extends NoSqlStatement {
+
+    private boolean isReactive;
 
     public CouchbaseTransactionAction asTransactionAction(ClusterOperator clusterOperator) {
         return transaction -> doInTransaction(transaction, clusterOperator);
     }
 
+    public CouchbaseReactiveTransactionAction asTransactionReactiveAction(ClusterOperator clusterOperator) {
+        return transaction -> doInTransactionReactive(transaction, clusterOperator);
+    }
+
     public abstract void doInTransaction(TransactionAttemptContext transaction,
                                          ClusterOperator clusterOperator);
+
+    public abstract Publisher<?> doInTransactionReactive(ReactiveTransactionAttemptContext transaction,
+                                                         ClusterOperator clusterOperator);
 
 }
