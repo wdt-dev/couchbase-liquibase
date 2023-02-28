@@ -68,6 +68,10 @@ public class ClusterOperator {
         cluster.buckets().createBucket(settings, options);
     }
 
+    public void dropBucket(String bucketName) {
+        cluster.buckets().dropBucket(bucketName);
+    }
+
     public QueryIndexManager getQueryIndexes() {
         return cluster.queryIndexes();
     }
@@ -100,6 +104,10 @@ public class ClusterOperator {
         } catch (BucketNotFoundException ex) {
             return false;
         }
+    }
+
+    public void dropBucket(String name) {
+        cluster.buckets().dropBucket(name);
     }
 
     public void dropIndex(String indexName, Keyspace keyspace) {

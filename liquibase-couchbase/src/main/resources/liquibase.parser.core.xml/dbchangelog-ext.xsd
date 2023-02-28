@@ -204,7 +204,16 @@
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
+                <xsd:element name="ignoreIfExists" type="xsd:boolean"/>
 			</xsd:all>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="dropBucket">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="bucketName" type="xsd:string"/>
+			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
 
@@ -246,6 +255,9 @@
 							<xsd:enumeration value="ARRAY_INSERT_UNIQUE"/>
 							<xsd:enumeration value="INCREMENT"/>
 							<xsd:enumeration value="DECREMENT"/>
+							<xsd:enumeration value="UPSERT"/>
+							<xsd:enumeration value="REPLACE"/>
+							<xsd:enumeration value="REMOVE"/>
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
@@ -272,6 +284,8 @@
 							<xsd:enumeration value="Double"/>
 							<xsd:enumeration value="Boolean"/>
 							<xsd:enumeration value="String"/>
+							<xsd:enumeration value="Json"/>
+							<xsd:enumeration value="JsonArray"/>
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:element>
