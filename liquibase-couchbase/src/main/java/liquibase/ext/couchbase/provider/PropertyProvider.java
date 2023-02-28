@@ -40,6 +40,7 @@ public interface PropertyProvider {
         return property;
     }
 
+    @NonNull
     static String findPropertyValue(String name, Properties properties) {
         String environmentValue = System.getenv(name);
         if (environmentValue != null) {
