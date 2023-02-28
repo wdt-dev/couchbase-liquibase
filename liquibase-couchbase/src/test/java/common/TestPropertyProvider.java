@@ -1,19 +1,17 @@
 package common;
 
+import liquibase.ext.couchbase.provider.PropertyProvider;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileReader;
 import java.util.Properties;
 
-import lombok.SneakyThrows;
-
 import static common.constants.TestConstants.PROPERTY_FILE_NAME;
 
-public class PropertyProvider {
+public class TestPropertyProvider implements PropertyProvider {
 
-
-    private static final Properties fileProperties = readPropertiesFile();
-
+    private static final Properties testProperties = readPropertiesFile();
 
     /**
      * Lookup firstly in Env properties and then in property file
@@ -24,17 +22,7 @@ public class PropertyProvider {
      */
     @NotNull
     public static String getProperty(String name) {
-        String environmentValue = System.getProperty(name);
-        if (environmentValue != null) {
-            return environmentValue;
-        }
-
-        String property = fileProperties.getProperty(name);
-        if (property == null) {
-            throw new IllegalArgumentException("No such registered property: " + name);
-        }
-
-        return property;
+        return PropertyProvider.getProperty(name, testProperties);
     }
 
     @SneakyThrows
