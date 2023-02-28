@@ -240,7 +240,7 @@ public class CouchbaseConnection implements DatabaseConnection {
         try {
             TransactionOptions options = transactionOptions().timeout(ofMinutes(TRANSACTION_WAIT_TIME));
             cluster.transactions()
-                    .run(ctx -> transactionalStatementQueue.stream().parallel().forEach(it -> it.accept(ctx)), options);
+                    .run(ctx -> transactionalStatementQueue.forEach(it -> it.accept(ctx)), options);
         } catch (TransactionFailedException e) {
             throw new TransactionalStatementExecutionException(e);
         } finally {
