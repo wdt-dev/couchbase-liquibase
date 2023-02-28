@@ -33,11 +33,9 @@ import liquibase.ext.couchbase.types.CouchbaseReactiveTransactionAction;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Driver;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -84,7 +82,7 @@ import static liquibase.ext.couchbase.database.Constants.COUCHBASE_PRODUCT_SHORT
 @NoArgsConstructor
 public class CouchbaseConnection implements DatabaseConnection {
 
-    public static final int TRANSACTION_WAIT_TIME = 20; //TODO to properties
+    public static final int TRANSACTION_WAIT_TIME_IN_MIN = 20; //TODO to properties and change to seconds
     public static final int REACTIVE_TRANSACTION_PARALLEL_THREADS = 16; //TODO to properties
     private final TransactionalStatementQueue transactionalStatementQueue = Scope.getCurrentScope()
             .getSingleton(TransactionalStatementQueue.class);
@@ -238,7 +236,7 @@ public class CouchbaseConnection implements DatabaseConnection {
         }
 
         try {
-            TransactionOptions options = transactionOptions().timeout(ofMinutes(TRANSACTION_WAIT_TIME));
+            TransactionOptions options = transactionOptions().timeout(ofMinutes(TRANSACTION_WAIT_TIME_IN_MIN));
             cluster.transactions()
                     .run(ctx -> transactionalStatementQueue.forEach(it -> it.accept(ctx)), options);
         } catch (TransactionFailedException e) {
@@ -254,7 +252,7 @@ public class CouchbaseConnection implements DatabaseConnection {
         }
 
         try {
-            TransactionOptions options = transactionOptions().timeout(ofMinutes(TRANSACTION_WAIT_TIME));
+            TransactionOptions options = transactionOptions().timeout(ofMinutes(TRANSACTION_WAIT_TIME_IN_MIN));
             Flux<CouchbaseReactiveTransactionAction> statements = Flux.fromIterable(transactionalReactiveStatementQueue);
             cluster.reactive().transactions()
                     .run(ctx -> statements
