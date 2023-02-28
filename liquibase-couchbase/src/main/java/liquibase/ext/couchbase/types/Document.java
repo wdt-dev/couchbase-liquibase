@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class Document extends AbstractLiquibaseSerializable {
 
     private String id;
-    private String content;
+    private Value value = new Value();
 
     @Override
     public String getSerializedObjectName() {
@@ -33,20 +33,48 @@ public class Document extends AbstractLiquibaseSerializable {
         return STANDARD_CHANGELOG_NAMESPACE;
     }
 
-    public static Document document(String id, String content) {
-        return new Document(id, content);
+    public static Document document(String id, String content, DataType type) {
+        return new Document(id, new Value(content, type));
     }
 
-    public static Document document(String id, JsonObject content) {
-        return new Document(id, content.toString());
+    public Document data(String data) {
+        this.value.setData(data);
+        return this;
     }
 
-    public JsonObject getContentAsObject() {
-        return JsonObject.fromJson(content);
+    public Document id(String id) {
+        this.setId(id);
+        return this;
+    }
+
+    public Document type(String type) {
+        this.value.setType(type);
+        return this;
+    }
+
+    public Document value(Value value) {
+        this.setValue(value);
+        return this;
+    }
+
+    public static Document document(String id, String content, String type) {
+        return new Document().id(id).data(content).type(type);
+    }
+
+    public static Document document(String id, Value value) {
+        return new Document().id(id).value(value);
+    }
+
+    public Object getContentAsObject() {
+        return value.mapDataToType();
+    }
+
+    public JsonObject getContentAsJson() {
+        return (JsonObject) getContentAsObject();
     }
 
     public List<Field> getFields() {
-        return getContentAsObject().getNames().stream().map(Field::new).collect(Collectors.toList());
+        return getContentAsJson().getNames().stream().map(Field::new).collect(Collectors.toList());
     }
 
     @Override

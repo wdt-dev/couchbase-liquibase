@@ -23,7 +23,7 @@ import static org.mockito.internal.util.collections.Iterables.firstOf;
 public class UpsertOneChangeTest {
 
     private ChangeLogProvider changeLogProvider;
-    private final Document doc = new Document(TEST_ID, "{key:value}");
+    private final Document doc = new Document().id(TEST_ID).type("Json").data("{key:value}");
 
     @BeforeEach
     void setUp() {
