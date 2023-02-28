@@ -1,13 +1,11 @@
 package liquibase.ext.couchbase.executor;
 
-import com.couchbase.client.java.transactions.error.TransactionFailedException;
 import liquibase.Scope;
 import liquibase.database.Database;
 import liquibase.exception.DatabaseException;
 import liquibase.executor.AbstractExecutor;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.exception.StatementExecutionException;
-import liquibase.ext.couchbase.exception.TransactionalStatementExecutionException;
 import liquibase.ext.couchbase.operator.ClusterOperator;
 import liquibase.ext.couchbase.statement.CouchbaseStatement;
 import liquibase.ext.couchbase.statement.CouchbaseTransactionStatement;
@@ -19,7 +17,6 @@ import liquibase.sql.visitor.SqlVisitor;
 import liquibase.statement.SqlStatement;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -61,7 +58,7 @@ public class CouchbaseExecutor extends NoSqlExecutor {
                 reactiveTransactionalStatementQueue.add(action);
             }
             else {
-                CouchbaseTransactionAction action = buildTransactionalAction(transactionStatement);
+                CouchbaseTransactionAction action = transactionStatement.asTransactionAction(clusterOperator);
                 transactionalStatementQueue.add(action);
             }
             return;
@@ -78,16 +75,6 @@ public class CouchbaseExecutor extends NoSqlExecutor {
             sql.execute(clusterOperator);
         } catch (final Exception e) {
             throw new StatementExecutionException(sql.getClass(), e);
-        }
-    }
-
-    private CouchbaseTransactionAction buildTransactionalAction(CouchbaseTransactionStatement sql) {
-        try {
-            ClusterOperator clusterOperator = new ClusterOperator(getDatabase().getConnection()
-                    .getCluster());
-            return sql.asTransactionAction(clusterOperator);
-        } catch (final TransactionFailedException e) {
-            throw new TransactionalStatementExecutionException(sql.getClass(), e);
         }
     }
 
