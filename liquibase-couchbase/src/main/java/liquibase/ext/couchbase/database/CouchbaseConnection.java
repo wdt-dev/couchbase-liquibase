@@ -82,8 +82,8 @@ import static liquibase.ext.couchbase.database.Constants.COUCHBASE_PRODUCT_SHORT
 @NoArgsConstructor
 public class CouchbaseConnection implements DatabaseConnection {
 
-    public static final int TRANSACTION_WAIT_TIME_IN_MIN = 20; //TODO to properties and change to seconds
-    public static final int REACTIVE_TRANSACTION_PARALLEL_THREADS = 16; //TODO to properties
+    private static final int TRANSACTION_WAIT_TIME_IN_MIN = 20; //TODO to properties and change to seconds
+    private static final int REACTIVE_TRANSACTION_PARALLEL_THREADS = 16; //TODO to properties
     private final TransactionalStatementQueue transactionalStatementQueue = Scope.getCurrentScope()
             .getSingleton(TransactionalStatementQueue.class);
     private final TransactionalReactiveStatementQueue transactionalReactiveStatementQueue = Scope.getCurrentScope()
