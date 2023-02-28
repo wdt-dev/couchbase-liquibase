@@ -24,12 +24,11 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet id="1" author="zorik">
-		<ext:createScope>
-			<ext:bucketName>testBucket</ext:bucketName>
-			<ext:scopeName>testScopeName</ext:scopeName>
-			<ext:collectionName>testCollection</ext:collectionName>
-		</ext:createScope>
-	</changeSet>
+    <changeSet id="1" author="zorik">
+        <ext:createScope>
+            <ext:bucketName>testBucket</ext:bucketName>
+            <ext:scopeName>testScopeName</ext:scopeName>
+        </ext:createScope>
+    </changeSet>
 
 </databaseChangeLog>

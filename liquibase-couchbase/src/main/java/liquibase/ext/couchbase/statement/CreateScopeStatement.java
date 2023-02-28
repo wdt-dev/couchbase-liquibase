@@ -1,6 +1,5 @@
 package liquibase.ext.couchbase.statement;
 
-import liquibase.ext.couchbase.database.CouchbaseConnection;
 import liquibase.ext.couchbase.operator.ClusterOperator;
 import liquibase.ext.couchbase.types.Keyspace;
 import lombok.EqualsAndHashCode;
@@ -21,10 +20,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CreateScopeStatement extends CouchbaseStatement {
     private final String scopeName;
-    private final Keyspace keyspace;
+    private final String bucketName;
 
     @Override
-    public void execute(CouchbaseConnection connection) {
-        new ClusterOperator(connection.getCluster()).createScope(scopeName, keyspace);
+    public void execute(ClusterOperator clusterOperator){
+        clusterOperator.getBucketOperator(bucketName).createScope(scopeName);
     }
 }

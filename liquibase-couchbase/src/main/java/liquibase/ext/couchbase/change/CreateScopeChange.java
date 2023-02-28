@@ -13,14 +13,9 @@ import lombok.Setter;
 import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 
 /**
- *
  * Part of change set package. Responsible for create scope with specified name
- *
+ * @link <a href="https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/createscope.html">Reference documentation</a>
  * @see CreateScopeStatement
- *
- * @link <a href="https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/createscope.html">Reference
- * documentation</a>
- *
  */
 
 @DatabaseChange(
@@ -37,18 +32,16 @@ import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 public class CreateScopeChange extends CouchbaseChange {
     private String bucketName;
     private String scopeName;
-    private String collectionName;
 
     @Override
     public String getConfirmationMessage() {
-        return String.format("%s has been successfully created", scopeName);
+        return String.format("Scope %s has been successfully created", scopeName);
     }
 
     @Override
     public SqlStatement[] generateStatements() {
-        Keyspace keyspace = keyspace(bucketName, scopeName,collectionName);
-        return new SqlStatement[]{
-            new CreateScopeStatement(scopeName, keyspace)
+        return new SqlStatement[] {
+                new CreateScopeStatement(scopeName, bucketName)
         };
     }
 
