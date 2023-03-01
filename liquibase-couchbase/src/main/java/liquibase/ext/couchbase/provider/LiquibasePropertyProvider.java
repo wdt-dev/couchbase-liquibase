@@ -33,7 +33,9 @@ public class LiquibasePropertyProvider implements PropertyProvider {
     @SneakyThrows
     private static Properties readLiquibasePropertiesFile() {
         Properties properties = new Properties();
-        properties.load(new FileReader(findLiquibaseFileFromRoot()));
+        try (FileReader fileReader = new FileReader(findLiquibaseFileFromRoot())) {
+            properties.load(fileReader);
+        }
         return properties;
     }
 

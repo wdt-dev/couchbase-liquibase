@@ -27,9 +27,11 @@ public class TestPropertyProvider implements PropertyProvider {
 
     @SneakyThrows
     private static Properties readPropertiesFile() {
-        Properties p = new Properties();
-        p.load(new FileReader(PROPERTY_FILE_NAME));
-        return p;
+        Properties properties = new Properties();
+        try (FileReader fileReader = new FileReader(PROPERTY_FILE_NAME)) {
+            properties.load(fileReader);
+        }
+        return properties;
     }
 
 }
