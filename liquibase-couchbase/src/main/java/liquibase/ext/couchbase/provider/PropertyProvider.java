@@ -5,6 +5,8 @@ import lombok.NonNull;
 
 import java.util.Properties;
 
+import static java.util.Optional.ofNullable;
+
 public interface PropertyProvider {
 
 
@@ -17,12 +19,8 @@ public interface PropertyProvider {
      */
     @NonNull
     static String getProperty(String name, Properties properties) {
-        String property = findPropertyValue(name, properties);
-        if (property == null) {
-            throw new IllegalArgumentException("No such registered property: " + name);
-        }
-
-        return property;
+        return ofNullable(findPropertyValue(name, properties))
+                .orElseThrow(() -> new IllegalArgumentException("No such registered property: " + name));
     }
 
     /**
@@ -32,22 +30,13 @@ public interface PropertyProvider {
      */
     @NonNull
     static String getPropertyOrDefault(String name, String defaultValue, Properties properties) {
-        String property = findPropertyValue(name, properties);
-        if (property == null) {
-            return defaultValue;
-        }
-
-        return property;
+        return ofNullable(findPropertyValue(name, properties))
+                .orElse(defaultValue);
     }
 
-    @NonNull
-    static String findPropertyValue(String name, Properties properties) {
-        String environmentValue = System.getenv(name);
-        if (environmentValue != null) {
-            return environmentValue;
-        }
-
-        return properties.getProperty(name);
+    static String findPropertyValue(@NonNull String name, @NonNull Properties properties) {
+        return ofNullable(System.getenv(name))
+                .orElse(properties.getProperty(name));
     }
 
 }

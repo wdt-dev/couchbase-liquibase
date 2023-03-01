@@ -63,7 +63,7 @@ public class CouchbaseLockService implements LockService {
     };
 
     /**
-     * Time to wait for the lock to be acquired, in milliseconds. Default value is 5 minutes.
+     * Time to wait for the lock to be acquired, in milliseconds. Default value is 300 seconds.
      */
     @Setter(onMethod = @__({@Override}))
     private long changeLogLockWaitTime = TimeUnit.SECONDS.toMillis(WAIT_LOCK_TIME);
