@@ -14,7 +14,7 @@ public class ConstantScopeTestCase extends CouchbaseContainerizedTest {
     protected static final TestBucketOperator bucketOperator = new TestBucketOperator(cluster);
 
     static {
-        bucketOperator.createScope(TEST_SCOPE);
-        bucketOperator.createCollection(TEST_COLLECTION, TEST_SCOPE);
+        bucketOperator.createDefaultTestScope();
+        bucketOperator.createDefaultTestCollection();
     }
 }
