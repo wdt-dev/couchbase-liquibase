@@ -7,7 +7,6 @@ import common.operators.TestBucketOperator;
 import common.operators.TestClusterOperator;
 import liquibase.Liquibase;
 import liquibase.exception.ValidationFailedException;
-import liquibase.ext.couchbase.provider.ServiceProvider;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
