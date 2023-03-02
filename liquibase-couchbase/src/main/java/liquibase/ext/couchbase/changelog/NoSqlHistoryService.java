@@ -6,15 +6,14 @@ import liquibase.changelog.ChangeSet;
 import liquibase.changelog.RanChangeSet;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.DatabaseHistoryException;
-import liquibase.ext.couchbase.provider.ContextServiceProvider;
-import liquibase.ext.couchbase.provider.ServiceProvider;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.operator.ChangeLogOperator;
+import liquibase.ext.couchbase.provider.ContextServiceProvider;
+import liquibase.ext.couchbase.provider.ServiceProvider;
 import liquibase.ext.couchbase.types.Keyspace;
 import liquibase.logging.Logger;
 import lombok.Getter;
 import lombok.Setter;
-import org.checkerframework.checker.units.qual.K;
 
 import java.util.List;
 
@@ -28,8 +27,8 @@ import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 import static liquibase.plugin.Plugin.PRIORITY_SPECIALIZED;
 
 /**
- * Abstract class for all NoSQL history services, extends {@link AbstractChangeLogHistoryService}<br><br>
- * {@link CouchbaseHistoryService} is the default implementation for Couchbase
+ * Abstract class for all NoSQL history services, extends {@link AbstractChangeLogHistoryService}<br><br> {@link CouchbaseHistoryService} is
+ * the default implementation for Couchbase
  * @see ChangeLogOperator
  * @see RanChangeSet
  */
