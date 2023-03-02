@@ -10,15 +10,21 @@ import liquibase.ext.couchbase.provider.ContextServiceProvider;
 import liquibase.ext.couchbase.provider.ServiceProvider;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.operator.ChangeLogOperator;
+import liquibase.ext.couchbase.types.Keyspace;
 import liquibase.logging.Logger;
 import lombok.Getter;
 import lombok.Setter;
+import org.checkerframework.checker.units.qual.K;
 
 import java.util.List;
 
+import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.isNull;
 import static liquibase.ext.couchbase.provider.ServiceProvider.CHANGE_LOG_COLLECTION;
+import static liquibase.ext.couchbase.provider.ServiceProvider.DEFAULT_SERVICE_SCOPE;
+import static liquibase.ext.couchbase.provider.ServiceProvider.SERVICE_BUCKET_NAME;
+import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 import static liquibase.plugin.Plugin.PRIORITY_SPECIALIZED;
 
 /**
@@ -32,6 +38,8 @@ import static liquibase.plugin.Plugin.PRIORITY_SPECIALIZED;
 @Setter
 public abstract class NoSqlHistoryService extends AbstractChangeLogHistoryService {
 
+    private static final String CREATING_TEMPLATE = "Creating history collection with name: %s";
+    private static final String CREATED_TEMPLATE = "Created history collection: %s";
     private Integer lastChangeLogOrder;
     private List<RanChangeSet> ranChangeSetList;
     private ChangeLogOperator changeLogOperator;
@@ -48,18 +56,17 @@ public abstract class NoSqlHistoryService extends AbstractChangeLogHistoryServic
     }
 
     @Override
-    public void init() throws DatabaseException {
+    public void init() {
         changeLogOperator = new ChangeLogOperator(getDatabase());
         serviceProvider = new ContextServiceProvider(getDatabase());
         if (!existsChangeLogCollection()) {
             log.info("Create Change Log Collection");
 
             // If there is no table in the database for recording change history create one.
-            log.info("Creating history collection with name: "
-                    + getDatabase().getConnection().getCatalog() + "." + CHANGE_LOG_COLLECTION);
+            Keyspace keyspace = keyspace(SERVICE_BUCKET_NAME, DEFAULT_SERVICE_SCOPE, CHANGE_LOG_COLLECTION);
+            log.info(format(CREATING_TEMPLATE, keyspace.getKeyspace()));
             createRepository();
-            log.info("Created history collection : "
-                    + getDatabase().getConnection().getCatalog() + "." + CHANGE_LOG_COLLECTION);
+            log.info(format(CREATED_TEMPLATE, keyspace.getKeyspace()));
         }
     }
 
