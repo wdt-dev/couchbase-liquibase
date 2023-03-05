@@ -1,0 +1,43 @@
+package liquibase.ext.couchbase.types;
+
+import liquibase.serializer.AbstractLiquibaseSerializable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+/**
+ * File to import
+ * @see AbstractLiquibaseSerializable
+ * @see liquibase.serializer.LiquibaseSerializable
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class File extends AbstractLiquibaseSerializable {
+
+    private String filePath;
+    private ImportType importType;
+
+    @Override
+    public String getSerializedObjectName() {
+        return "file";
+    }
+
+    @Override
+    public String getSerializedObjectNamespace() {
+        return STANDARD_CHANGELOG_NAMESPACE;
+    }
+
+    @Override
+    public SerializationType getSerializableFieldType(String field) {
+        return SerializationType.DIRECT_VALUE;
+    }
+
+    public void setImportType(String importType) {
+        this.importType = ImportType.getByName(importType);
+    }
+}

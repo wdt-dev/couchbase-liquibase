@@ -4,16 +4,20 @@ package liquibase.ext.couchbase.change;
 import liquibase.change.ChangeMetaData;
 import liquibase.change.DatabaseChange;
 import liquibase.ext.couchbase.statement.InsertDocumentsStatement;
+import liquibase.ext.couchbase.statement.InsertFromFileStatement;
 import liquibase.ext.couchbase.types.Document;
+import liquibase.ext.couchbase.types.File;
 import liquibase.ext.couchbase.types.Keyspace;
 import liquibase.statement.SqlStatement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 
@@ -37,10 +41,10 @@ import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 public class InsertDocumentsChange extends CouchbaseChange {
 
     private String bucketName;
-    private String id;
     private String scopeName;
     private String collectionName;
     private List<Document> documents = new ArrayList<>();
+    private File file = new File();
 
     @Override
     public String getConfirmationMessage() {
@@ -50,8 +54,10 @@ public class InsertDocumentsChange extends CouchbaseChange {
     @Override
     public SqlStatement[] generateStatements() {
         Keyspace keyspace = keyspace(bucketName, scopeName, collectionName);
+        Optional<String> hasFile = Optional.ofNullable(file).map(File::getFilePath).filter(StringUtils::isNotBlank);
         return new SqlStatement[] {
-                new InsertDocumentsStatement(keyspace, documents)
+                hasFile.isPresent() ? new InsertFromFileStatement(keyspace, file) :
+                        new InsertDocumentsStatement(keyspace, documents)
         };
     }
 
