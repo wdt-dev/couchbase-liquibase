@@ -29,7 +29,7 @@ public class CouchbaseLiquibaseConfiguration implements AutoloadedConfigurations
                 .build();
 
         CHANGELOG_WAIT_TIME = builder.define("changelogWaitTime", Duration.class)
-                .addAliasKey("liquibase.couchbase.changelogWaitTime")
+                .addAliasKey("liquibase.couchbase.lockservice.changelogWaitTime")
                 .setDescription("Time limit to wait for lock in LockService")
                 .setDefaultValue(Duration.ofSeconds(300L))
                 .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
