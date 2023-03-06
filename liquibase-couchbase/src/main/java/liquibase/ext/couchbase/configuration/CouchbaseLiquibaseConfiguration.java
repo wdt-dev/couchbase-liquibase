@@ -22,7 +22,7 @@ public class CouchbaseLiquibaseConfiguration implements AutoloadedConfigurations
         ConfigurationDefinition.Builder builder = new ConfigurationDefinition.Builder("liquibase.couchbase");
 
         CHANGELOG_RECHECK_TIME = builder.define("changelogRecheckTime", Duration.class)
-                .addAliasKey("liquibase.couchbase.changelogRecheckTime")
+                .addAliasKey("liquibase.couchbase.lockservice.changelogRecheckTime")
                 .setDescription("Change log recheck time")
                 .setDefaultValue(Duration.ofSeconds(10L))
                 .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
@@ -47,17 +47,18 @@ public class CouchbaseLiquibaseConfiguration implements AutoloadedConfigurations
                 .setDefaultValue("liquibaseServiceBucket")
                 .build();
 
-
-        LOCK_TTL_PROLONGATION = builder.define("lockservice.ttl-prolongation", Duration.class)
-                .addAliasKey("liquibase.couchbase.lockservice.ttl-prolongation")
+        LOCK_TTL_PROLONGATION = builder.define("ttlProlongation", Duration.class)
+                .addAliasKey("liquibase.couchbase.lockservice.ttlProlongation")
                 .setDescription("Liquibase locks prolongation time")
                 .setDefaultValue(Duration.ofMinutes(1L))
+                .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
                 .build();
 
-        LOCK_TTL = builder.define("lockservice.lock-ttl", Duration.class)
-                .addAliasKey("liquibase.couchbase.lockservice.lock-ttl")
+        LOCK_TTL = builder.define("lockTtl", Duration.class)
+                .addAliasKey("liquibase.couchbase.lockservice.lockTtl")
                 .setDescription("Liquibase locks time to live")
                 .setDefaultValue(Duration.ofMinutes(3L))
+                .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
                 .build();
     }
 
