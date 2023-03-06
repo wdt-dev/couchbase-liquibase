@@ -4,47 +4,43 @@ import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.core.error.DocumentExistsException;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.kv.InsertOptions;
-
-import java.time.Duration;
-import java.time.Instant;
-
 import liquibase.Scope;
 import liquibase.exception.LockException;
 import liquibase.ext.couchbase.types.Keyspace;
 import liquibase.logging.Logger;
 import lombok.RequiredArgsConstructor;
+
+import java.time.Duration;
+import java.time.Instant;
+
 import static com.couchbase.client.java.kv.InsertOptions.insertOptions;
-import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
+import static java.time.Duration.parse;
 import static liquibase.ext.couchbase.provider.LiquibasePropertyProvider.getPropertyOrDefault;
 
 /**
- * Collection based locker for {@link com.couchbase.client.java.Bucket Bucket}
- * Operates with documents in Liquibase service {@link Keyspace }
- *
+ * Collection based locker for {@link com.couchbase.client.java.Bucket Bucket} Operates with documents in Liquibase service
+ * {@link Keyspace }
  * @see CouchbaseLock
  * @see com.couchbase.client.core.service.ServiceScope
  */
 @RequiredArgsConstructor
 public class CouchbaseChangelogLocker {
     private final Logger log = Scope.getCurrentScope().getLog(CouchbaseChangelogLocker.class);
-    private static final int LOCK_TTL = parseInt(getPropertyOrDefault("service.lock.ttl", "180"));
-    private static final int LOCK_PROLONG_BY_TIME = parseInt(getPropertyOrDefault("service.lock.timeToProlongTtl", "60"));
 
     private final Collection collection;
     /**
      * liquibase lock ttl
      */
-    private final Duration expiry = Duration.ofSeconds(LOCK_TTL);
+    private final Duration expiry = parse(getPropertyOrDefault("service.lock.ttl", "PT3M"));
     /**
      * time which will be added to prolong the lock ttl
      */
-    private final Duration expiryProlongation = Duration.ofMinutes(LOCK_PROLONG_BY_TIME);
+    private final Duration expiryProlongation = parse(getPropertyOrDefault("service.lock.timeToProlongTtl", "PT1M"));
 
     /**
-     * Trying to acquire lock, attempt is success only when there is no such document with given bucketName.
-     * Inserts ${@link CouchbaseLock} in success.
-     *
+     * Trying to acquire lock, attempt is success only when there is no such document with given bucketName. Inserts ${@link CouchbaseLock}
+     * in success.
      * @param bucketName specific bucket name which we try to lock
      * @param owner      unique liquibase app service id
      * @return attempt result
@@ -59,7 +55,6 @@ public class CouchbaseChangelogLocker {
 
     /**
      * Trying release lock
-     *
      * @param lockId specific bucket name which we try to lock
      * @param owner  unique liquibase app service id
      * @throws LockException if it doesn't have ownership
@@ -74,7 +69,6 @@ public class CouchbaseChangelogLocker {
 
     /**
      * Checking whether it holds specific lock or not
-     *
      * @param lockId specific bucket name which we try to lock
      * @param owner  unique liquibase app service id
      */
@@ -91,7 +85,6 @@ public class CouchbaseChangelogLocker {
 
     /**
      * Releasing lock without any checks and ownership
-     *
      * @param lockId specific bucket name which we are trying to release
      */
     public void forceRelease(String lockId) {
@@ -104,7 +97,6 @@ public class CouchbaseChangelogLocker {
 
     /**
      * Add TTL to existing lock, maybe useful on long changesets
-     *
      * @param lockId specific bucket name which we prolong
      */
     public void refreshLockExpiry(String lockId) {
