@@ -15,6 +15,8 @@ public class CouchbaseLiquibaseConfiguration implements AutoloadedConfigurations
     public static final ConfigurationDefinition<String> CHANGELOG_LOCK_COLLECTION_NAME;
     public static final ConfigurationDefinition<Duration> CHANGELOG_WAIT_TIME;
     public static final ConfigurationDefinition<Duration> CHANGELOG_RECHECK_TIME;
+    public static final ConfigurationDefinition<Duration> LOCK_TTL;
+    public static final ConfigurationDefinition<Duration> LOCK_TTL_PROLONGATION;
 
     static {
         ConfigurationDefinition.Builder builder = new ConfigurationDefinition.Builder("liquibase.couchbase");
@@ -46,6 +48,17 @@ public class CouchbaseLiquibaseConfiguration implements AutoloadedConfigurations
                 .build();
 
 
+        LOCK_TTL_PROLONGATION = builder.define("lockservice.ttl-prolongation", Duration.class)
+                .addAliasKey("liquibase.couchbase.lockservice.ttl-prolongation")
+                .setDescription("Liquibase locks prolongation time")
+                .setDefaultValue(Duration.ofMinutes(1L))
+                .build();
+
+        LOCK_TTL = builder.define("lockservice.lock-ttl", Duration.class)
+                .addAliasKey("liquibase.couchbase.lockservice.lock-ttl")
+                .setDescription("Liquibase locks time to live")
+                .setDefaultValue(Duration.ofMinutes(3L))
+                .build();
     }
 
     private static Duration durationExtract(Object value) {
