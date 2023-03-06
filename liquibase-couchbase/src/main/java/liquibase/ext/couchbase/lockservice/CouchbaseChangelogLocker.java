@@ -29,7 +29,7 @@ import static liquibase.ext.couchbase.provider.LiquibasePropertyProvider.getProp
 public class CouchbaseChangelogLocker {
     private final Logger log = Scope.getCurrentScope().getLog(CouchbaseChangelogLocker.class);
     private static final int LOCK_TTL = parseInt(getPropertyOrDefault("service.lock.ttl", "180"));
-    private static final int LOCK_PROLONG_BY_TIME = parseInt(getPropertyOrDefault("service.lock.ttlToProlong", "60"));
+    private static final int LOCK_PROLONG_BY_TIME = parseInt(getPropertyOrDefault("service.lock.timeToProlongTtl", "60"));
 
     private final Collection collection;
     /**
