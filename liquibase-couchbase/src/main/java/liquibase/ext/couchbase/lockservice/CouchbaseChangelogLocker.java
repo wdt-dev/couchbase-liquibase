@@ -14,7 +14,9 @@ import liquibase.ext.couchbase.types.Keyspace;
 import liquibase.logging.Logger;
 import lombok.RequiredArgsConstructor;
 import static com.couchbase.client.java.kv.InsertOptions.insertOptions;
+import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
+import static liquibase.ext.couchbase.provider.LiquibasePropertyProvider.getPropertyOrDefault;
 
 /**
  * Collection based locker for {@link com.couchbase.client.java.Bucket Bucket}
@@ -26,10 +28,18 @@ import static java.lang.String.format;
 @RequiredArgsConstructor
 public class CouchbaseChangelogLocker {
     private final Logger log = Scope.getCurrentScope().getLog(CouchbaseChangelogLocker.class);
+    private static final int LOCK_TTL = parseInt(getPropertyOrDefault("service.lock.ttl", "180"));
+    private static final int LOCK_PROLONG_BY_TIME = parseInt(getPropertyOrDefault("service.lock.ttlToProlong", "60"));
 
     private final Collection collection;
-    private final Duration expiry = Duration.ofMinutes(3L);
-    private final Duration expiryProlongation = Duration.ofMinutes(1L);
+    /**
+     * liquibase lock ttl
+     */
+    private final Duration expiry = Duration.ofSeconds(LOCK_TTL);
+    /**
+     * time which will be added to prolong the lock ttl
+     */
+    private final Duration expiryProlongation = Duration.ofMinutes(LOCK_PROLONG_BY_TIME);
 
     /**
      * Trying to acquire lock, attempt is success only when there is no such document with given bucketName.

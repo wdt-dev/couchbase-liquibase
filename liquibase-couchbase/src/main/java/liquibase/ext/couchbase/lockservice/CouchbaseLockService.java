@@ -31,8 +31,8 @@ import static liquibase.plugin.Plugin.PRIORITY_SPECIALIZED;
 @LiquibaseService
 public class CouchbaseLockService implements LockService {
 
-    private static final int WAIT_LOCK_TIME = parseInt(getPropertyOrDefault("waitLockTimeInSec", "300"));
-    private static final int WAIT_RECHECK_LOCK_TIME = parseInt(getPropertyOrDefault("waitRecheckLockTimeInSec", "10"));
+    private static final int WAIT_LOCK_TIME = parseInt(getPropertyOrDefault("service.lock.waitForLockTimeInSec", "300"));
+    private static final int WAIT_RECHECK_LOCK_TIME = parseInt(getPropertyOrDefault("service.lock.recheckTimeInSec", "10"));
     public static final String LOCK_COLLECTION_NAME = "CHANGELOGLOCKS";
 
     private final Logger logger = Scope.getCurrentScope()
