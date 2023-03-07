@@ -1,5 +1,7 @@
 package liquibase.ext.couchbase.changelog;
 
+import java.util.List;
+
 import liquibase.Scope;
 import liquibase.changelog.AbstractChangeLogHistoryService;
 import liquibase.changelog.ChangeSet;
@@ -14,9 +16,6 @@ import liquibase.ext.couchbase.types.Keyspace;
 import liquibase.logging.Logger;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
-
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.isNull;
@@ -44,6 +43,10 @@ public abstract class NoSqlHistoryService extends AbstractChangeLogHistoryServic
     private ChangeLogOperator changeLogOperator;
     private ServiceProvider serviceProvider;
     private final Logger log = Scope.getCurrentScope().getLog(getClass());
+
+    public NoSqlHistoryService() {
+        init();
+    }
 
     public int getPriority() {
         return PRIORITY_SPECIALIZED;
