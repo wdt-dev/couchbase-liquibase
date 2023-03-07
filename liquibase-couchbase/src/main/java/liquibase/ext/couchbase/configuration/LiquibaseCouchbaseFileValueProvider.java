@@ -15,8 +15,8 @@ import static java.nio.file.Files.newBufferedReader;
 import static java.nio.file.Paths.get;
 
 /**
- * Custom properties provider for {@link CouchbaseLiquibaseConfiguration}
- * Look up in classpath for file named {@code liquibase-couchbase.properties}
+ * Custom properties provider for {@link CouchbaseLiquibaseConfiguration} Look up in classpath for file named
+ * {@code liquibase-couchbase.properties}
  * @see CouchbaseLiquibaseConfiguration
  */
 @LiquibaseService
@@ -35,6 +35,7 @@ public class LiquibaseCouchbaseFileValueProvider extends AbstractMapConfiguratio
         } catch (IOException e) {
             log.config("No " + propsFileName + " file provided, using default properties");
         }
+
     }
 
     @Override
