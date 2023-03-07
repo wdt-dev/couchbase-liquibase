@@ -27,7 +27,7 @@ public class DropBucketChange extends CouchbaseChange {
 
     private String bucketName;
 
-    private Boolean ignoreIfNotExist;
+    private Boolean ignoreIfNotExists;
 
     @Override
     public String getConfirmationMessage() {
@@ -36,7 +36,7 @@ public class DropBucketChange extends CouchbaseChange {
 
     @Override
     public SqlStatement[] generateStatements() {
-        return new SqlStatement[] {new DropBucketStatement(bucketName, ignoreIfNotExist)};
+        return new SqlStatement[] {new DropBucketStatement(bucketName, ignoreIfNotExists)};
     }
 
 }
