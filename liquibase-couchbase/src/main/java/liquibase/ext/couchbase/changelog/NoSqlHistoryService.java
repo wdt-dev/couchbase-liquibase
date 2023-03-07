@@ -28,6 +28,7 @@ import static liquibase.plugin.Plugin.PRIORITY_SPECIALIZED;
 /**
  * Abstract class for all NoSQL history services, extends {@link AbstractChangeLogHistoryService}<br><br> {@link CouchbaseHistoryService} is
  * the default implementation for Couchbase
+ *
  * @see ChangeLogOperator
  * @see RanChangeSet
  */
@@ -43,10 +44,6 @@ public abstract class NoSqlHistoryService extends AbstractChangeLogHistoryServic
     private ChangeLogOperator changeLogOperator;
     private ServiceProvider serviceProvider;
     private final Logger log = Scope.getCurrentScope().getLog(getClass());
-
-    public NoSqlHistoryService() {
-        init();
-    }
 
     public int getPriority() {
         return PRIORITY_SPECIALIZED;
