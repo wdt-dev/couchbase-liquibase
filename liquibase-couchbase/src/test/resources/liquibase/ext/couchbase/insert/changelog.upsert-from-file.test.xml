@@ -26,8 +26,8 @@
 
     <changeSet id="1" author="konstantin.umanets">
         <ext:upsertDocuments>
-            <ext:bucketName>travels-bucket</ext:bucketName>
-            <ext:scopeName>_default</ext:scopeName>
+            <ext:bucketName>testBucket</ext:bucketName>
+            <ext:scopeName>testScope</ext:scopeName>
             <ext:collectionName>testCollection</ext:collectionName>
             <ext:file>
                 <ext:filePath>./testLines.json</ext:filePath>

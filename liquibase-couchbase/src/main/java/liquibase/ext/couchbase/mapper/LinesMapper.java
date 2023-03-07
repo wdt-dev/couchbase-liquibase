@@ -1,8 +1,11 @@
 package liquibase.ext.couchbase.mapper;
 
 import com.couchbase.client.java.json.JsonObject;
+import liquibase.Scope;
+import liquibase.ext.couchbase.exception.IncorrectFileException;
 import liquibase.ext.couchbase.types.DataType;
 import liquibase.ext.couchbase.types.Document;
+import liquibase.logging.Logger;
 import lombok.NoArgsConstructor;
 
 import java.io.BufferedReader;
@@ -15,6 +18,9 @@ import static liquibase.ext.couchbase.types.Document.document;
 
 @NoArgsConstructor
 public class LinesMapper implements DocFileMapper {
+    private final Logger logger = Scope.getCurrentScope().getLog(LinesMapper.class);
+    private static final String ID = "id";
+
     @Override
     public List<Document> map(String filePath) {
         List<Document> docs = new ArrayList<>();
@@ -24,6 +30,10 @@ public class LinesMapper implements DocFileMapper {
 
             while ((line = reader.readLine()) != null) {
                 JsonObject jsonObject = JsonObject.fromJson(line);
+                if (!jsonObject.containsKey(ID)) {
+                    logger.info("Document has no id, can't import, skipping");
+                    continue;
+                }
                 docs.add(lineToDocument(jsonObject));
             }
 
@@ -31,11 +41,12 @@ public class LinesMapper implements DocFileMapper {
 
             return docs;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.warning("Incorrect json file provided",e);
+            throw new IncorrectFileException(filePath);
         }
     }
 
     private Document lineToDocument(JsonObject json) {
-        return document((String) json.get("key"), json.get("value").toString(), DataType.JSON);
+        return document((String) json.get(ID), json.toString(), DataType.JSON);
     }
 }
