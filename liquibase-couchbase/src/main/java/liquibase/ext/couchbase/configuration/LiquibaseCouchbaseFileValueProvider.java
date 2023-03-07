@@ -35,7 +35,6 @@ public class LiquibaseCouchbaseFileValueProvider extends AbstractMapConfiguratio
         } catch (IOException e) {
             log.config("No " + propsFileName + " file provided, using default properties");
         }
-
     }
 
     @Override
