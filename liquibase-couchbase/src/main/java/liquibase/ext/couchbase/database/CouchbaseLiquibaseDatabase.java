@@ -54,7 +54,7 @@ public class CouchbaseLiquibaseDatabase extends AbstractJdbcDatabase {
     public String getDefaultDriver(String url) {
         if (url.startsWith(COUCHBASE_PREFIX) ||
                 url.startsWith(COUCHBASE_SSL_PREFIX)) {
-            return CouchbaseLiquibaseDatabase.class.getName();
+            return CouchbaseStubDriver.class.getName();
         }
         throw new IllegalArgumentException(url + " driver is not supported");
     }
