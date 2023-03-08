@@ -23,7 +23,7 @@ public abstract class TransactionExecutorService {
     public abstract void clearStatementsQueue();
 
     public static TransactionExecutorService getExecutor(Cluster cluster) {
-        return IS_REACTIVE_TRANSACTIONS.getCurrentValue() ? new ReactiveTransactionExecutorService(cluster)
+        return Boolean.TRUE.equals(IS_REACTIVE_TRANSACTIONS.getCurrentValue()) ? new ReactiveTransactionExecutorService(cluster)
                 : new PlainTransactionExecutorService(cluster);
     }
 
