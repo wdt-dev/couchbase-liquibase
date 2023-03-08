@@ -6,11 +6,10 @@ import liquibase.exception.DatabaseException;
 import liquibase.executor.AbstractExecutor;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.exception.StatementExecutionException;
+import liquibase.ext.couchbase.executor.service.TransactionExecutorService;
 import liquibase.ext.couchbase.operator.ClusterOperator;
 import liquibase.ext.couchbase.statement.CouchbaseStatement;
 import liquibase.ext.couchbase.statement.CouchbaseTransactionStatement;
-import liquibase.ext.couchbase.types.CouchbaseReactiveTransactionAction;
-import liquibase.ext.couchbase.types.CouchbaseTransactionAction;
 import liquibase.logging.Logger;
 import liquibase.servicelocator.LiquibaseService;
 import liquibase.sql.visitor.SqlVisitor;
@@ -35,11 +34,6 @@ public class CouchbaseExecutor extends NoSqlExecutor {
     public static final String EXECUTOR_NAME = "jdbc";
     private final Logger log = Scope.getCurrentScope()
             .getLog(getClass());
-    private final TransactionalStatementQueue transactionalStatementQueue = Scope.getCurrentScope()
-            .getSingleton(TransactionalStatementQueue.class);
-    private static final TransactionalReactiveStatementQueue reactiveTransactionalStatementQueue = Scope.getCurrentScope()
-            .getSingleton(TransactionalReactiveStatementQueue.class);
-
 
     @Override
     @SneakyThrows
@@ -50,17 +44,9 @@ public class CouchbaseExecutor extends NoSqlExecutor {
         }
 
         if (sql instanceof CouchbaseTransactionStatement) {
-            ClusterOperator clusterOperator = new ClusterOperator(getDatabase().getConnection()
-                    .getCluster());
             CouchbaseTransactionStatement transactionStatement = (CouchbaseTransactionStatement) sql;
-            if (transactionStatement.isReactive()) {
-                CouchbaseReactiveTransactionAction action = transactionStatement.asTransactionReactiveAction(clusterOperator);
-                reactiveTransactionalStatementQueue.add(action);
-            }
-            else {
-                CouchbaseTransactionAction action = transactionStatement.asTransactionAction(clusterOperator);
-                transactionalStatementQueue.add(action);
-            }
+            TransactionExecutorService transactionExecutorService = getDatabase().getConnection().getTransactionExecutorService();
+            transactionExecutorService.addStatementIntoQueue(transactionStatement);
             return;
         }
 

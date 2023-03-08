@@ -82,12 +82,7 @@ import static liquibase.ext.couchbase.database.Constants.COUCHBASE_PRODUCT_SHORT
 @NoArgsConstructor
 public class CouchbaseConnection implements DatabaseConnection {
 
-    private static final int TRANSACTION_WAIT_TIME_IN_MIN = 20; //TODO to properties and change to seconds
-    private static final int REACTIVE_TRANSACTION_PARALLEL_THREADS = 16; //TODO to properties
-    private final TransactionalStatementQueue transactionalStatementQueue = Scope.getCurrentScope()
-            .getSingleton(TransactionalStatementQueue.class);
-    private final TransactionalReactiveStatementQueue transactionalReactiveStatementQueue = Scope.getCurrentScope()
-            .getSingleton(TransactionalReactiveStatementQueue.class);
+    private TransactionExecutorService transactionExecutorService;
     private ConnectionString connectionString;
     private Cluster cluster;
     private Bucket database;
@@ -117,8 +112,7 @@ public class CouchbaseConnection implements DatabaseConnection {
 
     @Override
     public void rollback() {
-        transactionalStatementQueue.clear();
-        transactionalReactiveStatementQueue.clear();
+        transactionExecutorService.clearStatementsQueue();
     }
 
     @Override
@@ -200,6 +194,7 @@ public class CouchbaseConnection implements DatabaseConnection {
             final String password = getAndTrimProperty(driverProperties, "password").orElse(null);
 
             cluster = connect(connectionString.original(), clusterOptions(connectionString.username(), password));
+            initTransactionExecutorService();
 
             if (connectionString.params()
                     .containsKey(BUCKET_PARAM)) {
@@ -226,47 +221,7 @@ public class CouchbaseConnection implements DatabaseConnection {
 
     @Override
     public void commit() {
-        executeTransactions();
-        executeTransactionsReactive();
-    }
-
-    private void executeTransactions() {
-        if (transactionalStatementQueue.isEmpty()) {
-            return;
-        }
-
-        try {
-            TransactionOptions options = transactionOptions().timeout(ofMinutes(TRANSACTION_WAIT_TIME_IN_MIN));
-            cluster.transactions()
-                    .run(ctx -> transactionalStatementQueue.forEach(it -> it.accept(ctx)), options);
-        } catch (TransactionFailedException e) {
-            throw new TransactionalStatementExecutionException(e);
-        } finally {
-            transactionalStatementQueue.clear();
-        }
-    }
-
-    private void executeTransactionsReactive() {
-        if (transactionalReactiveStatementQueue.isEmpty()) {
-            return;
-        }
-
-        try {
-            TransactionOptions options = transactionOptions().timeout(ofMinutes(TRANSACTION_WAIT_TIME_IN_MIN));
-            Flux<CouchbaseReactiveTransactionAction> statements = Flux.fromIterable(transactionalReactiveStatementQueue);
-            cluster.reactive().transactions()
-                    .run(ctx -> statements
-                            .parallel(REACTIVE_TRANSACTION_PARALLEL_THREADS)
-                            .runOn(Schedulers.boundedElastic())
-                            .concatMap(action -> action.apply(ctx))
-                            .sequential()
-                            .then(), options)
-                    .block();
-        } catch (TransactionFailedException e) {
-            throw new TransactionalReactiveStatementExecutionException(e);
-        } finally {
-            transactionalReactiveStatementQueue.clear();
-        }
+        transactionExecutorService.executeStatementsInTransaction();
     }
 
     @Override

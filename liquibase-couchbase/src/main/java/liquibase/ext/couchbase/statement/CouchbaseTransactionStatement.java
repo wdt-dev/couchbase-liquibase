@@ -8,9 +8,6 @@ import liquibase.ext.couchbase.operator.ClusterOperator;
 import liquibase.ext.couchbase.types.CouchbaseReactiveTransactionAction;
 import liquibase.ext.couchbase.types.CouchbaseTransactionAction;
 import liquibase.statement.SqlStatement;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.reactivestreams.Publisher;
 
 import java.util.function.Consumer;
@@ -24,12 +21,7 @@ import java.util.function.Consumer;
  * @see ClusterOperator
  */
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
 public abstract class CouchbaseTransactionStatement extends NoSqlStatement {
-
-    private boolean isReactive;
 
     public CouchbaseTransactionAction asTransactionAction(ClusterOperator clusterOperator) {
         return transaction -> doInTransaction(transaction, clusterOperator);
