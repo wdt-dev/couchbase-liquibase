@@ -17,6 +17,7 @@ import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfigurat
 
 public class ReactiveTransactionExecutorService extends TransactionExecutorService {
 
+    private static final TransactionOptions transactionOptions = transactionOptions().timeout(TRANSACTION_TIMEOUT.getCurrentValue());
     private final TransactionalReactiveStatementQueue transactionalReactiveStatementQueue = Scope.getCurrentScope()
             .getSingleton(TransactionalReactiveStatementQueue.class);
 
@@ -36,7 +37,6 @@ public class ReactiveTransactionExecutorService extends TransactionExecutorServi
         }
 
         try {
-            TransactionOptions options = transactionOptions().timeout(TRANSACTION_TIMEOUT.getCurrentValue());
             Flux<CouchbaseReactiveTransactionAction> statements = Flux.fromIterable(transactionalReactiveStatementQueue);
             cluster.reactive().transactions()
                     .run(ctx -> statements
@@ -44,7 +44,7 @@ public class ReactiveTransactionExecutorService extends TransactionExecutorServi
                             .runOn(Schedulers.boundedElastic())
                             .concatMap(action -> action.apply(ctx))
                             .sequential()
-                            .then(), options)
+                            .then(), transactionOptions)
                     .block();
         } catch (TransactionFailedException e) {
             throw new TransactionalReactiveStatementExecutionException(e);

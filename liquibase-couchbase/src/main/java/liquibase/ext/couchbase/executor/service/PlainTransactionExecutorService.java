@@ -13,6 +13,7 @@ import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfigurat
 
 public class PlainTransactionExecutorService extends TransactionExecutorService {
 
+    private static final TransactionOptions transactionOptions = transactionOptions().timeout(TRANSACTION_TIMEOUT.getCurrentValue());
     private final TransactionalStatementQueue transactionalStatementQueue = Scope.getCurrentScope()
             .getSingleton(TransactionalStatementQueue.class);
 
@@ -32,9 +33,8 @@ public class PlainTransactionExecutorService extends TransactionExecutorService 
         }
 
         try {
-            TransactionOptions options = transactionOptions().timeout(TRANSACTION_TIMEOUT.getCurrentValue());
             cluster.transactions()
-                    .run(ctx -> transactionalStatementQueue.forEach(it -> it.accept(ctx)), options);
+                    .run(ctx -> transactionalStatementQueue.forEach(it -> it.accept(ctx)), transactionOptions);
         } catch (TransactionFailedException e) {
             throw new TransactionalStatementExecutionException(e);
         } finally {
