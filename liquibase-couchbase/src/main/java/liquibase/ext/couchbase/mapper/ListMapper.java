@@ -10,6 +10,7 @@ import java.util.List;
 public class ListMapper implements DocFileMapper {
     @Override
     public List<Document> map(String filePath) {
-       throw new NotImplementedException();
+        // TODO implement this in scope of the separate task
+        return null;
     }
 }

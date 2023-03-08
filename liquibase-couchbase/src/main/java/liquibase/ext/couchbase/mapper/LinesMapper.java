@@ -8,11 +8,12 @@ import liquibase.ext.couchbase.types.Document;
 import liquibase.logging.Logger;
 import lombok.NoArgsConstructor;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static liquibase.ext.couchbase.types.Document.document;
 
@@ -23,27 +24,24 @@ public class LinesMapper implements DocFileMapper {
 
     @Override
     public List<Document> map(String filePath) {
-        List<Document> docs = new ArrayList<>();
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(filePath));
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                JsonObject jsonObject = JsonObject.fromJson(line);
-                if (!jsonObject.containsKey(ID)) {
-                    logger.info("Document has no id, can't import, skipping");
-                    continue;
-                }
-                docs.add(lineToDocument(jsonObject));
+            try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
+                return stream.map(JsonObject::fromJson)
+                        .map(this::processJson)
+                        .collect(Collectors.toList());
             }
-
-            reader.close();
-
-            return docs;
         } catch (IOException e) {
-            logger.warning("Incorrect json file provided",e);
+            logger.warning("Incorrect json file provided", e);
             throw new IncorrectFileException(filePath);
         }
+    }
+
+    private Document processJson(JsonObject jsonObject) {
+        if (!jsonObject.containsKey(ID)) {
+            logger.info("Document has no id, can't import, skipping");
+            return null;
+        }
+        return lineToDocument(jsonObject);
     }
 
     private Document lineToDocument(JsonObject json) {
