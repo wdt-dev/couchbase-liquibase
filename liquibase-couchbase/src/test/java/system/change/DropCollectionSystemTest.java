@@ -15,6 +15,7 @@ import static common.constants.TestConstants.TEST_BUCKET;
 import static common.constants.TestConstants.TEST_SCOPE;
 import static common.matchers.CouchBaseBucketAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class DropCollectionSystemTest extends LiquiBaseSystemTest {
     @Test
@@ -62,7 +63,7 @@ class DropCollectionSystemTest extends LiquiBaseSystemTest {
     void Should_skip_when_collection_not_exists() {
         Liquibase liquibase = liquiBase(SKIP_DROP_NOT_CREATED_COLLECTION_CHANGE_TEST_XML);
 
-        liquibase.update();
+        assertDoesNotThrow(() -> liquibase.update());
     }
 
 }
