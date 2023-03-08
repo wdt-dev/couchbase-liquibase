@@ -3,8 +3,9 @@ package liquibase.ext.couchbase.mapper;
 import com.couchbase.client.java.json.JsonObject;
 import liquibase.Scope;
 import liquibase.ext.couchbase.exception.IncorrectFileException;
-import liquibase.ext.couchbase.types.DataType;
+import liquibase.ext.couchbase.provider.DocumentKeyProvider;
 import liquibase.ext.couchbase.types.Document;
+import liquibase.ext.couchbase.types.File;
 import liquibase.logging.Logger;
 import lombok.NoArgsConstructor;
 
@@ -20,31 +21,24 @@ import static liquibase.ext.couchbase.types.Document.document;
 @NoArgsConstructor
 public class LinesMapper implements DocFileMapper {
     private final Logger logger = Scope.getCurrentScope().getLog(LinesMapper.class);
-    private static final String ID = "id";
 
     @Override
-    public List<Document> map(String filePath) {
+    public List<Document> map(File file) {
         try {
-            try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
+            DocumentKeyProvider<String, JsonObject> keyProvider =
+                    (DocumentKeyProvider<String, JsonObject>) keyProviderFactory.getKeyProvider(file);
+            try (Stream<String> stream = Files.lines(Paths.get(file.getFilePath()))) {
                 return stream.map(JsonObject::fromJson)
-                        .map(this::processJson)
+                        .map(json -> lineToDocument(keyProvider.getKey(json), json))
                         .collect(Collectors.toList());
             }
         } catch (IOException e) {
             logger.warning("Incorrect json file provided", e);
-            throw new IncorrectFileException(filePath);
+            throw new IncorrectFileException(file.getFilePath());
         }
     }
 
-    private Document processJson(JsonObject jsonObject) {
-        if (!jsonObject.containsKey(ID)) {
-            logger.info("Document has no id, can't import, skipping");
-            return null;
-        }
-        return lineToDocument(jsonObject);
-    }
-
-    private Document lineToDocument(JsonObject json) {
-        return document((String) json.get(ID), json.toString(), DataType.JSON);
+    private Document lineToDocument(String key, JsonObject json) {
+        return document(key, json);
     }
 }

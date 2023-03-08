@@ -21,6 +21,8 @@ public class File extends AbstractLiquibaseSerializable {
 
     private String filePath;
     private ImportType importType;
+    private KeyProviderType keyProviderType;
+    private String keyProviderExpression;
 
     @Override
     public String getSerializedObjectName() {
@@ -39,5 +41,13 @@ public class File extends AbstractLiquibaseSerializable {
 
     public void setImportType(String importType) {
         this.importType = ImportType.getByName(importType);
+    }
+
+    public void setKeyProviderType(String keyProviderType) {
+        this.keyProviderType = KeyProviderType.valueOf(keyProviderType);
+    }
+
+    public void setKeyProviderExpression(String keyProviderExpression) {
+        this.keyProviderExpression = keyProviderExpression;
     }
 }

@@ -1,0 +1,12 @@
+package liquibase.ext.couchbase.exception;
+
+import static java.lang.String.format;
+
+public class ProvideKeyFailedException extends RuntimeException {
+
+    private static final String template = "Can't provide key because: [%s]";
+
+    public ProvideKeyFailedException(String msg) {
+        super(format(template, msg));
+    }
+}

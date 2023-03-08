@@ -28,8 +28,7 @@ public class UpsertFromFileStatement extends CouchbaseFromFileStatement {
     public void doInTransaction(TransactionAttemptContext transaction, ClusterOperator clusterOperator) {
         CollectionOperator collectionOperator = clusterOperator.getBucketOperator(keyspace.getBucket())
                 .getCollectionOperator(keyspace.getCollection(), keyspace.getScope());
-        importFromFileWith(transaction, file.getFilePath(), file.getImportType(), clusterOperator,
-                collectionOperator::insertDocsTransactionally);
+        importFromFileWith(transaction, file, clusterOperator, collectionOperator::insertDocsTransactionally);
     }
 }
 
