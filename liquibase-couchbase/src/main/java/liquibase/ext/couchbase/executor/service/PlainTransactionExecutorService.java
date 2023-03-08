@@ -9,11 +9,10 @@ import liquibase.ext.couchbase.executor.TransactionalStatementQueue;
 import liquibase.ext.couchbase.statement.CouchbaseTransactionStatement;
 
 import static com.couchbase.client.java.transactions.config.TransactionOptions.transactionOptions;
-import static java.time.Duration.ofMinutes;
+import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration.TRANSACTION_TIMEOUT;
 
 public class PlainTransactionExecutorService extends TransactionExecutorService {
 
-    private static final int TRANSACTION_WAIT_TIME_IN_MIN = 20; // TODO to properties and change to seconds
     private final TransactionalStatementQueue transactionalStatementQueue = Scope.getCurrentScope()
             .getSingleton(TransactionalStatementQueue.class);
 
@@ -33,7 +32,7 @@ public class PlainTransactionExecutorService extends TransactionExecutorService 
         }
 
         try {
-            TransactionOptions options = transactionOptions().timeout(ofMinutes(TRANSACTION_WAIT_TIME_IN_MIN));
+            TransactionOptions options = transactionOptions().timeout(TRANSACTION_TIMEOUT.getCurrentValue());
             cluster.transactions()
                     .run(ctx -> transactionalStatementQueue.forEach(it -> it.accept(ctx)), options);
         } catch (TransactionFailedException e) {

@@ -29,15 +29,6 @@ public class CollectionOperator {
         collection.insert(id, content);
     }
 
-    public void insertDocInTransaction(TransactionAttemptContext transaction, String id, Object content) {
-        transaction.insert(collection, id, content);
-    }
-
-    //TODO check later with single invocation for each element with .then() in the end
-    public Mono<TransactionGetResult> insertDocInTransactionReactive(ReactiveTransactionAttemptContext transaction, String id, JsonObject content) {
-        return transaction.insert(collection.reactive(), id, content);
-    }
-
     public void insertDoc(Document document) {
         collection.insert(document.getId(), document.getValue().mapDataToType());
     }
@@ -46,16 +37,24 @@ public class CollectionOperator {
         return collection.exists(id).exists();
     }
 
-    public void removeDoc(String id) {
-        collection.remove(id);
-    }
-
     public void removeDocs(String... ids) {
         Arrays.stream(ids).forEach(collection::remove);
     }
 
+    public void removeDoc(String id) {
+        collection.remove(id);
+    }
+
     public void upsertDoc(String id, JsonObject content) {
         collection.upsert(id, content);
+    }
+
+    public void upsertDocs(Map<String, JsonObject> docs) {
+        docs.forEach(this::upsertDoc);
+    }
+
+    public void upsertDocsTransactionally(TransactionAttemptContext transaction, Map<String, Object> docs) {
+        docs.forEach((key, jsonObject) -> upsertDocInTransaction(transaction, key, jsonObject));
     }
 
     private void upsertDocInTransaction(TransactionAttemptContext transaction,
@@ -69,40 +68,38 @@ public class CollectionOperator {
         }
     }
 
-    //TODO check later with single invocation for each element with .then() in the end
-    public Mono<TransactionGetResult> upsertDocInTransactionReactive(ReactiveTransactionAttemptContext transaction,
-                                                     String key,
-                                                     JsonObject jsonObject) {
-        Mono<TransactionGetResult> document = transaction.get(collection.reactive(), key);
-        return document.doOnNext(transactionGetResult -> transaction.replace(transactionGetResult, jsonObject))
-                .onErrorResume(DocumentNotFoundException.class::isInstance,
-                        throwable -> transaction.insert(collection.reactive(), key, jsonObject));
-    }
-
-    public void upsertDocs(Map<String, JsonObject> docs) {
-        docs.forEach(this::upsertDoc);
-    }
-
-    public void upsertDocsTransactionally(TransactionAttemptContext transaction, Map<String, JsonObject> docs) {
-        docs.forEach((key, jsonObject) -> upsertDocInTransaction(transaction, key, jsonObject));
-    }
-
-    public void upsertDocsTransactionally(TransactionAttemptContext transaction, Map<String, Object> docs) {
-        docs.forEach((key, content) -> upsertDocInTransaction(transaction, key, content));
-    }
-
-
-    public Flux<TransactionGetResult> upsertDocsTransactionallyReactive(ReactiveTransactionAttemptContext transaction, Map<String, JsonObject> docs) {
+    public Flux<TransactionGetResult> upsertDocsTransactionallyReactive(ReactiveTransactionAttemptContext transaction,
+                                                                        Map<String, Object> docs) {
         return Flux.fromIterable(docs.entrySet())
                 .flatMap(entry -> upsertDocInTransactionReactive(transaction, entry.getKey(), entry.getValue()));
+    }
+
+    public Mono<TransactionGetResult> upsertDocInTransactionReactive(ReactiveTransactionAttemptContext transaction,
+                                                                     String key,
+                                                                     Object object) {
+        Mono<TransactionGetResult> document = transaction.get(collection.reactive(), key);
+        return document.doOnNext(transactionGetResult -> transaction.replace(transactionGetResult, object))
+                .onErrorResume(DocumentNotFoundException.class::isInstance,
+                        throwable -> transaction.insert(collection.reactive(), key, object));
     }
 
     public void insertDocsTransactionally(TransactionAttemptContext transaction, Map<String, Object> docs) {
         docs.forEach((key, content) -> insertDocInTransaction(transaction, key, content));
     }
 
-    public Flux<TransactionGetResult> insertDocsTransactionallyReactive(ReactiveTransactionAttemptContext transaction, Map<String, JsonObject> docs) {
+    public void insertDocInTransaction(TransactionAttemptContext transaction, String id, Object content) {
+        transaction.insert(collection, id, content);
+    }
+
+    public Flux<TransactionGetResult> insertDocsTransactionallyReactive(ReactiveTransactionAttemptContext transaction,
+                                                                        Map<String, Object> docs) {
         return Flux.fromIterable(docs.entrySet())
                 .flatMap(entry -> insertDocInTransactionReactive(transaction, entry.getKey(), entry.getValue()));
+    }
+
+    public Mono<TransactionGetResult> insertDocInTransactionReactive(ReactiveTransactionAttemptContext transaction,
+                                                                     String id,
+                                                                     Object object) {
+        return transaction.insert(collection.reactive(), id, object);
     }
 }

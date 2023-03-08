@@ -61,12 +61,10 @@ import java.util.Properties;
 import static com.couchbase.client.core.util.Validators.notNull;
 import static com.couchbase.client.core.util.Validators.notNullOrEmpty;
 import static com.couchbase.client.java.ClusterOptions.clusterOptions;
-import static com.couchbase.client.java.transactions.config.TransactionOptions.transactionOptions;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration.TRANSACTION_TIMEOUT;
 import static liquibase.ext.couchbase.database.Constants.BUCKET_PARAM;
 import static liquibase.ext.couchbase.database.Constants.COUCHBASE_PRIORITY;
 import static liquibase.ext.couchbase.database.Constants.COUCHBASE_PRODUCT_NAME;
@@ -204,6 +202,15 @@ public class CouchbaseConnection implements DatabaseConnection {
             }
         } catch (final Exception e) {
             throw new DatabaseException("Could not open connection to database: " + getBucketName(url), e);
+        }
+    }
+
+    private void initTransactionExecutorService() {
+        if (true) {
+            transactionExecutorService = new ReactiveTransactionExecutorService(cluster);
+        }
+        else {
+            transactionExecutorService = new PlainTransactionExecutorService(cluster);
         }
     }
 

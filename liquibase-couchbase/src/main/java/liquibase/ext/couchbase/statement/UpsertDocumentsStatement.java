@@ -1,6 +1,5 @@
 package liquibase.ext.couchbase.statement;
 
-import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.transactions.ReactiveTransactionAttemptContext;
 import com.couchbase.client.java.transactions.TransactionAttemptContext;
 import liquibase.ext.couchbase.operator.ClusterOperator;
@@ -42,7 +41,7 @@ public class UpsertDocumentsStatement extends CouchbaseTransactionStatement {
     @Override
     public Publisher<?> doInTransactionReactive(ReactiveTransactionAttemptContext transaction,
                                                 ClusterOperator clusterOperator) {
-        Map<String, JsonObject> contentList = clusterOperator.checkDocsAndTransformToJsons(documents);
+        Map<String, Object> contentList = clusterOperator.checkDocsAndTransformToObjects(documents);
         CollectionOperator collectionOperator = clusterOperator.getBucketOperator(keyspace.getBucket())
                 .getCollectionOperator(keyspace.getCollection(), keyspace.getScope());
 

@@ -3,16 +3,28 @@ package liquibase.ext.couchbase.executor.service;
 import com.couchbase.client.java.Cluster;
 import liquibase.ext.couchbase.operator.ClusterOperator;
 import liquibase.ext.couchbase.statement.CouchbaseTransactionStatement;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration.IS_REACTIVE_TRANSACTIONS;
+
 public abstract class TransactionExecutorService {
 
     protected final Cluster cluster;
-    protected final ClusterOperator clusterOperator = new ClusterOperator(cluster);
+    protected final ClusterOperator clusterOperator;
 
-    abstract public void addStatementIntoQueue(CouchbaseTransactionStatement transactionStatement);
-    abstract public void executeStatementsInTransaction();
-    abstract public void clearStatementsQueue();
+    protected TransactionExecutorService(Cluster cluster) {
+        this.cluster = cluster;
+        this.clusterOperator = new ClusterOperator(cluster);
+    }
+
+    public abstract void addStatementIntoQueue(CouchbaseTransactionStatement transactionStatement);
+
+    public abstract void executeStatementsInTransaction();
+
+    public abstract void clearStatementsQueue();
+
+    public static TransactionExecutorService getExecutor(Cluster cluster) {
+        return IS_REACTIVE_TRANSACTIONS.getCurrentValue() ? new ReactiveTransactionExecutorService(cluster)
+                : new PlainTransactionExecutorService(cluster);
+    }
 
 }

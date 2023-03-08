@@ -12,12 +12,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
 import static com.couchbase.client.java.transactions.config.TransactionOptions.transactionOptions;
-import static java.time.Duration.ofMinutes;
+import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration.REACTIVE_TRANSACTION_PARALLEL_THREADS;
+import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration.TRANSACTION_TIMEOUT;
 
 public class ReactiveTransactionExecutorService extends TransactionExecutorService {
-
-    private static final int TRANSACTION_WAIT_TIME_IN_MIN = 20; // TODO to properties and change to seconds
-    private static final int REACTIVE_TRANSACTION_PARALLEL_THREADS = 16; // TODO to properties
 
     private final TransactionalReactiveStatementQueue transactionalReactiveStatementQueue = Scope.getCurrentScope()
             .getSingleton(TransactionalReactiveStatementQueue.class);
@@ -38,11 +36,11 @@ public class ReactiveTransactionExecutorService extends TransactionExecutorServi
         }
 
         try {
-            TransactionOptions options = transactionOptions().timeout(ofMinutes(TRANSACTION_WAIT_TIME_IN_MIN));
+            TransactionOptions options = transactionOptions().timeout(TRANSACTION_TIMEOUT.getCurrentValue());
             Flux<CouchbaseReactiveTransactionAction> statements = Flux.fromIterable(transactionalReactiveStatementQueue);
             cluster.reactive().transactions()
                     .run(ctx -> statements
-                            .parallel(REACTIVE_TRANSACTION_PARALLEL_THREADS)
+                            .parallel(REACTIVE_TRANSACTION_PARALLEL_THREADS.getCurrentValue())
                             .runOn(Schedulers.boundedElastic())
                             .concatMap(action -> action.apply(ctx))
                             .sequential()
