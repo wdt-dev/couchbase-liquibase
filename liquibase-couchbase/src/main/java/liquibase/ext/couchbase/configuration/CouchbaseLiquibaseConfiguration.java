@@ -79,13 +79,13 @@ public class CouchbaseLiquibaseConfiguration implements AutoloadedConfigurations
                 .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
                 .build();
 
-        IS_REACTIVE_TRANSACTIONS = builder.define("reactiveTransaction", Boolean.class)
+        IS_REACTIVE_TRANSACTIONS = builder.define("transactionIsReactive", Boolean.class)
                 .addAliasKey("liquibase.couchbase.transaction.isReactive")
                 .setDescription("Flag if transactions is reactive")
                 .setDefaultValue(false)
                 .build();
 
-        REACTIVE_TRANSACTION_PARALLEL_THREADS = builder.define("reactiveTransactionParallelThreads", Integer.class)
+        REACTIVE_TRANSACTION_PARALLEL_THREADS = builder.define("transactionReactiveParallelThreads", Integer.class)
                 .addAliasKey("liquibase.couchbase.transaction.reactiveParallelThreads")
                 .setDescription("Number of parallel threads for executing statements in reactive transaction")
                 .setDefaultValue(16)
