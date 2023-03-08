@@ -66,14 +66,14 @@ public class CouchbaseLiquibaseConfiguration implements AutoloadedConfigurations
         TRANSACTION_TIMEOUT = builder.define("transactionTimeout", Duration.class)
                 .addAliasKey("liquibase.couchbase.transaction.timeout")
                 .setDescription("Transactions timeout")
-                .setDefaultValue(Duration.ofMinutes(50)) //TODO make lower when find a solution how to pass liquibase-couchbase.properties through maven plugin
+                .setDefaultValue(Duration.ofSeconds(15))
                 .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
                 .build();
 
         MUTATE_IN_TIMEOUT = builder.define("mutateInTimeout", Duration.class)
                 .addAliasKey("liquibase.couchbase.mutateIn.timeout")
                 .setDescription("MutateIn operation timeout")
-                .setDefaultValue(Duration.ofMinutes(15)) //TODO make lower when find a solution how to pass liquibase-couchbase.properties through maven plugin
+                .setDefaultValue(Duration.ofSeconds(2))
                 .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
                 .build();
     }
