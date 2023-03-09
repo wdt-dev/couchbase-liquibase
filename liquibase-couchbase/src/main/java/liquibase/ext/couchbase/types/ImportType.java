@@ -10,6 +10,7 @@ import static java.util.stream.Collectors.toMap;
 
 /**
  * Types of import from file (based on cbimport tool formats)
+ * @link <a href="https://docs.couchbase.com/server/current/tools/cbimport-json.html"/>
  */
 @Getter
 public enum ImportType {

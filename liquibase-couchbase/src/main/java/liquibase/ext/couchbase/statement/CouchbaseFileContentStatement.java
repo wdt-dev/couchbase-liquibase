@@ -2,12 +2,10 @@ package liquibase.ext.couchbase.statement;
 
 import com.couchbase.client.java.transactions.TransactionAttemptContext;
 import com.google.common.collect.ImmutableMap;
-import liquibase.Scope;
 import liquibase.ext.couchbase.mapper.DocFileMapper;
 import liquibase.ext.couchbase.mapper.LinesMapper;
 import liquibase.ext.couchbase.mapper.ListMapper;
 import liquibase.ext.couchbase.operator.ClusterOperator;
-import liquibase.ext.couchbase.provider.factory.DocumentKeyProviderFactory;
 import liquibase.ext.couchbase.types.File;
 import liquibase.ext.couchbase.types.ImportType;
 import lombok.Getter;
@@ -21,7 +19,7 @@ import java.util.function.BiConsumer;
  */
 
 @Getter
-public abstract class CouchbaseFromFileStatement extends CouchbaseTransactionStatement {
+public abstract class CouchbaseFileContentStatement extends CouchbaseTransactionStatement {
 
     private final Map<ImportType, DocFileMapper> importTypeToProcessor =
             ImmutableMap.of(ImportType.LINES, new LinesMapper()

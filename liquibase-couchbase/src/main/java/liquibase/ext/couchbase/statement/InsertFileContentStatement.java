@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * A statement to upsert documents from file inside one transaction into a keyspace
+ * A statement to insert documents from file inside one transaction into a keyspace
  * @see Document
  * @see CouchbaseStatement
  * @see Keyspace
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UpsertFromFileStatement extends CouchbaseFromFileStatement {
+public class InsertFileContentStatement extends CouchbaseFileContentStatement {
     private final Keyspace keyspace;
     private final File file;
 
@@ -28,7 +28,7 @@ public class UpsertFromFileStatement extends CouchbaseFromFileStatement {
     public void doInTransaction(TransactionAttemptContext transaction, ClusterOperator clusterOperator) {
         CollectionOperator collectionOperator = clusterOperator.getBucketOperator(keyspace.getBucket())
                 .getCollectionOperator(keyspace.getCollection(), keyspace.getScope());
-        importFromFileWith(transaction, file, clusterOperator, collectionOperator::insertDocsTransactionally);
+        importFromFileWith(transaction, file, clusterOperator, collectionOperator::upsertDocsTransactionally);
     }
 }
 

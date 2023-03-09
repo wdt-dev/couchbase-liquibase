@@ -24,14 +24,13 @@ public class LinesMapper implements DocFileMapper {
 
     @Override
     public List<Document> map(File file) {
-        try {
+        try (Stream<String> stream = Files.lines(Paths.get(file.getFilePath()))) {
             DocumentKeyProvider<String, JsonObject> keyProvider =
                     (DocumentKeyProvider<String, JsonObject>) keyProviderFactory.getKeyProvider(file);
-            try (Stream<String> stream = Files.lines(Paths.get(file.getFilePath()))) {
-                return stream.map(JsonObject::fromJson)
-                        .map(json -> lineToDocument(keyProvider.getKey(json), json))
-                        .collect(Collectors.toList());
-            }
+
+            return stream.map(JsonObject::fromJson)
+                    .map(json -> lineToDocument(keyProvider.getKey(json), json))
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             logger.warning("Incorrect json file provided", e);
             throw new IncorrectFileException(file.getFilePath());

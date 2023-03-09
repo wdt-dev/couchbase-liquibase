@@ -4,7 +4,7 @@ package liquibase.ext.couchbase.change;
 import liquibase.change.ChangeMetaData;
 import liquibase.change.DatabaseChange;
 import liquibase.ext.couchbase.statement.InsertDocumentsStatement;
-import liquibase.ext.couchbase.statement.InsertFromFileStatement;
+import liquibase.ext.couchbase.statement.InsertFileContentStatement;
 import liquibase.ext.couchbase.types.Document;
 import liquibase.ext.couchbase.types.File;
 import liquibase.ext.couchbase.types.Keyspace;
@@ -56,7 +56,7 @@ public class InsertDocumentsChange extends CouchbaseChange {
         Keyspace keyspace = keyspace(bucketName, scopeName, collectionName);
         Optional<String> hasFile = Optional.ofNullable(file).map(File::getFilePath).filter(StringUtils::isNotBlank);
         return new SqlStatement[] {
-                hasFile.isPresent() ? new InsertFromFileStatement(keyspace, file) :
+                hasFile.isPresent() ? new InsertFileContentStatement(keyspace, file) :
                         new InsertDocumentsStatement(keyspace, documents)
         };
     }
