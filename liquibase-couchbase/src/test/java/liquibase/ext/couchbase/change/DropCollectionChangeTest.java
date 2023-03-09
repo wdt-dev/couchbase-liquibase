@@ -32,7 +32,8 @@ public class DropCollectionChangeTest {
         DatabaseChangeLog load = changeLogProvider.load(DROP_NOT_CREATED_COLLECTION_CHANGE_TEST_XML);
         ChangeSet changeSet = firstOf(load.getChangeSets());
 
-        assertThat(changeSet.getChanges()).map(DropCollectionChange.class::cast)
+        assertThat(changeSet.getChanges())
+                .map(DropCollectionChange.class::cast)
                 .containsExactly(dropCollectionChange);
     }
 
