@@ -44,10 +44,6 @@ public class File extends AbstractLiquibaseSerializable {
     }
 
     public void setKeyProviderType(String keyProviderType) {
-        this.keyProviderType = KeyProviderType.valueOf(keyProviderType);
-    }
-
-    public void setKeyProviderExpression(String keyProviderExpression) {
-        this.keyProviderExpression = keyProviderExpression;
+        this.keyProviderType = KeyProviderType.getByName(keyProviderType);
     }
 }
