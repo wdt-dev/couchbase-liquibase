@@ -27,21 +27,21 @@ public class CouchbaseLiquibaseConfiguration implements AutoloadedConfigurations
     static {
         ConfigurationDefinition.Builder builder = new ConfigurationDefinition.Builder("liquibase.couchbase");
 
-        CHANGELOG_RECHECK_TIME = builder.define("changelogRecheckTime", Duration.class)
-                .addAliasKey("lockservice.changelogRecheckTime")
+        CHANGELOG_RECHECK_TIME = builder.define("lockservice.changelogRecheckTime", Duration.class)
+                .addAliasKey("changelogRecheckTime")
                 .setDescription("Change log recheck time")
                 .setDefaultValue(Duration.ofSeconds(10L))
                 .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
                 .build();
 
-        CHANGELOG_WAIT_TIME = builder.define("changelogWaitTime", Duration.class)
-                .addAliasKey("lockservice.changelogWaitTime")
+        CHANGELOG_WAIT_TIME = builder.define("lockservice.changelogWaitTime", Duration.class)
+                .addAliasKey("changelogWaitTime")
                 .setDescription("Time limit to wait for lock in LockService")
                 .setDefaultValue(Duration.ofSeconds(300L))
                 .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
                 .build();
 
-        CHANGELOG_LOCK_COLLECTION_NAME = builder.define("changelogCollectionName", String.class)
+        CHANGELOG_LOCK_COLLECTION_NAME = builder.define("lockservice.changelogCollectionName", String.class)
                 .addAliasKey("changelogCollectionName")
                 .setDescription("Collection name in service bucket")
                 .setDefaultValue("CHANGELOGLOCKS")
@@ -53,29 +53,29 @@ public class CouchbaseLiquibaseConfiguration implements AutoloadedConfigurations
                 .setDefaultValue("liquibaseServiceBucket")
                 .build();
 
-        LOCK_TTL_PROLONGATION = builder.define("ttlProlongation", Duration.class)
-                .addAliasKey("lockservice.ttlProlongation")
+        LOCK_TTL_PROLONGATION = builder.define("lockservice.ttlProlongation", Duration.class)
+                .addAliasKey("ttlProlongation")
                 .setDescription("Liquibase locks prolongation time")
                 .setDefaultValue(Duration.ofMinutes(1L))
                 .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
                 .build();
 
-        LOCK_TTL = builder.define("lockTtl", Duration.class)
-                .addAliasKey("lockservice.lockTtl")
+        LOCK_TTL = builder.define("lockservice.lockTtl", Duration.class)
+                .addAliasKey("lockTtl")
                 .setDescription("Liquibase locks time to live")
                 .setDefaultValue(Duration.ofMinutes(3L))
                 .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
                 .build();
 
-        TRANSACTION_TIMEOUT = builder.define("transactionTimeout", Duration.class)
-                .addAliasKey("transaction.timeout")
+        TRANSACTION_TIMEOUT = builder.define("lockservice.transaction.timeout", Duration.class)
+                .addAliasKey("transactionTimeout")
                 .setDescription("Transactions timeout")
                 .setDefaultValue(Duration.ofSeconds(15))
                 .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
                 .build();
 
-        MUTATE_IN_TIMEOUT = builder.define("mutateInTimeout", Duration.class)
-                .addAliasKey("mutateIn.timeout")
+        MUTATE_IN_TIMEOUT = builder.define("mutateIn.timeout", Duration.class)
+                .addAliasKey("mutateInTimeout")
                 .setDescription("MutateIn operation timeout")
                 .setDefaultValue(Duration.ofSeconds(2))
                 .setValueHandler(CouchbaseLiquibaseConfiguration::durationExtract)
