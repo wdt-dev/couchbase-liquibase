@@ -24,27 +24,10 @@ import com.couchbase.client.core.util.ConnectionString;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.ClusterOptions;
-import com.couchbase.client.java.transactions.config.TransactionOptions;
-import com.couchbase.client.java.transactions.error.TransactionFailedException;
-
-import liquibase.ext.couchbase.exception.TransactionalReactiveStatementExecutionException;
-import liquibase.ext.couchbase.executor.TransactionalReactiveStatementQueue;
-import liquibase.ext.couchbase.types.CouchbaseReactiveTransactionAction;
-import org.apache.commons.lang3.StringUtils;
-
-import java.sql.Driver;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-
-import liquibase.Scope;
 import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
 import liquibase.exception.DatabaseException;
-import liquibase.ext.couchbase.exception.TransactionalStatementExecutionException;
-import liquibase.ext.couchbase.executor.TransactionalStatementQueue;
+import liquibase.ext.couchbase.executor.service.TransactionExecutorService;
 import liquibase.util.StringUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -192,7 +175,7 @@ public class CouchbaseConnection implements DatabaseConnection {
             final String password = getAndTrimProperty(driverProperties, "password").orElse(null);
 
             cluster = connect(connectionString.original(), clusterOptions(connectionString.username(), password));
-            initTransactionExecutorService();
+            transactionExecutorService = TransactionExecutorService.getExecutor(cluster);
 
             if (connectionString.params()
                     .containsKey(BUCKET_PARAM)) {
@@ -202,15 +185,6 @@ public class CouchbaseConnection implements DatabaseConnection {
             }
         } catch (final Exception e) {
             throw new DatabaseException("Could not open connection to database: " + getBucketName(url), e);
-        }
-    }
-
-    private void initTransactionExecutorService() {
-        if (true) {
-            transactionExecutorService = new ReactiveTransactionExecutorService(cluster);
-        }
-        else {
-            transactionExecutorService = new PlainTransactionExecutorService(cluster);
         }
     }
 
