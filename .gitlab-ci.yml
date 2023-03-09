@@ -1,10 +1,17 @@
+services:
+    - name: docker:dind
+      command: ["--tls=false"]
 variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_DRIVER: overlay2
     # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
     MAVEN_OPTS: >-
         -Dhttps.protocols=TLSv1.2
         -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
         -Dorg.slf4j.simpleLogger.showDateTime=true
         -Djava.awt.headless=true
+        -DskipIntegrationTests=false
 
     MAVEN_CLI_OPTS: >-
         --batch-mode
