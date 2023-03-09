@@ -44,6 +44,9 @@ public class ChangeLogSampleFilePaths {
             ".test.xml";
     public static final String INSERT_UPSERT_STRESS_TEST_XML = rootPrefix + "/stress/stress-test-10k-insert-5k-upsert.xml";
     public static final String DROP_BUCKET_TEST_XML = rootPrefix + "/bucket/changelog.drop-bucket.test.xml";
+    public static final String DROP_BUCKET_TEST_JSON = rootPrefix + "/bucket/json/drop-bucket.test.json";
+    public static final String CREATE_BUCKET_TEST_JSON = rootPrefix + "/bucket/json/changelog.create-bucket.test.json";
     public static final String UPDATE_BUCKET_TEST_XML = rootPrefix + "/bucket/changelog.update-bucket.test.xml";
+    public static final String UPDATE_BUCKET_TEST_JSON = rootPrefix + "/bucket/json/changelog.update-bucket.test.json";
 
 }
