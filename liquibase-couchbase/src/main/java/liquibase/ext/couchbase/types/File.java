@@ -38,12 +38,4 @@ public class File extends AbstractLiquibaseSerializable {
     public SerializationType getSerializableFieldType(String field) {
         return SerializationType.DIRECT_VALUE;
     }
-
-    public void setImportType(String importType) {
-        this.importType = ImportType.getByName(importType);
-    }
-
-    public void setKeyProviderType(String keyProviderType) {
-        this.keyProviderType = KeyProviderType.getByName(keyProviderType);
-    }
 }

@@ -32,7 +32,7 @@
             <ext:file>
                 <ext:filePath>./testLines.json</ext:filePath>
                 <ext:importType>LINES</ext:importType>
-                <ext:keyProviderType>default</ext:keyProviderType>
+                <ext:keyProviderType>DEFAULT</ext:keyProviderType>
                 <ext:keyProviderExpression>id</ext:keyProviderExpression>
             </ext:file>
         </ext:upsertDocuments>
