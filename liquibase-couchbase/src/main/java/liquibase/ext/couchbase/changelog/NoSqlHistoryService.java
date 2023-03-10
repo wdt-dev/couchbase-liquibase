@@ -16,7 +16,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
@@ -53,29 +52,31 @@ public abstract class NoSqlHistoryService extends AbstractChangeLogHistoryServic
 
     @Override
     public CouchbaseLiquibaseDatabase getDatabase() {
-        return (CouchbaseLiquibaseDatabase) super.getDatabase();
+        return (CouchbaseLiquibaseDatabase) Scope.getCurrentScope().getDatabase();
     }
 
+    public NoSqlHistoryService() {
+        changeLogOperator = new ChangeLogOperator(getDatabase());
+        serviceProvider = new ContextServiceProvider(getDatabase());
+    }
+
+    /**
+     * If there is no table in the database for recording change history create one.
+     */
     @Override
     public void init() {
-        if (!initialized) {
-            initOperatorAndService();
-            if (!existsChangeLogCollection()) {
-                log.info("Create Change Log Collection");
+        if (initialized) {
+            return;
+        }
+        if (!existsChangeLogCollection()) {
+            log.info("Create Change Log Collection");
 
-                // If there is no table in the database for recording change history create one.
-                Keyspace keyspace = keyspace(SERVICE_BUCKET_NAME, DEFAULT_SERVICE_SCOPE, CHANGE_LOG_COLLECTION);
-                log.info(format(CREATING_TEMPLATE, keyspace.getKeyspace()));
-                createRepository();
-                log.info(format(CREATED_TEMPLATE, keyspace.getKeyspace()));
-            }
+            Keyspace keyspace = keyspace(SERVICE_BUCKET_NAME, DEFAULT_SERVICE_SCOPE, CHANGE_LOG_COLLECTION);
+            log.info(format(CREATING_TEMPLATE, keyspace.getKeyspace()));
+            createRepository();
+            log.info(format(CREATED_TEMPLATE, keyspace.getKeyspace()));
         }
         initialized = true;
-    }
-
-    protected void initOperatorAndService() {
-        changeLogOperator = Optional.ofNullable(changeLogOperator).orElseGet(() -> new ChangeLogOperator(getDatabase()));
-        serviceProvider = Optional.ofNullable(serviceProvider).orElseGet(() -> new ContextServiceProvider(getDatabase()));
     }
 
     @Override

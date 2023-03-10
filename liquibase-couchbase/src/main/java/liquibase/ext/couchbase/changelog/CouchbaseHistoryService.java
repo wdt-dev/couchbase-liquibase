@@ -97,7 +97,6 @@ public class CouchbaseHistoryService extends NoSqlHistoryService {
 
     @Override
     protected List<RanChangeSet> getAllChangeLogs() {
-        initOperatorAndService();
         if (existsChangeLogCollection()) {
             return getChangeLogOperator().getAllChangeLogs();
         }
