@@ -63,16 +63,17 @@ public class MutateInChange extends CouchbaseChange {
     private MutateInOptions buildOptions(String expiry, String preserveExpiry, String storeSemantics) {
         MutateInOptions options = mutateInOptions();
         options.timeout(MUTATE_IN_TIMEOUT.getCurrentValue());
-        Optional.ofNullable(expiry)
-                .filter(StringUtils::isNotEmpty)
+        optionalWithNullFilter(expiry)
                 .ifPresent(value -> options.expiry(Duration.parse(value)));
-        Optional.ofNullable(preserveExpiry)
-                .filter(StringUtils::isNotEmpty)
+        optionalWithNullFilter(preserveExpiry)
                 .ifPresent(value -> options.preserveExpiry(Boolean.parseBoolean(value)));
-        Optional.ofNullable(storeSemantics)
-                .filter(StringUtils::isNotEmpty)
+        optionalWithNullFilter(storeSemantics)
                 .ifPresent(value -> options.storeSemantics(StoreSemantics.valueOf(storeSemantics)));
         return options;
+    }
+
+    private Optional<String> optionalWithNullFilter(String storeSemantics) {
+        return Optional.ofNullable(storeSemantics).filter(StringUtils::isNotEmpty);
     }
 
     @Override
