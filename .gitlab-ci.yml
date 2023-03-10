@@ -1,7 +1,9 @@
 services:
   - name: docker:dind
     command: [ "--tls=false" ]
+
 variables:
+  #  TESTCONTAINERS_HOST_OVERRIDE: "host.docker.internal"
   DOCKER_HOST: "tcp://docker:2375"
   DOCKER_TLS_CERTDIR: ""
   DOCKER_DRIVER: overlay2
@@ -11,7 +13,6 @@ variables:
     -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
     -Dorg.slf4j.simpleLogger.showDateTime=true
     -Djava.awt.headless=true
-    -DskipIntegrationTests=false
 
   MAVEN_CLI_OPTS: >-
     --batch-mode
@@ -19,12 +20,18 @@ variables:
     --fail-at-end
     --show-version
     --no-transfer-progress
-    -DinstallAtEnd=true
-default:
-  image: maven:3-openjdk-8
-  cache:
-    paths:
-      - .m2/repository
+#    -DinstallAtEnd=true
+
+  INT_TEST_DISABLE: >-
+    -Dskip.integration.tests=true
+
+  INT_TEST_ENABLE: >-
+    -Dskip.integration.tests=false
+
+image: maven:3-openjdk-8
+cache:
+  paths:
+    - .m2/repository
 
 stages:
   - build
@@ -33,7 +40,7 @@ stages:
 build:
   stage: build
   script:
-    - 'mvn $MAVEN_CLI_OPTS install'
+    - 'mvn $MAVEN_CLI_OPTS install $INT_TEST_DISABLE'
   except:
     variables:
       - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -41,7 +48,7 @@ build:
 test:
   stage: test
   script:
-    - 'mvn $MAVEN_CLI_OPTS verify'
+    - 'mvn $MAVEN_CLI_OPTS verify $INT_TEST_ENABLE'
   except:
     variables:
       - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
