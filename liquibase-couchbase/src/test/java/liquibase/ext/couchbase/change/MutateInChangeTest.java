@@ -67,6 +67,9 @@ public class MutateInChangeTest {
                 TEST_BUCKET,
                 TEST_SCOPE,
                 TEST_COLLECTION,
+                null,
+                null,
+                null,
                 specs
         );
     }
