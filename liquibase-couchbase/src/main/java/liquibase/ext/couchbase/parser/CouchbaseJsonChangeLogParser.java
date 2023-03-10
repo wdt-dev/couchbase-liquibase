@@ -6,11 +6,12 @@ import liquibase.changelog.DatabaseChangeLog;
 import liquibase.exception.ChangeLogParseException;
 import liquibase.ext.couchbase.exception.InvalidJSONException;
 import liquibase.logging.Logger;
+import liquibase.parser.core.json.JsonChangeLogParser;
 import liquibase.resource.ResourceAccessor;
 
 import static java.lang.String.format;
 
-public class JsonChangeLogParser extends liquibase.parser.core.json.JsonChangeLogParser {
+public class CouchbaseJsonChangeLogParser extends JsonChangeLogParser {
 
     private final Logger log = Scope.getCurrentScope().getLog(getClass());
 

@@ -1,1 +1,1 @@
-liquibase.ext.couchbase.parser.JsonChangeLogParser
+liquibase.ext.couchbase.parser.CouchbaseJsonChangeLogParser
