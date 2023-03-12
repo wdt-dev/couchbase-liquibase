@@ -49,6 +49,12 @@ test:
   stage: test
   script:
     - 'mvn $MAVEN_CLI_OPTS verify $INT_TEST_ENABLE'
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - liquibase-couchbase/target/surefire-reports/TEST-*.xml
+        - liquibase-couchbase/target/failsafe-reports/TEST-*.xml
   except:
     variables:
       - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
