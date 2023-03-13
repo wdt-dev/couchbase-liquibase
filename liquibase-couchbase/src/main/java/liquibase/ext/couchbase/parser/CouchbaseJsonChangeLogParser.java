@@ -15,6 +15,7 @@ public class CouchbaseJsonChangeLogParser extends JsonChangeLogParser {
 
     private final Logger log = Scope.getCurrentScope().getLog(getClass());
 
+    @Override
     public DatabaseChangeLog parse(String physicalChangeLogLocation,
                                    ChangeLogParameters changeLogParameters,
                                    ResourceAccessor resourceAccessor) throws ChangeLogParseException {
