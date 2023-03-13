@@ -6,6 +6,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+
+/**
+ * Document mapper for LIST mode (equals to cbimport LIST mode), when we have JsonArray with documents in file
+ *
+ * @link <a href="https://docs.couchbase.com/server/current/tools/cbimport-json.html#list">cbimport documentation</a>
+ */
 @NoArgsConstructor
 public class ListMapper implements DocFileMapper {
     @Override

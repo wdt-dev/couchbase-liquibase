@@ -18,6 +18,11 @@ import java.util.stream.Stream;
 
 import static liquibase.ext.couchbase.types.Document.document;
 
+/**
+ * Document mapper for LINES mode (equals to cbimport LINES mode), when every line in file consider as document
+ *
+ * @link <a href="https://docs.couchbase.com/server/current/tools/cbimport-json.html#list">cbimport documentation</a>
+ */
 @NoArgsConstructor
 public class LinesMapper implements DocFileMapper {
     private final Logger logger = Scope.getCurrentScope().getLog(LinesMapper.class);

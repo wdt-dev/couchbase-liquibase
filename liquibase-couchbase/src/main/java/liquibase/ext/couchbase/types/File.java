@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * File to import
+ *
  * @see AbstractLiquibaseSerializable
  * @see liquibase.serializer.LiquibaseSerializable
  */

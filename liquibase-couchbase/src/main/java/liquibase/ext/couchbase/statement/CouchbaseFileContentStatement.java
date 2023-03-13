@@ -17,7 +17,6 @@ import java.util.function.BiConsumer;
 /**
  * A base class for import from file statements, generalize the logic of importing
  */
-
 @Getter
 public abstract class CouchbaseFileContentStatement extends CouchbaseTransactionStatement {
 

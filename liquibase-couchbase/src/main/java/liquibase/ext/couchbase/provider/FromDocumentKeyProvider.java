@@ -5,6 +5,10 @@ import liquibase.ext.couchbase.exception.ProvideKeyFailedException;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+/**
+ * Document's key provider which uses specific field from document as key.
+ * If there's no field in document the document consider as incorrect
+ */
 public class FromDocumentKeyProvider implements DocumentKeyProvider<String, JsonObject> {
     private static final String DEFAULT_KEY_FIELD = "id";
     private final String keyField;

@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * Types of import from file (based on cbimport tool formats)
  *
- * @link <a href="https://docs.couchbase.com/server/current/tools/cbimport-json.html"/>
+ * @link <a href="https://docs.couchbase.com/server/current/tools/cbimport-json.html#dataset-formats"/>
  */
 @Getter
 public enum ImportType implements SingletonObject {

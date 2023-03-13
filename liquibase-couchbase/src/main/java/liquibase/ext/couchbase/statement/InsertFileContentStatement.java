@@ -12,11 +12,12 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * A statement to insert documents from file inside one transaction into a keyspace
+ *
+ * @link <a href="https://docs.couchbase.com/server/current/tools/cbimport-json.html"/>
  * @see Document
  * @see CouchbaseStatement
  * @see Keyspace
  */
-
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = true)

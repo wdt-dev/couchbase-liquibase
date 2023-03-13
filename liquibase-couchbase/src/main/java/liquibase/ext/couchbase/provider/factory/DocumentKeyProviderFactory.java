@@ -6,6 +6,10 @@ import liquibase.ext.couchbase.provider.FromDocumentKeyProvider;
 import liquibase.ext.couchbase.types.File;
 import liquibase.ext.couchbase.types.KeyProviderType;
 
+/**
+ * This is factory of Couchbase document key's providers.
+ * It is using to get keys for documents that import from file
+ */
 public class DocumentKeyProviderFactory implements SingletonObject {
 
     public DocumentKeyProvider<?, ?> getKeyProvider(File file) {
