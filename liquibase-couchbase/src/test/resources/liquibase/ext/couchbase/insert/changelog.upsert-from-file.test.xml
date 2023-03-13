@@ -22,7 +22,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
-        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-couchbase-ext.xsd">
 
     <changeSet id="1" author="konstantin.umanets">
         <ext:upsertDocuments>
@@ -30,7 +30,7 @@
             <ext:scopeName>testScope</ext:scopeName>
             <ext:collectionName>testCollection</ext:collectionName>
             <ext:file>
-                <ext:filePath>./testLines.json</ext:filePath>
+                <ext:filePath>src/test/resources/liquibase/ext/couchbase/insert/testLines.json</ext:filePath>
                 <ext:importType>LINES</ext:importType>
                 <ext:keyProviderType>DEFAULT</ext:keyProviderType>
                 <ext:keyProviderExpression>id</ext:keyProviderExpression>

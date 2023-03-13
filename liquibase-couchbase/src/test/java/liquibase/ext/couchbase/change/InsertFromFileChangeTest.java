@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.internal.util.collections.Iterables.firstOf;
 
 class InsertFromFileChangeTest {
-    private static final String TEST_FILE_NAME = "./testLines.json";
+    private static final String TEST_FILE_NAME = "testLines.json";
     private DatabaseChangeLog changeLog;
 
     @BeforeEach
@@ -39,7 +39,7 @@ class InsertFromFileChangeTest {
         InsertDocumentsChange change = (InsertDocumentsChange) firstOf(changeSet.getChanges());
         assertThat(change.getDocuments()).isEmpty();
         assertThat(change.getFile()).isNotNull();
-        assertThat(change.getFile().getFilePath()).isEqualTo(TEST_FILE_NAME);
+        assertThat(change.getFile().getFilePath()).contains(TEST_FILE_NAME);
         assertThat(change.getFile().getImportType()).isEqualTo(ImportType.LINES);
     }
 }

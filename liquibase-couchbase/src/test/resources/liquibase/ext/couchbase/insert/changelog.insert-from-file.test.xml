@@ -30,7 +30,7 @@
             <ext:scopeName>testScope</ext:scopeName>
             <ext:collectionName>testCollection</ext:collectionName>
             <ext:file>
-                <ext:filePath>./testLines.json</ext:filePath>
+                <ext:filePath>src/test/resources/liquibase/ext/couchbase/insert/testLines.json</ext:filePath>
                 <ext:importType>LINES</ext:importType>
                 <ext:keyProviderType>DEFAULT</ext:keyProviderType>
                 <ext:keyProviderExpression>id</ext:keyProviderExpression>

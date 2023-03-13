@@ -5,19 +5,9 @@ import liquibase.change.ChangeMetaData;
 import liquibase.change.DatabaseChange;
 import liquibase.ext.couchbase.statement.InsertDocumentsStatement;
 import liquibase.ext.couchbase.statement.InsertFileContentStatement;
-import liquibase.ext.couchbase.types.Document;
-import liquibase.ext.couchbase.types.File;
 import liquibase.ext.couchbase.types.Keyspace;
 import liquibase.statement.SqlStatement;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import lombok.Data;
 
 import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 
@@ -28,37 +18,27 @@ import static liquibase.ext.couchbase.types.Keyspace.keyspace;
  * @see Keyspace
  */
 
-@Getter
-@Setter
+@Data
 @DatabaseChange(
         name = "insertDocuments",
         description = "Inserts multiple documents into a collection https://docs.couchbase.com/java-sdk/3.3/howtos/kv-operations.html",
         priority = ChangeMetaData.PRIORITY_DEFAULT,
         appliesTo = {"collection", "database"}
 )
-@NoArgsConstructor
-@AllArgsConstructor
-public class InsertDocumentsChange extends CouchbaseChange {
-
-    private String bucketName;
-    private String scopeName;
-    private String collectionName;
-    private List<Document> documents = new ArrayList<>();
-    private File file = new File();
-
-    @Override
-    public String getConfirmationMessage() {
-        return String.format("Documents inserted into collection %s", collectionName);
-    }
+public class InsertDocumentsChange extends DocumentsChange {
 
     @Override
     public SqlStatement[] generateStatements() {
         Keyspace keyspace = keyspace(bucketName, scopeName, collectionName);
-        Optional<String> hasFile = Optional.ofNullable(file).map(File::getFilePath).filter(StringUtils::isNotBlank);
-        return new SqlStatement[] {
-                hasFile.isPresent() ? new InsertFileContentStatement(keyspace, file) :
-                        new InsertDocumentsStatement(keyspace, documents)
-        };
+        SqlStatement statement = isFileChange()
+                ? new InsertFileContentStatement(keyspace, file)
+                : new InsertDocumentsStatement(keyspace, documents);
+        return new SqlStatement[] {statement};
+    }
+
+    @Override
+    public String getConfirmationMessage() {
+        return String.format("Documents inserted into collection %s", collectionName);
     }
 
 }
