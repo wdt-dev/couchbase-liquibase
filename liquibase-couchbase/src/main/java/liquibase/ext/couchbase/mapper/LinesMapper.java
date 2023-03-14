@@ -30,19 +30,20 @@ public class LinesMapper implements DocFileMapper {
     @Override
     public List<Document> map(File file) {
         try (Stream<String> stream = Files.lines(Paths.get(file.getFilePath()))) {
-            DocumentKeyProvider<String, JsonObject> keyProvider =
-                    (DocumentKeyProvider<String, JsonObject>) keyProviderFactory.getKeyProvider(file);
-
-            return stream.map(JsonObject::fromJson)
-                    .map(json -> lineToDocument(keyProvider.getKey(json), json))
-                    .collect(Collectors.toList());
+            return getDocumentsFromFile(file, stream);
         } catch (IOException e) {
             logger.warning("Incorrect json file provided", e);
             throw new IncorrectFileException(file.getFilePath());
         }
     }
 
-    private Document lineToDocument(String key, JsonObject json) {
-        return document(key, json);
+    private List<Document> getDocumentsFromFile(File file, Stream<String> linesFromFile) {
+        DocumentKeyProvider<String, JsonObject> keyProvider =
+                (DocumentKeyProvider<String, JsonObject>) keyProviderFactory.getKeyProvider(file);
+
+        return linesFromFile
+                .map(JsonObject::fromJson)
+                .map(json -> document(keyProvider.getKey(json), json))
+                .collect(Collectors.toList());
     }
 }
