@@ -1,21 +1,16 @@
 package liquibase.ext.couchbase.mapper;
 
 import com.couchbase.client.java.json.JsonObject;
-import liquibase.Scope;
-import liquibase.ext.couchbase.exception.IncorrectFileException;
-import liquibase.ext.couchbase.provider.DocumentKeyProvider;
-import liquibase.ext.couchbase.types.Document;
-import liquibase.ext.couchbase.types.File;
-import liquibase.logging.Logger;
-import lombok.NoArgsConstructor;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import liquibase.ext.couchbase.provider.DocumentKeyProvider;
+import liquibase.ext.couchbase.provider.factory.DocumentKeyProviderFactory;
+import liquibase.ext.couchbase.types.Document;
+import liquibase.ext.couchbase.types.File;
+import static java.util.stream.Collectors.toList;
+import static liquibase.Scope.getCurrentScope;
 import static liquibase.ext.couchbase.types.Document.document;
 
 /**
@@ -23,27 +18,33 @@ import static liquibase.ext.couchbase.types.Document.document;
  *
  * @link <a href="https://docs.couchbase.com/server/current/tools/cbimport-json.html#list">cbimport documentation</a>
  */
-@NoArgsConstructor
 public class LinesMapper implements DocFileMapper {
-    private final Logger logger = Scope.getCurrentScope().getLog(LinesMapper.class);
+    private final DocumentKeyProviderFactory keyProviderFactory;
+
+    public LinesMapper() {
+        this(getCurrentScope().getSingleton(DocumentKeyProviderFactory.class));
+    }
+
+    public LinesMapper(DocumentKeyProviderFactory keyProviderFactory) {
+        this.keyProviderFactory = keyProviderFactory;
+    }
 
     @Override
     public List<Document> map(File file) {
-        try (Stream<String> stream = Files.lines(Paths.get(file.getFilePath()))) {
-            return getDocumentsFromFile(file, stream);
-        } catch (IOException e) {
-            logger.warning("Incorrect json file provided", e);
-            throw new IncorrectFileException(file.getFilePath());
+        try (Stream<String> stream = file.lines()) {
+            DocumentKeyProvider keyProvider = keyProviderFactory.getKeyProvider(file);
+            return extractDocuments(stream, keyProvider);
         }
     }
 
-    private List<Document> getDocumentsFromFile(File file, Stream<String> linesFromFile) {
-        DocumentKeyProvider<String, JsonObject> keyProvider =
-                (DocumentKeyProvider<String, JsonObject>) keyProviderFactory.getKeyProvider(file);
+    private List<Document> extractDocuments(Stream<String> stream, DocumentKeyProvider keyProvider) {
+        return stream.map(JsonObject::fromJson)
+                .map(json -> lineToDocument(keyProvider.getKey(json), json))
+                .collect(toList());
+    }
 
-        return linesFromFile
-                .map(JsonObject::fromJson)
-                .map(json -> document(keyProvider.getKey(json), json))
-                .collect(Collectors.toList());
+
+    private Document lineToDocument(String key, JsonObject json) {
+        return document(key, json);
     }
 }
