@@ -10,6 +10,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 /**
  * A statement to insert documents from file inside one transaction into a keyspace
  *
@@ -29,7 +31,7 @@ public class InsertFileContentStatement extends CouchbaseFileContentStatement {
     public void doInTransaction(TransactionAttemptContext transaction, ClusterOperator clusterOperator) {
         CollectionOperator collectionOperator = clusterOperator.getBucketOperator(keyspace.getBucket())
                 .getCollectionOperator(keyspace.getCollection(), keyspace.getScope());
-        importFromFileWith(transaction, file, clusterOperator, collectionOperator::upsertDocsTransactionally);
+        Map<String, Object> stringObjectMap = importFromFileWith(file, clusterOperator);
     }
 }
 

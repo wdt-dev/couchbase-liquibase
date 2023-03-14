@@ -9,18 +9,18 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * Document's key provider which uses specific field from document as key.
  * If there's no field in document the document consider as incorrect
  */
-public class FromDocumentKeyProvider implements DocumentKeyProvider<String, JsonObject> {
+public class FieldDocumentKeyProvider implements DocumentKeyProvider {
     private static final String DEFAULT_KEY_FIELD = "id";
     private final String keyField;
 
-    public FromDocumentKeyProvider(String keyField) {
+    public FieldDocumentKeyProvider(String keyField) {
         this.keyField = isEmpty(keyField) ? DEFAULT_KEY_FIELD : keyField;
     }
 
     @Override
     public String getKey(JsonObject jsonObject) {
         if (jsonObject.containsKey(keyField)) {
-            return (String) jsonObject.get(keyField);
+            return jsonObject.getString(keyField);
         }
         throw new ProvideKeyFailedException("Document contains no key field");
     }
