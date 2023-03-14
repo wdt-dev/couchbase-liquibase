@@ -1,6 +1,9 @@
 package liquibase.ext.couchbase.statement;
 
 import com.couchbase.client.java.transactions.TransactionAttemptContext;
+
+import java.util.Map;
+
 import liquibase.ext.couchbase.operator.ClusterOperator;
 import liquibase.ext.couchbase.operator.CollectionOperator;
 import liquibase.ext.couchbase.types.Document;
@@ -9,8 +12,6 @@ import liquibase.ext.couchbase.types.Keyspace;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Map;
 
 /**
  * A statement to upsert documents from file inside one transaction into a keyspace
