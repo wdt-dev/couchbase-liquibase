@@ -1,6 +1,9 @@
 package liquibase.ext.couchbase.statement;
 
 import com.couchbase.client.java.transactions.TransactionAttemptContext;
+
+import java.util.Map;
+
 import liquibase.ext.couchbase.operator.ClusterOperator;
 import liquibase.ext.couchbase.operator.CollectionOperator;
 import liquibase.ext.couchbase.types.Document;
@@ -29,7 +32,8 @@ public class UpsertFileContentStatement extends CouchbaseFileContentStatement {
     public void doInTransaction(TransactionAttemptContext transaction, ClusterOperator clusterOperator) {
         CollectionOperator collectionOperator = clusterOperator.getBucketOperator(keyspace.getBucket())
                 .getCollectionOperator(keyspace.getCollection(), keyspace.getScope());
-        importFromFileWith(transaction, file, clusterOperator, collectionOperator::insertDocsTransactionally);
+        Map<String, Object> docs = getDocsFromFile(file, clusterOperator);
+        collectionOperator.insertDocsTransactionally(transaction, docs);
     }
 }
 

@@ -31,7 +31,8 @@ public class InsertFileContentStatement extends CouchbaseFileContentStatement {
     public void doInTransaction(TransactionAttemptContext transaction, ClusterOperator clusterOperator) {
         CollectionOperator collectionOperator = clusterOperator.getBucketOperator(keyspace.getBucket())
                 .getCollectionOperator(keyspace.getCollection(), keyspace.getScope());
-        Map<String, Object> stringObjectMap = importFromFileWith(file, clusterOperator);
+        Map<String, Object> docs = getDocsFromFile(file, clusterOperator);
+        collectionOperator.upsertDocsTransactionally(transaction, docs);
     }
 }
 
