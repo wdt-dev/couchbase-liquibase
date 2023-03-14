@@ -11,6 +11,7 @@ import com.couchbase.client.java.manager.query.CreatePrimaryQueryIndexOptions;
 import com.couchbase.client.java.manager.query.CreateQueryIndexOptions;
 import com.couchbase.client.java.manager.query.QueryIndex;
 import com.couchbase.client.java.manager.query.QueryIndexManager;
+import com.couchbase.client.java.transactions.TransactionAttemptContext;
 import liquibase.ext.couchbase.types.Document;
 import liquibase.ext.couchbase.types.Field;
 import liquibase.ext.couchbase.types.Keyspace;
@@ -19,6 +20,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
@@ -91,6 +93,28 @@ public class ClusterOperator {
 
     public void dropBucket(String bucketName) {
         cluster.buckets().dropBucket(bucketName);
+    }
+
+    // TODO
+    public void executeN1ql(TransactionAttemptContext transaction, List<String> queries) {
+        queries.forEach(query -> {
+            if (query.toLowerCase().contains("create scope") || query.toLowerCase().contains("create collection")) {
+                cluster.query(query);
+            }
+            else {
+                transaction.query(query);
+            }
+        });
+    }
+
+    // TODO
+    public void executeN1ql(List<String> queries) {
+        //             if (query.toLowerCase().contains("create scope")) {
+        //             }
+        //             else {
+        //                 transaction.query(query);
+        //             }
+        queries.forEach(cluster::query);
     }
 
     public QueryIndexManager getQueryIndexes() {
