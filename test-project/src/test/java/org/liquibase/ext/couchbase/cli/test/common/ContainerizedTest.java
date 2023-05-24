@@ -5,8 +5,9 @@ import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.operator.ClusterOperator;
 import org.testcontainers.couchbase.CouchbaseContainer;
 
-import static org.liquibase.ext.couchbase.cli.test.common.TestContainerInitializer.createCocubhaseContainer;
+import static org.liquibase.ext.couchbase.cli.test.common.TestContainerInitializer.createCouchbaseContainer;
 import static org.liquibase.ext.couchbase.cli.test.common.TestContainerInitializer.createDatabase;
+import static org.liquibase.ext.couchbase.cli.test.common.TestContainerInitializer.createJavaMavenContainerWithJar;
 
 public abstract class ContainerizedTest {
 
@@ -19,12 +20,12 @@ public abstract class ContainerizedTest {
     protected static final String TEST_COLLECTION = "testCollection";
 
     static {
-        couchbaseContainer = createCocubhaseContainer(TEST_BUCKET);
+        couchbaseContainer = createCouchbaseContainer(TEST_BUCKET);
         couchbaseContainer.start();
         CouchbaseLiquibaseDatabase database = createDatabase(couchbaseContainer);
         cluster = database.getConnection().getCluster();
         clusterOperator = new ClusterOperator(cluster);
 
-        TestContainerInitializer.createJavaMavenContainerWithJar();
+        //createJavaMavenContainerWithJar();
     }
 }
