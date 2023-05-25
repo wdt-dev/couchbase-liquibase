@@ -195,37 +195,29 @@
                     <goal>verify</goal>
                     <includes>
                         <include>**/liquibase/ext/couchbase/**</include>
-<!--                        <include>**/integration/**</include>-->
-<!--                        <include>**/system/**</include>-->
                     </includes>
-                    <properties>
-                        <configurationParameters>
-                            junit.platform.reporting.open.xml.enabled = true
-                            junit.platform.reporting.output.dir = target/surefire-reports
-                        </configurationParameters>
-                    </properties>
                 </configuration>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-failsafe-plugin</artifactId>-->
-<!--                <version>${failsafe.maven.plugin.version}</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>integration-test</goal>-->
-<!--                            <goal>verify</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <skipITs>${skip.integration.tests}</skipITs>-->
-<!--                            <includes>-->
-<!--                                <include>**/integration/**</include>-->
-<!--                                <include>**/system/**</include>-->
-<!--                            </includes>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${failsafe.maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <skipITs>${skip.integration.tests}</skipITs>
+                            <includes>
+                                <include>**/integration/**</include>
+                                <include>**/system/**</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
