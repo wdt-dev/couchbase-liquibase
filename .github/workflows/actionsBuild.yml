@@ -24,7 +24,7 @@ jobs:
       run: mvn package --file liquibase-couchbase/pom.xml -DskipTests
     
     - name: Test with Maven
-      run: mvn clean verify --file liquibase-couchbase/pom.xml -Dskip.integration.tests=false
+      run: mvn clean verifyy --file liquibase-couchbase/pom.xml -Dskip.integration.tests=false
 
 #     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
 #     - name: Update dependency graph
