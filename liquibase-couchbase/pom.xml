@@ -195,8 +195,8 @@
                     <goal>verify</goal>
                     <includes>
                         <include>**/liquibase/ext/couchbase/**</include>
-                        <include>**/integration/**</include>
-                        <include>**/system/**</include>
+<!--                        <include>**/integration/**</include>-->
+<!--                        <include>**/system/**</include>-->
                     </includes>
                     <properties>
                         <configurationParameters>

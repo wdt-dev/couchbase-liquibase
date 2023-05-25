@@ -25,6 +25,9 @@ jobs:
     
     - name: Test with Maven
       run: mvn clean verify --file liquibase-couchbase/pom.xml -Dskip.integration.tests=false
+
+    - name: Install packages
+      run: npm ci                   # install packages
       
     - name: Test Report
       uses: dorny/test-reporter@v1
