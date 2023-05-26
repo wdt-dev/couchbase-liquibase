@@ -1,4 +1,4 @@
-package org.liquibase.ext.couchbase.starter.test;
+package org.liquibase.ext.couchbase.plugin.test;
 
 import com.couchbase.client.java.Collection;
 import liquibase.ext.couchbase.operator.CollectionOperator;

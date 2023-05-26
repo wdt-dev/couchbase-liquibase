@@ -22,8 +22,8 @@ class CreateBucketSystemTest extends ContainerizedTest {
 
     @Test
     @SneakyThrows
-    void Should_create_bucket_scope_collection() {
-        javaMavenPluginContainer = createMavenPluginContainer(couchbaseContainer, "changelogs/create-bucket.test.xml");
+    void Should_create_bucket() {
+        javaMavenPluginContainer = createMavenPluginContainer(couchbaseContainer, "changelogs/create-bucket.xml");
 
         javaMavenPluginContainer.start();
         while (javaMavenPluginContainer.isRunning()) {

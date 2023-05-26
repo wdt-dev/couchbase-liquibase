@@ -1,4 +1,4 @@
-package org.liquibase.ext.couchbase.starter.test;
+package org.liquibase.ext.couchbase.plugin.test;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
@@ -28,6 +28,7 @@ public class CustomSettingsSystemTest extends ContainerizedTest {
 
     @Test
     @SneakyThrows
+    //TODO test doesn't pass for now
     public void Should_set_custom_settings() {
         javaMavenPluginContainer = createMavenPluginContainer(couchbaseContainer, "changelogs/custom-settings-mock-test.xml");
 

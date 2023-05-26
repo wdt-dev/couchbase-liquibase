@@ -18,8 +18,6 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.String.format;
-
 public class TestContainerInitializer {
     private static final String COUCHBASE_IMAGE_NAME = TestPropertyProvider.getProperty("couchbase.image.name");
     private static final String COUCHBASE_IMAGE_VERSION = TestPropertyProvider.getProperty("couchbase.version");
@@ -68,7 +66,8 @@ public class TestContainerInitializer {
         MountableFile changelogFile = MountableFile.forHostPath(
                 getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/src/test/resources/" + changelog);
         MountableFile liquibaseCouchbaseFile = MountableFile.forHostPath(
-                getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/src/test/resources/mvntest/liquibase-couchbase.properties");
+                getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/src/test/resources/mvntest/liquibase-couchbase" +
+                        ".properties");
         MountableFile credentialsFile = MountableFile.forHostPath(
                 getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/src/test/resources/" + LIQUIBASE_PROPERTIES_FILE);
         MountableFile liquibaseUpdateShFile = MountableFile.forHostPath(
@@ -83,7 +82,8 @@ public class TestContainerInitializer {
                         getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project"), "/test-project")
                 .withCopyFileToContainer(changelogFile,
                         "/test-project/src/main/resources/liquibase/changelog-root.xml")
-                .withCopyFileToContainer(liquibaseCouchbaseFile, "/test-project/src/main/resources/liquibase/liquibase-couchbase.properties")
+                .withCopyFileToContainer(liquibaseCouchbaseFile,
+                        "/test-project/src/main/resources/liquibase/liquibase-couchbase.properties")
                 .withCopyFileToContainer(credentialsFile,
                         "/test-project/src/main/resources/liquibase/liquibase.properties")
                 .withCopyFileToContainer(liquibaseUpdateShFile, "liquibase-update-command.sh")
@@ -96,9 +96,12 @@ public class TestContainerInitializer {
     @SneakyThrows
     public static JavaMavenContainer createJavaMavenContainerWithJar() {
         try (JavaMavenContainer javaMavenContainer = new JavaMavenContainer()) {
-            javaMavenContainer.withFileSystemBind(getPathOfLiquibaseCouchbaseParentProject().toString(),
+            javaMavenContainer
+                    .withFileSystemBind(getPathOfLiquibaseCouchbaseParentProject().toString(),
                             LIQUIBASE_COUCHBASE_PROJECT_BASE_DIR,
                             BindMode.READ_WRITE)
+//                     .withCopyFileToContainer(MountableFile.forHostPath(
+//                             getPathOfLiquibaseCouchbaseParentProject().toString()), "/couchbase-extension")
                     .withFileSystemBind(getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/dependencies",
                             "/root/.m2/repository")
                     .withCopyFileToContainer(MountableFile.forClasspathResource("build-dependency.sh"),
