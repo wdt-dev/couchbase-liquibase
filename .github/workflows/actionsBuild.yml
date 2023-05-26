@@ -38,7 +38,7 @@ jobs:
       id: jacoco
       uses: madrapps/jacoco-report@v1.3
       with:
-        paths: liquibase-couchbase/target/site/jacoco/jacoco.xml,liquibase-couchbase/target/site/jacoco-it/jacoco.xml
+        paths: liquibase-couchbase/target/site/jacoco/jacoco.xml
         token: ${{ secrets.GITHUB_TOKEN }}
         min-coverage-overall: 40
         min-coverage-changed-files: 60
