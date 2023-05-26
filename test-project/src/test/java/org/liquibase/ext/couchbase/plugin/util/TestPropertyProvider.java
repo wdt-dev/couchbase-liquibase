@@ -1,4 +1,4 @@
-package org.liquibase.ext.couchbase.cli.test.util;
+package org.liquibase.ext.couchbase.plugin.util;
 
 import lombok.SneakyThrows;
 

@@ -1,13 +1,15 @@
-package org.liquibase.ext.couchbase.cli.test.common;
+package org.liquibase.ext.couchbase.plugin.common;
 
+import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.operator.ClusterOperator;
 import org.testcontainers.couchbase.CouchbaseContainer;
 
-import static org.liquibase.ext.couchbase.cli.test.common.TestContainerInitializer.createCouchbaseContainer;
-import static org.liquibase.ext.couchbase.cli.test.common.TestContainerInitializer.createDatabase;
-import static org.liquibase.ext.couchbase.cli.test.common.TestContainerInitializer.createJavaMavenContainerWithJar;
+import static com.couchbase.client.java.manager.collection.CollectionSpec.create;
+import static org.liquibase.ext.couchbase.plugin.common.TestContainerInitializer.createCouchbaseContainer;
+import static org.liquibase.ext.couchbase.plugin.common.TestContainerInitializer.createDatabase;
+import static org.liquibase.ext.couchbase.plugin.common.TestContainerInitializer.createJavaMavenContainerWithJar;
 
 public abstract class ContainerizedTest {
 
@@ -23,9 +25,13 @@ public abstract class ContainerizedTest {
         couchbaseContainer = createCouchbaseContainer(TEST_BUCKET);
         couchbaseContainer.start();
         CouchbaseLiquibaseDatabase database = createDatabase(couchbaseContainer);
+
         cluster = database.getConnection().getCluster();
+        Bucket bucket = cluster.bucket(TEST_BUCKET);
+        bucket.collections().createScope(TEST_SCOPE);
+        bucket.collections().createCollection(create(TEST_COLLECTION, TEST_SCOPE));
         clusterOperator = new ClusterOperator(cluster);
 
-        //createJavaMavenContainerWithJar();
+        createJavaMavenContainerWithJar();
     }
 }

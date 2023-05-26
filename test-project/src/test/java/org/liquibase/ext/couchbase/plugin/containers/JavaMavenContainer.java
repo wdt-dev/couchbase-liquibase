@@ -1,6 +1,6 @@
-package org.liquibase.ext.couchbase.cli.test.containers;
+package org.liquibase.ext.couchbase.plugin.containers;
 
-import org.liquibase.ext.couchbase.cli.test.common.TestContainerInitializer;
+import org.liquibase.ext.couchbase.plugin.common.TestContainerInitializer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
