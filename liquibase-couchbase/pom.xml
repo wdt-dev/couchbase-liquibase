@@ -243,6 +243,7 @@
                         <configuration>
                             <formats>
                                 <format>HTML</format>
+                                <format>XML</format>
                             </formats>
                         </configuration>
                     </execution>
@@ -254,6 +255,7 @@
                         <configuration>
                             <formats>
                                 <format>HTML</format>
+                                <format>XML</format>
                             </formats>
                         </configuration>
                     </execution>
