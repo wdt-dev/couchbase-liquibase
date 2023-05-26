@@ -24,7 +24,7 @@ jobs:
       run: mvn package --file liquibase-couchbase/pom.xml -DskipTests
 
     - name: Test with Maven
-      run: mvn clean --file liquibase-couchbase/pom.xml org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.8:report -Dskip.integration.tests=true
+      run: mvn clean --file liquibase-couchbase/pom.xml org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.8:report -Dskip.integration.tests=false
       
     - name: Test Report
       uses: dorny/test-reporter@v1
