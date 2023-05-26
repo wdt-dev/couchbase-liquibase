@@ -24,7 +24,7 @@ jobs:
       run: mvn package --file liquibase-couchbase/pom.xml -DskipTests
 
     - name: Test with Maven
-      run: mvn clean verify --file liquibase-couchbase/pom.xml -Dskip.integration.tests=true
+      run: mvn clean --file liquibase-couchbase/pom.xml org.jacoco:jacoco-maven-plugin:0.8.8:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.8:report -Dskip.integration.tests=true
       
     - name: Test Report
       uses: dorny/test-reporter@v1
@@ -39,6 +39,7 @@ jobs:
       uses: madrapps/jacoco-report@v1.3
       with:
         paths: liquibase-couchbase/target/site/jacoco/jacoco.xml,liquibase-couchbase/target/site/jacoco-it/jacoco.xml
+        token: ${{ secrets.GITHUB_TOKEN }}
         min-coverage-overall: 40
         min-coverage-changed-files: 60
 
