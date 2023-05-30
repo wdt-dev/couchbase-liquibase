@@ -22,21 +22,12 @@ public class TestContainerInitializer {
     private static final String COUCHBASE_IMAGE_NAME = TestPropertyProvider.getProperty("couchbase.image.name");
     private static final String COUCHBASE_IMAGE_VERSION = TestPropertyProvider.getProperty("couchbase.version");
     private static final String TEST_PROJECT_ABSOLUTE_PATH = System.getProperty("user.dir");
+    private static final String TEST_PROJECT_MAIN_RESOURCES_PATH = "/test-project/src/main/resources/";
+    private static final String ROOT_WITH_TEST_PROJECT_TEST_RESOURCES = TEST_PROJECT_ABSOLUTE_PATH + "/src/test/resources/";
     private static final String COUCHBASE_NETWORK_ALIAS = "couchbase";
-    private static final String CONTAINER_JAR_PATH = "/liquibase/internal/lib/liquibase_couchbase.jar";
-    private static final String LIQUIBASE_CONTAINER_CHANGELOG_PATH = "/liquibase/changelog-exec.xml";
     private static final String LIQUIBASE_COUCHBASE_PROJECT_BASE_DIR = "/liquibase-couchbase-extension";
-    private static final String LIQUIBASE_CONTAINER_COUCHBASE_PROPERTIES_PATH = "/liquibase/liquibase-couchbase.properties";
-    private static final String LIQUIBASE_CONTAINER_PROPERTIES_PATH = "/liquibase/liquibase.properties";
-    private static final String LIQUIBASE_COUCHBASE_PROJECT_RELATIVE_PATH = "liquibase-couchbase/target/liquibase-couchbase-0.1" +
-            ".0-SNAPSHOT.jar";
-    private static final String LIQUIBASE_COUCHBASE_PROPERTIES_FILE = "liquibase-couchbase.properties";
     private static final String LIQUIBASE_PROPERTIES_FILE = "liquibase.properties";
-    private static final String LIQUIBASE_UPDATE_COMMAND_TEMPLATE = "mvn -f /test-project/pom.xml " +
-            "liquibase:update -DchangeLogFile=changelog-exec.xml";
-    private static final String MAVEN_CLEAN_PACKAGE_COMMAND = "mvn -f /liquibase-couchbase-extension/test-project/pom.xml clean package " +
-            "-Dmaven.test.skip";
-    private static final Integer COUCHBASE_UPDATE_PORT = 11210;
+    private static final String DEPENDENCIES_VOLUME = "/dependencies";
 
     public static CouchbaseLiquibaseDatabase createDatabase(CouchbaseContainer container) {
         return new CouchbaseLiquibaseDatabase(
@@ -63,29 +54,21 @@ public class TestContainerInitializer {
     }
 
     public static JavaMavenContainer createMavenPluginContainer(CouchbaseContainer couchbaseContainer, String changelog) {
-        MountableFile changelogFile = MountableFile.forHostPath(
-                getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/src/test/resources/" + changelog);
+        MountableFile changelogFile = MountableFile.forHostPath(ROOT_WITH_TEST_PROJECT_TEST_RESOURCES + changelog);
         MountableFile liquibaseCouchbaseFile = MountableFile.forHostPath(
-                getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/src/test/resources/mvntest/liquibase-couchbase" +
-                        ".properties");
-        MountableFile credentialsFile = MountableFile.forHostPath(
-                getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/src/test/resources/" + LIQUIBASE_PROPERTIES_FILE);
+                ROOT_WITH_TEST_PROJECT_TEST_RESOURCES + "mvntest/liquibase-couchbase.properties");
+        MountableFile credentialsFile = MountableFile.forHostPath(ROOT_WITH_TEST_PROJECT_TEST_RESOURCES + LIQUIBASE_PROPERTIES_FILE);
         MountableFile liquibaseUpdateShFile = MountableFile.forHostPath(
-                getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/src/test/resources/liquibase-update-command.sh");
+                ROOT_WITH_TEST_PROJECT_TEST_RESOURCES + "liquibase-update-command.sh");
 
         try (JavaMavenContainer javaMavenPluginContainer = new JavaMavenContainer()
-                .withFileSystemBind(getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/dependencies",
-                        "/root/.m2/repository")
+                .withFileSystemBind(getRootPath() + DEPENDENCIES_VOLUME, "/root/.m2/repository")
                 .withNetwork(couchbaseContainer.getNetwork())
                 .withAccessToHost(true)
-                .withCopyFileToContainer(MountableFile.forHostPath(
-                        getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project"), "/test-project")
-                .withCopyFileToContainer(changelogFile,
-                        "/test-project/src/main/resources/liquibase/changelog-root.xml")
-                .withCopyFileToContainer(liquibaseCouchbaseFile,
-                        "/test-project/src/main/resources/liquibase-couchbase.properties")
-                .withCopyFileToContainer(credentialsFile,
-                        "/test-project/src/main/resources/liquibase/liquibase.properties")
+                .withCopyFileToContainer(MountableFile.forHostPath(TEST_PROJECT_ABSOLUTE_PATH), "/test-project")
+                .withCopyFileToContainer(changelogFile, TEST_PROJECT_MAIN_RESOURCES_PATH + "liquibase/changelog-root.xml")
+                .withCopyFileToContainer(liquibaseCouchbaseFile, TEST_PROJECT_MAIN_RESOURCES_PATH + "liquibase-couchbase.properties")
+                .withCopyFileToContainer(credentialsFile, TEST_PROJECT_MAIN_RESOURCES_PATH + "liquibase/liquibase.properties")
                 .withCopyFileToContainer(liquibaseUpdateShFile, "liquibase-update-command.sh")
                 .dependsOn(couchbaseContainer)
                 .withCommand("sh liquibase-update-command.sh")) {
@@ -94,13 +77,13 @@ public class TestContainerInitializer {
     }
 
     @SneakyThrows
-    public static JavaMavenContainer createJavaMavenContainerWithJar() {
+    public static JavaMavenContainer createJavaMavenContainerToBuildDependency() {
         try (JavaMavenContainer javaMavenContainer = new JavaMavenContainer()) {
             javaMavenContainer
                     .withFileSystemBind(getPathOfLiquibaseCouchbaseParentProject().toString(),
                             LIQUIBASE_COUCHBASE_PROJECT_BASE_DIR,
                             BindMode.READ_WRITE)
-                    .withFileSystemBind(getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/dependencies",
+                    .withFileSystemBind(getRootPath() + DEPENDENCIES_VOLUME,
                             "/root/.m2/repository")
                     .withCopyFileToContainer(MountableFile.forClasspathResource("build-dependency.sh"),
                             "build-dependency.sh")
@@ -115,6 +98,10 @@ public class TestContainerInitializer {
 
     public static Path getPathOfLiquibaseCouchbaseParentProject() {
         return Paths.get(TEST_PROJECT_ABSOLUTE_PATH).getParent();
+    }
+
+    public static String getRootPath() {
+        return getPathOfLiquibaseCouchbaseParentProject().toString();
     }
 
 }

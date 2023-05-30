@@ -9,7 +9,7 @@ import org.testcontainers.couchbase.CouchbaseContainer;
 import static com.couchbase.client.java.manager.collection.CollectionSpec.create;
 import static org.liquibase.ext.couchbase.plugin.common.TestContainerInitializer.createCouchbaseContainer;
 import static org.liquibase.ext.couchbase.plugin.common.TestContainerInitializer.createDatabase;
-import static org.liquibase.ext.couchbase.plugin.common.TestContainerInitializer.createJavaMavenContainerWithJar;
+import static org.liquibase.ext.couchbase.plugin.common.TestContainerInitializer.createJavaMavenContainerToBuildDependency;
 
 public abstract class ContainerizedTest {
 
@@ -32,6 +32,6 @@ public abstract class ContainerizedTest {
         bucket.collections().createCollection(create(TEST_COLLECTION, TEST_SCOPE));
         clusterOperator = new ClusterOperator(cluster);
 
-        createJavaMavenContainerWithJar();
+        createJavaMavenContainerToBuildDependency();
     }
 }
