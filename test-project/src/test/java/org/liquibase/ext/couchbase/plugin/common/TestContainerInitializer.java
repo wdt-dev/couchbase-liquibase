@@ -83,7 +83,7 @@ public class TestContainerInitializer {
                 .withCopyFileToContainer(changelogFile,
                         "/test-project/src/main/resources/liquibase/changelog-root.xml")
                 .withCopyFileToContainer(liquibaseCouchbaseFile,
-                        "/test-project/src/main/resources/liquibase/liquibase-couchbase.properties")
+                        "/test-project/src/main/resources/liquibase-couchbase.properties")
                 .withCopyFileToContainer(credentialsFile,
                         "/test-project/src/main/resources/liquibase/liquibase.properties")
                 .withCopyFileToContainer(liquibaseUpdateShFile, "liquibase-update-command.sh")
@@ -100,8 +100,6 @@ public class TestContainerInitializer {
                     .withFileSystemBind(getPathOfLiquibaseCouchbaseParentProject().toString(),
                             LIQUIBASE_COUCHBASE_PROJECT_BASE_DIR,
                             BindMode.READ_WRITE)
-//                     .withCopyFileToContainer(MountableFile.forHostPath(
-//                             getPathOfLiquibaseCouchbaseParentProject().toString()), "/couchbase-extension")
                     .withFileSystemBind(getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/dependencies",
                             "/root/.m2/repository")
                     .withCopyFileToContainer(MountableFile.forClasspathResource("build-dependency.sh"),
@@ -117,11 +115,6 @@ public class TestContainerInitializer {
 
     public static Path getPathOfLiquibaseCouchbaseParentProject() {
         return Paths.get(TEST_PROJECT_ABSOLUTE_PATH).getParent();
-    }
-
-    public static Path getPathOfShadeJar() {
-        Path basePathObj = Paths.get(TEST_PROJECT_ABSOLUTE_PATH);
-        return basePathObj.resolveSibling(LIQUIBASE_COUCHBASE_PROJECT_RELATIVE_PATH);
     }
 
 }
