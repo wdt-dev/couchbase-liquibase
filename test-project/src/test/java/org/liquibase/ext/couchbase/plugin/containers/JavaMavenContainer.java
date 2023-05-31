@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 public class JavaMavenContainer extends GenericContainer<JavaMavenContainer> {
 
     public JavaMavenContainer() {
-        // super(new ImageFromDockerfile().withFileFromClasspath("Dockerfile", "Dockerfile"));
         super(new ImageFromDockerfile().withFileFromPath("Dockerfile", Paths.get(
                 TestContainerInitializer.getPathOfLiquibaseCouchbaseParentProject().toString() + "/test-project/src/test" +
                         "/resources/Dockerfile")));
