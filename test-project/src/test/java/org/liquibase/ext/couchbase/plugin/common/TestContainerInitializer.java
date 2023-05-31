@@ -23,7 +23,7 @@ public class TestContainerInitializer {
     private static final String COUCHBASE_IMAGE_VERSION = TestPropertyProvider.getProperty("couchbase.version");
     private static final String TEST_PROJECT_ABSOLUTE_PATH = System.getProperty("user.dir");
     private static final String TEST_PROJECT_MAIN_RESOURCES_PATH = "/test-project/src/main/resources/";
-    private static final String ROOT_WITH_TEST_PROJECT_TEST_RESOURCES = TEST_PROJECT_ABSOLUTE_PATH + "/src/test/resources/";
+    public static final String ROOT_WITH_TEST_PROJECT_TEST_RESOURCES = TEST_PROJECT_ABSOLUTE_PATH + "/src/test/resources/";
     private static final String COUCHBASE_NETWORK_ALIAS = "couchbase";
     private static final String LIQUIBASE_COUCHBASE_PROJECT_BASE_DIR = "/liquibase-couchbase-extension";
     private static final String LIQUIBASE_PROPERTIES_FILE = "liquibase.properties";
