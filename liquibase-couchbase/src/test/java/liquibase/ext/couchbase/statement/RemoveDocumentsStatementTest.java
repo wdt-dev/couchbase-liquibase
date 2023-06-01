@@ -1,7 +1,7 @@
 package liquibase.ext.couchbase.statement;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.couchbase.client.java.transactions.ReactiveTransactionAttemptContext;
 import com.couchbase.client.java.transactions.TransactionAttemptContext;
@@ -39,7 +39,7 @@ public class RemoveDocumentsStatementTest {
 
     @Test
     void Should_execute_in_transaction() {
-        List<Id> ids = new ArrayList<>();
+        Set<Id> ids = new HashSet<>();
         ids.add(new Id("id"));
         RemoveDocumentsStatement statement = new RemoveDocumentsStatement(TEST_KEYSPACE, ids);
 
@@ -50,7 +50,7 @@ public class RemoveDocumentsStatementTest {
 
     @Test
     void Should_execute_in_transaction_reactive() {
-        List<Id> ids = new ArrayList<>();
+        Set<Id> ids = new HashSet<>();
         ids.add(new Id("id"));
         RemoveDocumentsStatement statement = new RemoveDocumentsStatement(TEST_KEYSPACE, ids);
         Flux<TransactionGetResult> mockedPublisher = Flux.empty();
