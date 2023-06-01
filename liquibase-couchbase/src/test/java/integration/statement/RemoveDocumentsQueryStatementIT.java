@@ -1,5 +1,10 @@
 package integration.statement;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.manager.query.CreatePrimaryQueryIndexOptions;
@@ -17,11 +22,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
 import static common.constants.TestConstants.INDEX;
 import static common.matchers.CouchbaseCollectionAssert.assertThat;
 import static liquibase.ext.couchbase.types.Keyspace.keyspace;
@@ -32,14 +32,14 @@ class RemoveDocumentsQueryStatementIT extends TransactionStatementTest {
     private static final String DOC_FIELD_VALUE = "val";
     private static final String testCollection = UUID.randomUUID().toString();
     private static final String testScope = UUID.randomUUID().toString();
-    private static final TestCollectionOperator collectionOperator = bucketOperator.getCollectionOperator(testCollection, testScope);
-    private static Collection collection;
+    private static final TestCollectionOperator collectionOperator =
+            bucketOperator.getCollectionOperator(testCollection, testScope);
 
     private Set<Id> ids;
     private Document doc1;
     private Document doc2;
     private Document doc3;
-    private Keyspace keyspace = keyspace(bucketName, testScope, testCollection);
+    private final Keyspace keyspace = keyspace(bucketName, testScope, testCollection);
 
     @BeforeAll
     @SneakyThrows
@@ -52,7 +52,6 @@ class RemoveDocumentsQueryStatementIT extends TransactionStatementTest {
                 .createPrimaryQueryIndexOptions()
                 .indexName(INDEX));
         TimeUnit.SECONDS.sleep(2L);
-        collection = bucketOperator.getCollection(testCollection, testScope);
     }
 
     @AfterAll
@@ -93,16 +92,19 @@ class RemoveDocumentsQueryStatementIT extends TransactionStatementTest {
 
         doInTransaction(statement.asTransactionAction(clusterOperator));
 
-        assertThat(collection).doesNotContainIds(doc1.getId(), doc2.getId(), doc3.getId());
+        Collection retrievedCollection = bucketOperator.getCollection(collectionName, scopeName);
+        assertThat(retrievedCollection).doesNotContainIds(doc1.getId(), doc2.getId(), doc3.getId());
     }
 
     @Test
     void Should_remove_docks_by_where_condition_like() {
-        RemoveDocumentsQueryStatement statement = new RemoveDocumentsQueryStatement(keyspace, new HashSet<>(), "field LIKE \"%val%\"");
+        RemoveDocumentsQueryStatement statement =
+                new RemoveDocumentsQueryStatement(keyspace, new HashSet<>(), "field LIKE \"%val%\"");
 
         doInTransaction(statement.asTransactionAction(clusterOperator));
 
-        assertThat(collection).doesNotContainIds(doc1.getId(), doc2.getId(), doc3.getId());
+        Collection retrievedCollection = bucketOperator.getCollection(collectionName, scopeName);
+        assertThat(retrievedCollection).doesNotContainIds(doc1.getId(), doc2.getId(), doc3.getId());
     }
 
 }
