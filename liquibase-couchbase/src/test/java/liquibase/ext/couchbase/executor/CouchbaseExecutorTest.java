@@ -1,8 +1,5 @@
 package liquibase.ext.couchbase.executor;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.couchbase.client.java.Cluster;
 import liquibase.exception.DatabaseException;
 import liquibase.ext.couchbase.database.CouchbaseConnection;
@@ -11,7 +8,6 @@ import liquibase.ext.couchbase.exception.StatementExecutionException;
 import liquibase.ext.couchbase.executor.service.TransactionExecutorService;
 import liquibase.ext.couchbase.statement.CouchbaseStatement;
 import liquibase.ext.couchbase.statement.CouchbaseTransactionStatement;
-import liquibase.sql.visitor.SqlVisitor;
 import liquibase.statement.SqlStatement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class CouchbaseExecutorTest {
+class CouchbaseExecutorTest {
 
     private final CouchbaseLiquibaseDatabase database = mock(CouchbaseLiquibaseDatabase.class);
     private final Cluster cluster = mock(Cluster.class);
@@ -44,19 +40,19 @@ public class CouchbaseExecutorTest {
     }
 
     @Test
-    public void Should_support_liquibase() {
+    void Should_support_liquibase() {
         assertThat(couchbaseExecutor.supports(database)).isTrue();
     }
 
     @Test
-    public void Should_throw_if_statement_not_couchbase() {
+    void Should_throw_if_statement_not_couchbase() {
         SqlStatement sqlStatement = mock(SqlStatement.class);
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> couchbaseExecutor.execute(sqlStatement));
     }
 
     @Test
-    public void Should_add_transaction_statement_to_queue() throws DatabaseException {
+    void Should_add_transaction_statement_to_queue() throws DatabaseException {
         CouchbaseTransactionStatement sqlStatement = mock(CouchbaseTransactionStatement.class);
         couchbaseExecutor.execute(sqlStatement);
 
@@ -64,7 +60,7 @@ public class CouchbaseExecutorTest {
     }
 
     @Test
-    public void Should_execute_statement() throws DatabaseException {
+    void Should_execute_statement() throws DatabaseException {
         CouchbaseStatement sqlStatement = mock(CouchbaseStatement.class);
         couchbaseExecutor.execute(sqlStatement);
 
@@ -72,7 +68,7 @@ public class CouchbaseExecutorTest {
     }
 
     @Test
-    public void Should_wrap_exception() {
+    void Should_wrap_exception() {
         CouchbaseStatement sqlStatement = mock(CouchbaseStatement.class);
 
         doThrow(new RuntimeException("Mocked")).when(sqlStatement).execute(any());

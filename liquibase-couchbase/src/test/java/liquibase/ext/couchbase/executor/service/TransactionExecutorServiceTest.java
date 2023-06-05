@@ -7,12 +7,12 @@ import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfigurat
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-public class TransactionExecutorServiceTest {
+class TransactionExecutorServiceTest {
 
     private final Cluster cluster = mock(Cluster.class);
 
     @Test
-    public void Should_return_PlainTransactionExecutorService_or_ReactiveTransactionExecutorService() {
+    void Should_return_PlainTransactionExecutorService_or_ReactiveTransactionExecutorService() {
         TransactionExecutorService transactionExecutorService = TransactionExecutorService.getExecutor(cluster);
 
         if (IS_REACTIVE_TRANSACTIONS.getCurrentValue()) {

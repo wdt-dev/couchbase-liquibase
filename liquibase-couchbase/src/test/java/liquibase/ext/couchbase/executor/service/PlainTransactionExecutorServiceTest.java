@@ -15,20 +15,20 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class PlainTransactionExecutorServiceTest {
+class PlainTransactionExecutorServiceTest {
     private final Cluster cluster = mock(Cluster.class);
     private final Transactions transactions = mock(Transactions.class);
 
     private PlainTransactionExecutorService plainTransactionExecutorService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         plainTransactionExecutorService = new PlainTransactionExecutorService(cluster);
         when(cluster.transactions()).thenReturn(transactions);
     }
 
     @Test
-    public void Should_not_execute_empty() {
+    void Should_not_execute_empty() {
         when(cluster.transactions()).thenThrow(new UnsupportedOperationException("Mocked"));
 
         plainTransactionExecutorService.executeStatementsInTransaction();
@@ -37,7 +37,7 @@ public class PlainTransactionExecutorServiceTest {
     }
 
     @Test
-    public void Should_clear_successfully() {
+    void Should_clear_successfully() {
         plainTransactionExecutorService.addStatementIntoQueue(mock(CouchbaseTransactionStatement.class));
 
         when(cluster.transactions()).thenThrow(new UnsupportedOperationException("Mocked"));
@@ -50,7 +50,7 @@ public class PlainTransactionExecutorServiceTest {
     }
 
     @Test
-    public void Should_execute_successfully() {
+    void Should_execute_successfully() {
         plainTransactionExecutorService.addStatementIntoQueue(mock(CouchbaseTransactionStatement.class));
 
         plainTransactionExecutorService.executeStatementsInTransaction();
@@ -60,7 +60,7 @@ public class PlainTransactionExecutorServiceTest {
     }
 
     @Test
-    public void Should_catch_TransactionalStatementExecutionException() {
+    void Should_catch_TransactionalStatementExecutionException() {
         plainTransactionExecutorService.addStatementIntoQueue(mock(CouchbaseTransactionStatement.class));
 
         TransactionFailedException mockedException = mock(TransactionFailedException.class);

@@ -21,7 +21,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ReactiveTransactionExecutorServiceTest {
+class ReactiveTransactionExecutorServiceTest {
     private final Cluster cluster = mock(Cluster.class);
     private final ReactiveCluster reactiveCluster = mock(ReactiveCluster.class);
     private final ReactiveTransactions transactions = mock(ReactiveTransactions.class);
@@ -31,14 +31,14 @@ public class ReactiveTransactionExecutorServiceTest {
     private ReactiveTransactionExecutorService reactiveTransactionExecutorService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         reactiveTransactionExecutorService = new ReactiveTransactionExecutorService(cluster);
         when(cluster.reactive()).thenReturn(reactiveCluster);
         when(reactiveCluster.transactions()).thenReturn(transactions);
     }
 
     @Test
-    public void Should_not_execute_empty() {
+    void Should_not_execute_empty() {
         when(cluster.transactions()).thenThrow(new UnsupportedOperationException("Mocked"));
 
         reactiveTransactionExecutorService.executeStatementsInTransaction();
@@ -47,7 +47,7 @@ public class ReactiveTransactionExecutorServiceTest {
     }
 
     @Test
-    public void Should_clear_successfully() {
+    void Should_clear_successfully() {
         reactiveTransactionExecutorService.addStatementIntoQueue(transactionStatement);
 
         when(cluster.reactive()).thenThrow(new UnsupportedOperationException("Mocked"));
@@ -60,7 +60,7 @@ public class ReactiveTransactionExecutorServiceTest {
     }
 
     @Test
-    public void Should_execute_successfully() {
+    void Should_execute_successfully() {
         when(transactions.run(any(), any())).thenAnswer((arg) -> {
             Function<ReactiveTransactionAttemptContext, Mono<?>> funcArg = arg.getArgument(0);
             return funcArg.apply(mock(ReactiveTransactionAttemptContext.class));
@@ -77,7 +77,7 @@ public class ReactiveTransactionExecutorServiceTest {
     }
 
     @Test
-    public void Should_catch_TransactionalStatementExecutionException() {
+    void Should_catch_TransactionalStatementExecutionException() {
         reactiveTransactionExecutorService.addStatementIntoQueue(transactionStatement);
 
         TransactionFailedException mockedException = mock(TransactionFailedException.class);
