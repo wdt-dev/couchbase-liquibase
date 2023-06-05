@@ -12,7 +12,7 @@ public class UidDocumentKeyProvider implements DocumentKeyProvider {
     private final UidKeyGenerator generator;
 
     public UidDocumentKeyProvider() {
-        this.generator = new UidKeyGenerator();
+        this(new UidKeyGenerator());
     }
 
     @Override
