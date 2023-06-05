@@ -21,8 +21,18 @@ import java.util.Set;
 public class JsonChangelogValidator implements SingletonObject {
 
     private final Logger log = Scope.getCurrentScope().getLog(getClass());
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final JsonSchemaFactory schemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
+    private final ObjectMapper objectMapper;
+    private final JsonSchemaFactory schemaFactory;
+
+    public JsonChangelogValidator() {
+        this.objectMapper = new ObjectMapper();
+        this.schemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
+    }
+
+    public JsonChangelogValidator(ObjectMapper objectMapper, JsonSchemaFactory schemaFactory) {
+        this.objectMapper = objectMapper;
+        this.schemaFactory = schemaFactory;
+    }
 
     @SneakyThrows
     public void validateChangeLogFile(String fileLocation, String schemaLocation) {

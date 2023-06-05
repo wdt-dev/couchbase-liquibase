@@ -49,6 +49,11 @@ public class ChangeLogOperator {
         this.serviceProvider = new ContextServiceProvider(database);
     }
 
+    public ChangeLogOperator(CouchbaseLiquibaseDatabase database, ServiceProvider serviceProvider) {
+        this.database = database;
+        this.serviceProvider = serviceProvider;
+    }
+
     public void createChangeLogCollection() {
         Scope scope = serviceProvider.getScopeOfCollection(CHANGE_LOG_COLLECTION);
         CreatePrimaryQueryIndexOptions indexOptions = createPrimaryQueryIndexOptions()
