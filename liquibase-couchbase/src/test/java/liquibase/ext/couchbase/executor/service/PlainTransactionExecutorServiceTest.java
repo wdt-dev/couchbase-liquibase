@@ -39,11 +39,7 @@ class PlainTransactionExecutorServiceTest {
     @Test
     void Should_clear_successfully() {
         plainTransactionExecutorService.addStatementIntoQueue(mock(CouchbaseTransactionStatement.class));
-
-        when(cluster.transactions()).thenThrow(new UnsupportedOperationException("Mocked"));
-
         plainTransactionExecutorService.clearStatementsQueue();
-
         plainTransactionExecutorService.executeStatementsInTransaction();
 
         verify(cluster, never()).transactions();

@@ -40,7 +40,7 @@ class CouchbaseExecutorTest {
     }
 
     @Test
-    void Should_support_liquibase() {
+    void Should_support_couchbase() {
         assertThat(couchbaseExecutor.supports(database)).isTrue();
     }
 
