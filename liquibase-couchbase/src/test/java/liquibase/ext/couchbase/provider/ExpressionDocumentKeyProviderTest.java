@@ -1,6 +1,5 @@
 package liquibase.ext.couchbase.provider;
 
-import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -17,7 +16,7 @@ import static org.mockito.Mockito.when;
 class ExpressionDocumentKeyProviderTest {
 
     @Test
-    void Should_parse_expression_correctly() throws NoSuchFieldException, IllegalAccessException {
+    void Should_parse_expression_correctly() {
         String expression = "#token#%value_value%%%%#%#%#";
         Map<String, TokenType> expected = new LinkedHashMap<>();
         expected.put("token", TokenType.GENERATOR);
@@ -27,9 +26,7 @@ class ExpressionDocumentKeyProviderTest {
         expected.put("%", TokenType.GENERATOR);
         ExpressionDocumentKeyProvider expressionDocumentKeyProvider = new ExpressionDocumentKeyProvider(expression);
 
-        Field expTokens = expressionDocumentKeyProvider.getClass().getDeclaredField("expTokens");
-        expTokens.setAccessible(true);
-        assertThat((Map<String, TokenType>) expTokens.get(expressionDocumentKeyProvider)).isEqualTo(expected);
+        assertThat(expressionDocumentKeyProvider.getExpTokens()).isEqualTo(expected);
     }
 
     @Test
