@@ -11,6 +11,6 @@ class UidKeyGeneratorTest {
         UidKeyGenerator uidKeyGenerator = new UidKeyGenerator();
         String uuid = uidKeyGenerator.generate();
         assertThat(uuid).isNotNull();
-        assertThat(uuid.length()).isEqualTo(36);
+        assertThat(uuid).hasSize(36);
     }
 }

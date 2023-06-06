@@ -21,7 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class LinesMapperTest {
+class LinesMapperTest {
 
     private final DocumentKeyProviderFactory documentKeyProviderFactory = mock(DocumentKeyProviderFactory.class);
     private final DocumentKeyProvider documentKeyProvider = mock(DocumentKeyProvider.class);
