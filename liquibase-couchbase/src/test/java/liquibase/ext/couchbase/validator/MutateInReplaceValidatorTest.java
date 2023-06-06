@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class MutateInReplaceValidatorTest {
+class MutateInReplaceValidatorTest {
 
     private MutateInReplaceValidator validator = new MutateInReplaceValidator(MutateInType.REPLACE);
 

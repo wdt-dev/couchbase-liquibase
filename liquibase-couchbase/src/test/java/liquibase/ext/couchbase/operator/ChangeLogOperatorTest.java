@@ -46,7 +46,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class ChangeLogOperatorTest {
+class ChangeLogOperatorTest {
 
     @Mock
     private ServiceProvider serviceProvider;

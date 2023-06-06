@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class MutateInArrayValidatorTest {
+class MutateInArrayValidatorTest {
 
     private MutateInArrayValidator validator = new MutateInArrayValidator(MutateInType.ARRAY_APPEND);
 

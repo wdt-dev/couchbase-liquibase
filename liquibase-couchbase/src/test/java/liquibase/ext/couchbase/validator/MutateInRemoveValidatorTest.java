@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class MutateInRemoveValidatorTest {
+class MutateInRemoveValidatorTest {
 
     private MutateInRemoveValidator validator = new MutateInRemoveValidator(MutateInType.REMOVE);
 

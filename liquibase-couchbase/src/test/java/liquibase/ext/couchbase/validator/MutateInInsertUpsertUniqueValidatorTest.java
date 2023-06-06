@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class MutateInInsertUpsertUniqueValidatorTest {
+class MutateInInsertUpsertUniqueValidatorTest {
 
     private MutateInLongValueValidator validator = new MutateInLongValueValidator(MutateInType.INCREMENT);
 

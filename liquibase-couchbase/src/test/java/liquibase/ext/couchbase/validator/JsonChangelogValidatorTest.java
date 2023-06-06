@@ -32,7 +32,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class JsonChangelogValidatorTest {
+class JsonChangelogValidatorTest {
 
     @Mock
     private ObjectMapper objectMapper;

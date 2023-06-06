@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class MutateInValidatorRegistryTest {
+class MutateInValidatorRegistryTest {
 
     private MutateInValidatorRegistry validatorRegistry = new MutateInValidatorRegistry();
 
