@@ -7,6 +7,8 @@ import liquibase.ext.couchbase.exception.TransactionalStatementExecutionExceptio
 import liquibase.ext.couchbase.statement.CouchbaseTransactionStatement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,22 +17,25 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@MockitoSettings
 class PlainTransactionExecutorServiceTest {
-    private final Cluster cluster = mock(Cluster.class);
-    private final Transactions transactions = mock(Transactions.class);
+
+    @Mock
+    private Cluster cluster;
+    @Mock
+    private Transactions transactions;
+    @Mock
+    private CouchbaseTransactionStatement couchbaseTransactionStatement;
 
     private PlainTransactionExecutorService plainTransactionExecutorService;
 
     @BeforeEach
     void setUp() {
         plainTransactionExecutorService = new PlainTransactionExecutorService(cluster);
-        when(cluster.transactions()).thenReturn(transactions);
     }
 
     @Test
     void Should_not_execute_empty() {
-        when(cluster.transactions()).thenThrow(new UnsupportedOperationException("Mocked"));
-
         plainTransactionExecutorService.executeStatementsInTransaction();
 
         verify(cluster, never()).transactions();
@@ -38,7 +43,7 @@ class PlainTransactionExecutorServiceTest {
 
     @Test
     void Should_clear_successfully() {
-        plainTransactionExecutorService.addStatementIntoQueue(mock(CouchbaseTransactionStatement.class));
+        plainTransactionExecutorService.addStatementIntoQueue(couchbaseTransactionStatement);
         plainTransactionExecutorService.clearStatementsQueue();
         plainTransactionExecutorService.executeStatementsInTransaction();
 
@@ -47,7 +52,9 @@ class PlainTransactionExecutorServiceTest {
 
     @Test
     void Should_execute_successfully() {
-        plainTransactionExecutorService.addStatementIntoQueue(mock(CouchbaseTransactionStatement.class));
+        when(cluster.transactions()).thenReturn(transactions);
+
+        plainTransactionExecutorService.addStatementIntoQueue(couchbaseTransactionStatement);
 
         plainTransactionExecutorService.executeStatementsInTransaction();
 
@@ -57,10 +64,11 @@ class PlainTransactionExecutorServiceTest {
 
     @Test
     void Should_catch_TransactionalStatementExecutionException() {
-        plainTransactionExecutorService.addStatementIntoQueue(mock(CouchbaseTransactionStatement.class));
-
+        when(cluster.transactions()).thenReturn(transactions);
         TransactionFailedException mockedException = mock(TransactionFailedException.class);
         when(transactions.run(any(), any())).thenThrow(mockedException);
+
+        plainTransactionExecutorService.addStatementIntoQueue(couchbaseTransactionStatement);
 
         assertThatExceptionOfType(TransactionalStatementExecutionException.class)
                 .isThrownBy(() -> plainTransactionExecutorService.executeStatementsInTransaction());

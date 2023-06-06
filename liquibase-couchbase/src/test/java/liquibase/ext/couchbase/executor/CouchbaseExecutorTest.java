@@ -11,21 +11,33 @@ import liquibase.ext.couchbase.statement.CouchbaseTransactionStatement;
 import liquibase.statement.SqlStatement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@MockitoSettings
 class CouchbaseExecutorTest {
 
-    private final CouchbaseLiquibaseDatabase database = mock(CouchbaseLiquibaseDatabase.class);
-    private final Cluster cluster = mock(Cluster.class);
-    private final CouchbaseConnection connection = mock(CouchbaseConnection.class);
-    private final TransactionExecutorService transactionExecutorService = mock(TransactionExecutorService.class);
+    @Mock
+    private CouchbaseLiquibaseDatabase database;
+    @Mock
+    private Cluster cluster;
+    @Mock
+    private CouchbaseConnection connection;
+    @Mock
+    private TransactionExecutorService transactionExecutorService;
+    @Mock
+    private SqlStatement sqlStatement;
+    @Mock
+    private CouchbaseStatement couchbaseStatement;
+    @Mock
+    private CouchbaseTransactionStatement couchbaseTransactionStatement;
 
     private CouchbaseExecutor couchbaseExecutor;
 
@@ -33,10 +45,6 @@ class CouchbaseExecutorTest {
     void setUp() {
         couchbaseExecutor = new CouchbaseExecutor();
         couchbaseExecutor.setDatabase(database);
-
-        when(database.getConnection()).thenReturn(connection);
-        when(connection.getTransactionExecutorService()).thenReturn(transactionExecutorService);
-        when(connection.getCluster()).thenReturn(cluster);
     }
 
     @Test
@@ -46,34 +54,39 @@ class CouchbaseExecutorTest {
 
     @Test
     void Should_throw_if_statement_not_couchbase() {
-        SqlStatement sqlStatement = mock(SqlStatement.class);
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> couchbaseExecutor.execute(sqlStatement));
+                .isThrownBy(() -> couchbaseExecutor.execute(sqlStatement))
+                .withMessage("Couchbase cannot execute %s statements", sqlStatement.getClass().getName());
     }
 
     @Test
     void Should_add_transaction_statement_to_queue() throws DatabaseException {
-        CouchbaseTransactionStatement sqlStatement = mock(CouchbaseTransactionStatement.class);
-        couchbaseExecutor.execute(sqlStatement);
+        when(database.getConnection()).thenReturn(connection);
+        when(connection.getTransactionExecutorService()).thenReturn(transactionExecutorService);
 
-        verify(transactionExecutorService).addStatementIntoQueue(sqlStatement);
+        couchbaseExecutor.execute(couchbaseTransactionStatement);
+
+        verify(transactionExecutorService).addStatementIntoQueue(couchbaseTransactionStatement);
     }
 
     @Test
     void Should_execute_statement() throws DatabaseException {
-        CouchbaseStatement sqlStatement = mock(CouchbaseStatement.class);
-        couchbaseExecutor.execute(sqlStatement);
+        when(database.getConnection()).thenReturn(connection);
+        when(connection.getCluster()).thenReturn(cluster);
 
-        verify(sqlStatement).execute(any());
+        couchbaseExecutor.execute(couchbaseStatement);
+
+        verify(couchbaseStatement).execute(any());
     }
 
     @Test
     void Should_wrap_exception() {
-        CouchbaseStatement sqlStatement = mock(CouchbaseStatement.class);
+        when(database.getConnection()).thenReturn(connection);
+        when(connection.getCluster()).thenReturn(cluster);
 
-        doThrow(new RuntimeException("Mocked")).when(sqlStatement).execute(any());
+        doThrow(new RuntimeException("Mocked")).when(couchbaseStatement).execute(any());
 
         assertThatExceptionOfType(StatementExecutionException.class)
-                .isThrownBy(() -> couchbaseExecutor.execute(sqlStatement));
+                .isThrownBy(() -> couchbaseExecutor.execute(couchbaseStatement));
     }
 }

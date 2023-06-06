@@ -12,6 +12,8 @@ import liquibase.ext.couchbase.statement.CouchbaseTransactionStatement;
 import liquibase.ext.couchbase.types.CouchbaseReactiveTransactionAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 import reactor.core.publisher.Mono;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -21,26 +23,29 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@MockitoSettings
 class ReactiveTransactionExecutorServiceTest {
-    private final Cluster cluster = mock(Cluster.class);
-    private final ReactiveCluster reactiveCluster = mock(ReactiveCluster.class);
-    private final ReactiveTransactions transactions = mock(ReactiveTransactions.class);
-    private final CouchbaseTransactionStatement transactionStatement = mock(CouchbaseTransactionStatement.class);
-    private final CouchbaseReactiveTransactionAction transactionAction = mock(CouchbaseReactiveTransactionAction.class);
+
+    @Mock
+    private Cluster cluster;
+    @Mock
+    private ReactiveCluster reactiveCluster;
+    @Mock
+    private ReactiveTransactions transactions;
+    @Mock
+    private CouchbaseTransactionStatement transactionStatement;
+    @Mock
+    private CouchbaseReactiveTransactionAction transactionAction;
 
     private ReactiveTransactionExecutorService reactiveTransactionExecutorService;
 
     @BeforeEach
     void setUp() {
         reactiveTransactionExecutorService = new ReactiveTransactionExecutorService(cluster);
-        when(cluster.reactive()).thenReturn(reactiveCluster);
-        when(reactiveCluster.transactions()).thenReturn(transactions);
     }
 
     @Test
     void Should_not_execute_empty() {
-        when(cluster.transactions()).thenThrow(new UnsupportedOperationException("Mocked"));
-
         reactiveTransactionExecutorService.executeStatementsInTransaction();
 
         verify(cluster, never()).reactive();
@@ -49,11 +54,7 @@ class ReactiveTransactionExecutorServiceTest {
     @Test
     void Should_clear_successfully() {
         reactiveTransactionExecutorService.addStatementIntoQueue(transactionStatement);
-
-        when(cluster.reactive()).thenThrow(new UnsupportedOperationException("Mocked"));
-
         reactiveTransactionExecutorService.clearStatementsQueue();
-
         reactiveTransactionExecutorService.executeStatementsInTransaction();
 
         verify(cluster, never()).reactive();
@@ -61,6 +62,8 @@ class ReactiveTransactionExecutorServiceTest {
 
     @Test
     void Should_execute_successfully() {
+        when(cluster.reactive()).thenReturn(reactiveCluster);
+        when(reactiveCluster.transactions()).thenReturn(transactions);
         when(transactions.run(any(), any())).thenAnswer((arg) -> {
             Function<ReactiveTransactionAttemptContext, Mono<?>> funcArg = arg.getArgument(0);
             return funcArg.apply(mock(ReactiveTransactionAttemptContext.class));
@@ -69,7 +72,6 @@ class ReactiveTransactionExecutorServiceTest {
         when(transactionAction.apply(any())).thenReturn(Mono.empty());
 
         reactiveTransactionExecutorService.addStatementIntoQueue(transactionStatement);
-
         reactiveTransactionExecutorService.executeStatementsInTransaction();
 
         verify(cluster).reactive();
@@ -78,10 +80,12 @@ class ReactiveTransactionExecutorServiceTest {
 
     @Test
     void Should_catch_TransactionalStatementExecutionException() {
-        reactiveTransactionExecutorService.addStatementIntoQueue(transactionStatement);
-
+        when(cluster.reactive()).thenReturn(reactiveCluster);
+        when(reactiveCluster.transactions()).thenReturn(transactions);
         TransactionFailedException mockedException = mock(TransactionFailedException.class);
         when(transactions.run(any(), any())).thenThrow(mockedException);
+
+        reactiveTransactionExecutorService.addStatementIntoQueue(transactionStatement);
 
         assertThatExceptionOfType(TransactionalReactiveStatementExecutionException.class)
                 .isThrownBy(() -> reactiveTransactionExecutorService.executeStatementsInTransaction());
