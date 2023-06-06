@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IncrementalKeyGeneratorTest {
+class IncrementalKeyGeneratorTest {
 
     @Test
-    public void Should_generate_incremental_key() {
+    void Should_generate_incremental_key() {
         String expectedResult1 = "999";
         String expectedResult2 = "1000";
         AtomicLong holder = new AtomicLong(Long.parseLong(expectedResult1));

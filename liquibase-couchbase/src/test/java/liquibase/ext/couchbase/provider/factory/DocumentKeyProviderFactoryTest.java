@@ -17,39 +17,39 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
-public class DocumentKeyProviderFactoryTest {
+class DocumentKeyProviderFactoryTest {
 
     private final File file = mock(File.class);
     private final DocumentKeyProviderFactory documentKeyProviderFactory = new DocumentKeyProviderFactory();
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         reset(file);
     }
 
     @Test
-    public void Should_return_default() {
+    void Should_return_default() {
         when(file.getKeyProviderType()).thenReturn(DEFAULT);
 
         assertThat(documentKeyProviderFactory.getKeyProvider(file)).isInstanceOf(FieldDocumentKeyProvider.class);
     }
 
     @Test
-    public void Should_return_uid() {
+    void Should_return_uid() {
         when(file.getKeyProviderType()).thenReturn(UID);
 
         assertThat(documentKeyProviderFactory.getKeyProvider(file)).isInstanceOf(UidDocumentKeyProvider.class);
     }
 
     @Test
-    public void Should_return_incremental() {
+    void Should_return_incremental() {
         when(file.getKeyProviderType()).thenReturn(INCREMENT);
 
         assertThat(documentKeyProviderFactory.getKeyProvider(file)).isInstanceOf(IncrementalDocumentKeyProvider.class);
     }
 
     @Test
-    public void Should_return_expression() {
+    void Should_return_expression() {
         when(file.getKeyProviderType()).thenReturn(EXPRESSION);
         when(file.getKeyProviderExpression()).thenReturn("#a, #b");
 

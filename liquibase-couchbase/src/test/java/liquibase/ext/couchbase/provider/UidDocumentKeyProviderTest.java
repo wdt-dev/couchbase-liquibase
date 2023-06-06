@@ -7,12 +7,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class UidDocumentKeyProviderTest {
+class UidDocumentKeyProviderTest {
 
     private final UidKeyGenerator uidKeyGenerator = mock(UidKeyGenerator.class);
 
     @Test
-    public void Should_call_generate() {
+    void Should_call_generate() {
         UidDocumentKeyProvider uidDocumentKeyProvider = new UidDocumentKeyProvider(uidKeyGenerator);
 
         when(uidKeyGenerator.generate()).thenReturn("");
