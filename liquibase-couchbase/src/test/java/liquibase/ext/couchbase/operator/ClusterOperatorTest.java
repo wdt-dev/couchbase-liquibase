@@ -438,7 +438,7 @@ class ClusterOperatorTest {
 
         QueryResult returnedResult = clusterOperator.executeSingleSql(statement);
         assertNotNull(returnedResult);
-        verify(cluster, times(1)).query(statement);
+        verify(cluster).query(statement);
     }
 
 }

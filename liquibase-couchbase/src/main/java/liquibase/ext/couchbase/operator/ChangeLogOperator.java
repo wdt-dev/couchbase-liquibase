@@ -45,8 +45,7 @@ public class ChangeLogOperator {
     private final ServiceProvider serviceProvider;
 
     public ChangeLogOperator(CouchbaseLiquibaseDatabase database) {
-        this.database = database;
-        this.serviceProvider = new ContextServiceProvider(database);
+        this(database, new ContextServiceProvider(database));
     }
 
     public ChangeLogOperator(CouchbaseLiquibaseDatabase database, ServiceProvider serviceProvider) {

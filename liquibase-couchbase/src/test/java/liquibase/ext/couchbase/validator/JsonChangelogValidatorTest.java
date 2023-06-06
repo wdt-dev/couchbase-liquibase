@@ -41,20 +41,20 @@ public class JsonChangelogValidatorTest {
     @InjectMocks
     private JsonChangelogValidator validator;
 
+    private Scope scope = mock(Scope.class);
+    private ResourceAccessor resourceAccessor = mock(ResourceAccessor.class);
+    private Resource changelogResource = mock(Resource.class);
+    private Resource schemaResource = mock(Resource.class);
+    private InputStream changelogInputStream = mock(InputStream.class);
+    private InputStream schemaInputStream = mock(InputStream.class);
+    private JsonNode jsonNode = mock(JsonNode.class);
+    private JsonSchema jsonSchema = mock(JsonSchema.class);
+
     @Test
     @SneakyThrows
     void Should_validate_json_by_schema_successfully() {
         String pathToChangelog = "pathToChangelog";
         String pathToSchema = "pathToSchema";
-
-        Scope scope = mock(Scope.class);
-        ResourceAccessor resourceAccessor = mock(ResourceAccessor.class);
-        Resource changelogResource = mock(Resource.class);
-        Resource schemaResource = mock(Resource.class);
-        InputStream changelogInputStream = mock(InputStream.class);
-        InputStream schemaInputStream = mock(InputStream.class);
-        JsonNode jsonNode = mock(JsonNode.class);
-        JsonSchema jsonSchema = mock(JsonSchema.class);
 
         try (MockedStatic<Scope> scopeUtilities = Mockito.mockStatic(Scope.class)) {
             scopeUtilities.when(Scope::getCurrentScope)
@@ -82,11 +82,6 @@ public class JsonChangelogValidatorTest {
         String pathToChangelog = "pathToChangelog";
         String pathToSchema = "pathToSchema";
 
-        Scope scope = mock(Scope.class);
-        ResourceAccessor resourceAccessor = mock(ResourceAccessor.class);
-        Resource changelogResource = mock(Resource.class);
-        Resource schemaResource = mock(Resource.class);
-
         try (MockedStatic<Scope> scopeUtilities = Mockito.mockStatic(Scope.class)) {
             scopeUtilities.when(Scope::getCurrentScope)
                     .thenReturn(scope);
@@ -104,15 +99,6 @@ public class JsonChangelogValidatorTest {
     void Should_throw_invalid_json_exception_when_validation_error_messages() {
         String pathToChangelog = "pathToChangelog";
         String pathToSchema = "pathToSchema";
-
-        Scope scope = mock(Scope.class);
-        ResourceAccessor resourceAccessor = mock(ResourceAccessor.class);
-        Resource changelogResource = mock(Resource.class);
-        Resource schemaResource = mock(Resource.class);
-        InputStream changelogInputStream = mock(InputStream.class);
-        InputStream schemaInputStream = mock(InputStream.class);
-        JsonNode jsonNode = mock(JsonNode.class);
-        JsonSchema jsonSchema = mock(JsonSchema.class);
 
         ValidationMessage validationMessage = prepareValidationMessage();
         Set<ValidationMessage> validationResult = new HashSet<>();
@@ -150,14 +136,6 @@ public class JsonChangelogValidatorTest {
         String pathToChangelog = "pathToChangelog";
         String pathToSchema = "pathToSchema";
 
-        Scope scope = mock(Scope.class);
-        ResourceAccessor resourceAccessor = mock(ResourceAccessor.class);
-        Resource changelogResource = mock(Resource.class);
-        Resource schemaResource = mock(Resource.class);
-        InputStream changelogInputStream = mock(InputStream.class);
-        InputStream schemaInputStream = mock(InputStream.class);
-        JsonNode jsonNode = mock(JsonNode.class);
-        JsonSchema jsonSchema = mock(JsonSchema.class);
 
         try (MockedStatic<Scope> scopeUtilities = Mockito.mockStatic(Scope.class)) {
             scopeUtilities.when(Scope::getCurrentScope)

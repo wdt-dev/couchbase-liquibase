@@ -275,14 +275,14 @@ class CollectionOperatorTest {
 
         collectionOperator.createCollectionPrimaryIndex(options);
 
-        verify(collectionQueryIndexManager, times(1)).createPrimaryIndex(options);
+        verify(collectionQueryIndexManager).createPrimaryIndex(options);
     }
 
     @Test
     void Should_create_collection_primary_index_when_options_not_provided() {
         collectionOperator.createCollectionPrimaryIndex(null);
 
-        verify(collectionQueryIndexManager, times(1)).createPrimaryIndex();
+        verify(collectionQueryIndexManager).createPrimaryIndex();
     }
 
     @Test
@@ -314,8 +314,8 @@ class CollectionOperatorTest {
         Document[] documents = {TEST_DOCUMENT, TEST_DOCUMENT_2};
 
         collectionOperator.insertDocs(documents);
-        verify(collection, times(1)).insert(TEST_DOCUMENT.getId(), TEST_DOCUMENT.getValue().mapDataToType());
-        verify(collection, times(1)).insert(TEST_DOCUMENT_2.getId(), TEST_DOCUMENT_2.getValue().mapDataToType());
+        verify(collection).insert(TEST_DOCUMENT.getId(), TEST_DOCUMENT.getValue().mapDataToType());
+        verify(collection).insert(TEST_DOCUMENT_2.getId(), TEST_DOCUMENT_2.getValue().mapDataToType());
     }
 
     @Test
@@ -343,8 +343,8 @@ class CollectionOperatorTest {
                 .expectNext(mockedResult2)
                 .expectComplete()
                 .verify();
-        verify(reactiveTransaction, times(1)).insert(reactiveCollection, TEST_DOCUMENT.getId(), TEST_DOCUMENT.getContentAsObject());
-        verify(reactiveTransaction, times(1)).insert(reactiveCollection, TEST_DOCUMENT_2.getId(), TEST_DOCUMENT_2.getContentAsObject());
+        verify(reactiveTransaction).insert(reactiveCollection, TEST_DOCUMENT.getId(), TEST_DOCUMENT.getContentAsObject());
+        verify(reactiveTransaction).insert(reactiveCollection, TEST_DOCUMENT_2.getId(), TEST_DOCUMENT_2.getContentAsObject());
     }
 
     @Test
@@ -417,7 +417,7 @@ class CollectionOperatorTest {
                 .expectNext(mockedResult2)
                 .expectComplete()
                 .verify();
-        verify(reactiveTransaction, times(1)).remove(mockedResult1);
-        verify(reactiveTransaction, times(1)).remove(mockedResult2);
+        verify(reactiveTransaction).remove(mockedResult1);
+        verify(reactiveTransaction).remove(mockedResult2);
     }
 }

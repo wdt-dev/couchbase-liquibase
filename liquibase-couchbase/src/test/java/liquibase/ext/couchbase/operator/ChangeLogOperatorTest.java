@@ -16,7 +16,6 @@ import liquibase.ext.couchbase.changelog.Context;
 import liquibase.ext.couchbase.changelog.CouchbaseChangeLog;
 import liquibase.ext.couchbase.database.CouchbaseConnection;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
-import liquibase.ext.couchbase.provider.ContextServiceProvider;
 import liquibase.ext.couchbase.provider.ServiceProvider;
 import lombok.NonNull;
 import org.junit.jupiter.api.Test;
@@ -41,10 +40,8 @@ import static liquibase.ext.couchbase.operator.ChangeLogOperator.SELECT_LAST_CHA
 import static liquibase.ext.couchbase.operator.ChangeLogOperator.SELECT_LAST_ORDER_N1QL;
 import static liquibase.ext.couchbase.provider.ServiceProvider.CHANGE_LOG_COLLECTION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -92,7 +89,7 @@ public class ChangeLogOperatorTest {
 
         changeLogOperator.createChangeLogCollection();
 
-        verify(queryIndexManager, times(1)).createPrimaryIndex(eq(TEST_BUCKET), any(CreatePrimaryQueryIndexOptions.class));
+        verify(queryIndexManager).createPrimaryIndex(eq(TEST_BUCKET), any(CreatePrimaryQueryIndexOptions.class));
     }
 
     @Test
@@ -106,7 +103,7 @@ public class ChangeLogOperatorTest {
 
         changeLogOperator.insertChangeLog(changeLog);
 
-        verify(collection, times(1)).insert("file::id::author", changeLog);
+        verify(collection).insert("file::id::author", changeLog);
     }
 
     @Test
@@ -189,7 +186,7 @@ public class ChangeLogOperatorTest {
 
         changeLogOperator.removeChangeSetFromHistory(changeSet);
 
-        verify(collection, times(1)).remove("file::id::author");
+        verify(collection).remove("file::id::author");
     }
 
     @Test
@@ -205,7 +202,7 @@ public class ChangeLogOperatorTest {
 
         changeLogOperator.tagLastChangeSet(tag);
 
-        verify(collection, times(1)).mutateIn(eq(changesetId), any(List.class));
+        verify(collection).mutateIn(eq(changesetId), any(List.class));
     }
 
     @Test
