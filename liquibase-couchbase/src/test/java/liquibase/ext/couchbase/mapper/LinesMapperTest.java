@@ -6,8 +6,8 @@ import liquibase.ext.couchbase.types.DataType;
 import liquibase.ext.couchbase.types.Document;
 import liquibase.ext.couchbase.types.File;
 import liquibase.ext.couchbase.types.Value;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
@@ -18,9 +18,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @MockitoSettings
 class LinesMapperTest {
@@ -33,12 +31,9 @@ class LinesMapperTest {
     private File file;
 
     private final AtomicLong keyHolder = new AtomicLong(1L);
-    private LinesMapper linesMapper;
 
-    @BeforeEach
-    public void setUp() {
-        this.linesMapper = new LinesMapper(documentKeyProviderFactory);
-    }
+    @InjectMocks
+    private LinesMapper linesMapper;
 
     @Test
     void Should_map_file_successfully() {
