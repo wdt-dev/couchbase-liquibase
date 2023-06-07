@@ -50,8 +50,6 @@ class ContextServiceProviderTest {
 
     @BeforeEach
     void setUp() {
-        reset(couchbaseLiquibaseDatabase, couchbaseConnection, cluster, bucket, scope, cluster, bucketManager,
-                collectionManager, queryIndexManager);
         when(couchbaseLiquibaseDatabase.getConnection()).thenReturn(couchbaseConnection);
         when(couchbaseConnection.getCluster()).thenReturn(cluster);
         when(bucket.collections()).thenReturn(collectionManager);
@@ -66,12 +64,8 @@ class ContextServiceProviderTest {
 
         String collectionName = "collection";
 
-        List<ScopeSpec> scopeSpecList = createScopeSpecs(DEFAULT_SERVICE_SCOPE);
-        scopeSpecList.forEach(it -> {
-            String scopeName = it.name();
-            Set<CollectionSpec> collectionSpecSet = createCollectionSpecs(scopeName, collectionName);
-            when(it.collections()).thenReturn(collectionSpecSet);
-        });
+        List<ScopeSpec> scopeSpecList = createScopeSpecs(collectionName, DEFAULT_SERVICE_SCOPE);
+
         List<QueryIndex> queryIndexList = createQueryIndexes(collectionName);
         when(couchbaseConnection.getDatabase()).thenReturn(bucket);
         when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
@@ -91,12 +85,8 @@ class ContextServiceProviderTest {
 
         String collectionName = "collection";
 
-        List<ScopeSpec> scopeSpecList = createScopeSpecs(DEFAULT_SERVICE_SCOPE);
-        scopeSpecList.forEach(it -> {
-            String scopeName = it.name();
-            Set<CollectionSpec> collectionSpecSet = createCollectionSpecs(scopeName, collectionName);
-            when(it.collections()).thenReturn(collectionSpecSet);
-        });
+        List<ScopeSpec> scopeSpecList = createScopeSpecs(collectionName, DEFAULT_SERVICE_SCOPE);
+
         List<QueryIndex> queryIndexList = createQueryIndexes(collectionName);
         when(couchbaseConnection.getDatabase()).thenReturn(bucket);
         when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
@@ -124,12 +114,8 @@ class ContextServiceProviderTest {
 
         String collectionName = "collection";
 
-        List<ScopeSpec> scopeSpecList = createScopeSpecs(DEFAULT_SERVICE_SCOPE);
-        scopeSpecList.forEach(it -> {
-            String scopeName = it.name();
-            Set<CollectionSpec> collectionSpecSet = createCollectionSpecs(scopeName, collectionName);
-            when(it.collections()).thenReturn(collectionSpecSet);
-        });
+        List<ScopeSpec> scopeSpecList = createScopeSpecs(collectionName, DEFAULT_SERVICE_SCOPE);
+
         List<QueryIndex> queryIndexList = createQueryIndexes(collectionName);
         when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
         when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
@@ -157,12 +143,8 @@ class ContextServiceProviderTest {
 
         String collectionName = "collection";
 
-        List<ScopeSpec> scopeSpecList = createScopeSpecs(DEFAULT_SERVICE_SCOPE);
-        scopeSpecList.forEach(it -> {
-            String scopeName = it.name();
-            Set<CollectionSpec> collectionSpecSet = createCollectionSpecs(scopeName, collectionName);
-            when(it.collections()).thenReturn(collectionSpecSet);
-        });
+        List<ScopeSpec> scopeSpecList = createScopeSpecs(collectionName, DEFAULT_SERVICE_SCOPE);
+
         List<QueryIndex> queryIndexList = createQueryIndexes(collectionName);
         when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
         when(cluster.buckets()).thenReturn(bucketManager);
@@ -232,12 +214,8 @@ class ContextServiceProviderTest {
 
         String collectionName = "collection";
 
-        List<ScopeSpec> scopeSpecList = createScopeSpecs(DEFAULT_SERVICE_SCOPE);
-        scopeSpecList.forEach(it -> {
-            String scopeName = it.name();
-            Set<CollectionSpec> collectionSpecSet = createCollectionSpecs(scopeName, collectionName);
-            when(it.collections()).thenReturn(collectionSpecSet);
-        });
+        List<ScopeSpec> scopeSpecList = createScopeSpecs(collectionName, DEFAULT_SERVICE_SCOPE);
+
         when(couchbaseConnection.getDatabase()).thenReturn(bucket);
         when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
         when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
@@ -260,13 +238,17 @@ class ContextServiceProviderTest {
         verify(queryIndexManager).watchIndexes(eq(SERVICE_BUCKET_NAME), any(), any(), any());
     }
 
-    private List<ScopeSpec> createScopeSpecs(String... specNames) {
+    private List<ScopeSpec> createScopeSpecs(String collectionName, String... specNames) {
         List<ScopeSpec> scopeSpecList = new ArrayList<>();
         if (specNames != null) {
             for (String specName : specNames) {
                 ScopeSpec scopeSpec = mock(ScopeSpec.class);
-                when(scopeSpec.name()).thenReturn(specName);
                 scopeSpecList.add(scopeSpec);
+
+                Set<CollectionSpec> collectionSpecSet = createCollectionSpecs(specName, collectionName);
+
+                when(scopeSpec.name()).thenReturn(specName);
+                when(scopeSpec.collections()).thenReturn(collectionSpecSet);
             }
         }
         return scopeSpecList;

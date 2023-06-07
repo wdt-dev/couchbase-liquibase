@@ -4,16 +4,21 @@ import com.couchbase.client.java.json.JsonObject;
 import liquibase.ext.couchbase.exception.ProvideKeyFailedException;
 import liquibase.ext.couchbase.types.TokenType;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@MockitoSettings
 class ExpressionDocumentKeyProviderTest {
+
+    @Mock
+    private JsonObject jsonObject;
 
     @Test
     void Should_parse_expression_correctly() {
@@ -32,16 +37,15 @@ class ExpressionDocumentKeyProviderTest {
     @Test
     void Should_throw_if_expression_is_null() {
         assertThatExceptionOfType(ProvideKeyFailedException.class)
-                .isThrownBy(() -> new ExpressionDocumentKeyProvider(null));
+                .isThrownBy(() -> new ExpressionDocumentKeyProvider(null))
+                .withMessage("Can't provide key because: [Document contains no key field]");
     }
 
     @Test
     void Should_return_key_by_field() {
-        String expression = "%token%____";
-        ExpressionDocumentKeyProvider expressionDocumentKeyProvider = new ExpressionDocumentKeyProvider(expression);
+        ExpressionDocumentKeyProvider expressionDocumentKeyProvider = new ExpressionDocumentKeyProvider("%token%____");
         String expected = "expected";
 
-        JsonObject jsonObject = mock(JsonObject.class);
         when(jsonObject.getString("token")).thenReturn(expected);
 
         assertThat(expressionDocumentKeyProvider.getKey(jsonObject)).isEqualTo(expected + "____");
@@ -49,11 +53,8 @@ class ExpressionDocumentKeyProviderTest {
 
     @Test
     void Should_throw_exception_if_nothing_found_by_key() {
-        String expression = "%token%____";
-        ExpressionDocumentKeyProvider expressionDocumentKeyProvider = new ExpressionDocumentKeyProvider(expression);
-        String expected = "expected";
+        ExpressionDocumentKeyProvider expressionDocumentKeyProvider = new ExpressionDocumentKeyProvider("%token%____");
 
-        JsonObject jsonObject = mock(JsonObject.class);
         when(jsonObject.getString("token")).thenReturn(null);
 
         assertThatExceptionOfType(ProvideKeyFailedException.class)
@@ -62,10 +63,7 @@ class ExpressionDocumentKeyProviderTest {
 
     @Test
     void Should_return_generated_value_by_key() {
-        String expression = "#MONO_INCR#____";
-        ExpressionDocumentKeyProvider expressionDocumentKeyProvider = new ExpressionDocumentKeyProvider(expression);
-
-        JsonObject jsonObject = mock(JsonObject.class);
+        ExpressionDocumentKeyProvider expressionDocumentKeyProvider = new ExpressionDocumentKeyProvider("#MONO_INCR#____");
 
         assertThat(expressionDocumentKeyProvider.getKey(jsonObject)).isEqualTo("0____");
         assertThat(expressionDocumentKeyProvider.getKey(jsonObject)).isEqualTo("1____");
@@ -74,12 +72,10 @@ class ExpressionDocumentKeyProviderTest {
 
     @Test
     void Should_throw_exception_if_nothing_found_by_generator() {
-        String expression = "#UNEXISTING#";
-        ExpressionDocumentKeyProvider expressionDocumentKeyProvider = new ExpressionDocumentKeyProvider(expression);
-
-        JsonObject jsonObject = mock(JsonObject.class);
+        ExpressionDocumentKeyProvider expressionDocumentKeyProvider = new ExpressionDocumentKeyProvider("#UNEXISTING#");
 
         assertThatExceptionOfType(ProvideKeyFailedException.class)
                 .isThrownBy(() -> expressionDocumentKeyProvider.getKey(jsonObject));
     }
+
 }
