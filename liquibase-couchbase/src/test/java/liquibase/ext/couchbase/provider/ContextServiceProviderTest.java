@@ -15,6 +15,7 @@ import liquibase.ext.couchbase.database.CouchbaseConnection;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
@@ -62,12 +63,12 @@ class ContextServiceProviderTest {
 
     private final List<ScopeSpec> scopeSpecList = createScopeSpecs(DEFAULT_SERVICE_SCOPE);
     private final List<QueryIndex> queryIndexList = createQueryIndexes(TEST_COLLECTION_NAME);
+
+    @InjectMocks
     private ContextServiceProvider contextServiceProvider;
 
     @BeforeEach
     void setUp() {
-        this.contextServiceProvider = new ContextServiceProvider(couchbaseLiquibaseDatabase);
-
         when(couchbaseLiquibaseDatabase.getConnection()).thenReturn(couchbaseConnection);
         when(couchbaseConnection.getCluster()).thenReturn(cluster);
         when(bucket.collections()).thenReturn(collectionManager);
