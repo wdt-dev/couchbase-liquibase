@@ -1,12 +1,5 @@
 package liquibase.ext.couchbase.provider;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.couchbase.client.core.error.BucketNotFoundException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
@@ -22,6 +15,13 @@ import liquibase.ext.couchbase.database.CouchbaseConnection;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static liquibase.ext.couchbase.provider.ServiceProvider.DEFAULT_SERVICE_SCOPE;
 import static liquibase.ext.couchbase.provider.ServiceProvider.SERVICE_BUCKET_NAME;
@@ -179,7 +179,8 @@ class ContextServiceProviderTest {
         when(cluster.bucket(SERVICE_BUCKET_NAME)).thenAnswer(args -> {
             if (isCreated.get()) {
                 return bucket;
-            } else {
+            }
+            else {
                 return null;
             }
         });

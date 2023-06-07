@@ -1,12 +1,12 @@
 package liquibase.ext.couchbase.provider;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.couchbase.client.java.json.JsonObject;
 import liquibase.ext.couchbase.exception.ProvideKeyFailedException;
 import liquibase.ext.couchbase.types.TokenType;
 import org.junit.jupiter.api.Test;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
