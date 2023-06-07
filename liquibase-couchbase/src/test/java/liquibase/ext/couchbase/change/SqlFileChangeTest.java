@@ -3,29 +3,24 @@ package liquibase.ext.couchbase.change;
 import common.TestChangeLogProvider;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.DatabaseChangeLog;
-import liquibase.ext.couchbase.changelog.ChangeLogProvider;
-import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.statement.CouchbaseSqlStatement;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static common.constants.ChangeLogSampleFilePaths.CREATE_COLLECTION_SQL_TEST;
 import static common.constants.ChangeLogSampleFilePaths.INSERT_DOCUMENT_ROLLBACK_SQL_TEST;
 import static common.constants.ChangeLogSampleFilePaths.INSERT_DOCUMENT_SQL_TEST;
 import static liquibase.ext.couchbase.change.SqlFileChange.builder;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.internal.util.collections.Iterables.firstOf;
 
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class SqlFileChangeTest {
 
-    private ChangeLogProvider changeLogProvider;
-
-    @BeforeEach
-    void setUp() {
-        CouchbaseLiquibaseDatabase db = mock(CouchbaseLiquibaseDatabase.class);
-        changeLogProvider = new TestChangeLogProvider(db);
-    }
+    @InjectMocks
+    private TestChangeLogProvider changeLogProvider;
 
     @Test
     void Should_parse_changes_correctly() {
@@ -76,6 +71,5 @@ public class SqlFileChangeTest {
         ChangeSet changeSet = firstOf(load.getChangeSets());
         return (SqlFileChange) firstOf(changeSet.getChanges());
     }
-
 
 }

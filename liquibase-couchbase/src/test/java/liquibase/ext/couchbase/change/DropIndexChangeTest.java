@@ -3,13 +3,13 @@ package liquibase.ext.couchbase.change;
 import common.TestChangeLogProvider;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.DatabaseChangeLog;
-import liquibase.ext.couchbase.changelog.ChangeLogProvider;
-import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.statement.DropIndexStatement;
 import liquibase.ext.couchbase.statement.DropPrimaryIndexStatement;
 import liquibase.statement.SqlStatement;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static common.constants.ChangeLogSampleFilePaths.DROP_INDEX_TEST_XML;
 import static common.constants.TestConstants.INDEX;
@@ -18,22 +18,17 @@ import static common.constants.TestConstants.TEST_COLLECTION;
 import static common.constants.TestConstants.TEST_SCOPE;
 import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.internal.util.collections.Iterables.firstOf;
 
+@MockitoSettings(strictness = Strictness.LENIENT)
 class DropIndexChangeTest {
 
-    private DatabaseChangeLog changeLog;
-
-    @BeforeEach
-    void setUp() {
-        CouchbaseLiquibaseDatabase database = mock(CouchbaseLiquibaseDatabase.class);
-        ChangeLogProvider changeLogProvider = new TestChangeLogProvider(database);
-        changeLog = changeLogProvider.load(DROP_INDEX_TEST_XML);
-    }
+    @InjectMocks
+    private TestChangeLogProvider changeLogProvider;
 
     @Test
     void Should_have_correct_change_type() {
+        DatabaseChangeLog changeLog = changeLogProvider.load(DROP_INDEX_TEST_XML);
         assertThat(changeLog.getChangeSets())
                 .flatMap(ChangeSet::getChanges)
                 .withFailMessage("Changelog contains wrong types")
@@ -42,6 +37,7 @@ class DropIndexChangeTest {
 
     @Test
     void Should_contains_correct_bucket() {
+        DatabaseChangeLog changeLog = changeLogProvider.load(DROP_INDEX_TEST_XML);
         ChangeSet changeSet = firstOf(changeLog.getChangeSets());
         DropIndexChange change = (DropIndexChange) firstOf(changeSet.getChanges());
         assertThat(change.getBucketName()).isEqualTo("testBucket");

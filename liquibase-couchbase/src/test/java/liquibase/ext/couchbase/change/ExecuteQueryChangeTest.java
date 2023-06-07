@@ -4,32 +4,27 @@ import com.google.common.collect.Lists;
 import common.TestChangeLogProvider;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.DatabaseChangeLog;
-import liquibase.ext.couchbase.changelog.ChangeLogProvider;
-import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.statement.ExecuteQueryStatement;
 import liquibase.ext.couchbase.types.Param;
 import liquibase.statement.SqlStatement;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.List;
 
 import static common.constants.ChangeLogSampleFilePaths.EXECUTE_QUERY_CHANGE_TEST_XML;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.internal.util.collections.Iterables.firstOf;
 
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ExecuteQueryChangeTest {
 
-    private ChangeLogProvider changeLogProvider;
+    @InjectMocks
+    private TestChangeLogProvider changeLogProvider;
     private final String query = "DELETE FROM `testBucket`.testScope.testCollection WHERE META().id = $id";
-    List<Param> paramList = Lists.newArrayList(new Param("id", "abcd"));
-
-    @BeforeEach
-    void setUp() {
-        CouchbaseLiquibaseDatabase db = mock(CouchbaseLiquibaseDatabase.class);
-        changeLogProvider = new TestChangeLogProvider(db);
-    }
+    private List<Param> paramList = Lists.newArrayList(new Param("id", "abcd"));
 
     @Test
     void Should_parse_changes_correctly() {

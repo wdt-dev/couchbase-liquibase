@@ -28,7 +28,7 @@ class CouchbaseConnectionTest {
     private final Database database = mock(Database.class);
     private final Bucket bucket = mock(Bucket.class);
     private final Cluster cluster = mock(Cluster.class);
-    Driver driver = mock(Driver.class);
+    private final Driver driver = mock(Driver.class);
 
     @BeforeEach
     public void configure() {

@@ -9,6 +9,8 @@ import liquibase.ext.couchbase.statement.DropScopeStatement;
 import liquibase.statement.SqlStatement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static common.constants.ChangeLogSampleFilePaths.DROP_SCOPE_CHANGE_TEST_XML;
 import static common.constants.TestConstants.TEST_BUCKET;
@@ -17,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.internal.util.collections.Iterables.firstOf;
 
+@MockitoSettings(strictness = Strictness.LENIENT)
 class DropScopeChangeTest {
 
     private ChangeLogProvider changeLogProvider;

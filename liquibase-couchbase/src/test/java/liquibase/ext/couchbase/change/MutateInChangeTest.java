@@ -6,8 +6,6 @@ import common.TestChangeLogProvider;
 import liquibase.change.Change;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.DatabaseChangeLog;
-import liquibase.ext.couchbase.changelog.ChangeLogProvider;
-import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.statement.MutateInQueryStatement;
 import liquibase.ext.couchbase.statement.MutateInStatement;
 import liquibase.ext.couchbase.types.DataType;
@@ -15,8 +13,10 @@ import liquibase.ext.couchbase.types.Value;
 import liquibase.ext.couchbase.types.subdoc.LiquibaseMutateInSpec;
 import liquibase.ext.couchbase.types.subdoc.MutateInType;
 import liquibase.statement.SqlStatement;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,34 +30,31 @@ import static common.constants.TestConstants.TEST_SCOPE;
 import static java.util.Arrays.asList;
 import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.internal.util.collections.Iterables.firstOf;
 
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class MutateInChangeTest {
 
-    private DatabaseChangeLog changeLog;
-
-    @BeforeEach
-    void setUp() {
-        CouchbaseLiquibaseDatabase database = mock(CouchbaseLiquibaseDatabase.class);
-        ChangeLogProvider provider = new TestChangeLogProvider(database);
-        changeLog = provider.load(MUTATE_IN_INSERT_TEST_XML);
-    }
+    @InjectMocks
+    private TestChangeLogProvider changeLogProvider;
 
     @Test
     void Should_parse_mutateIn_id_correctly() {
+        DatabaseChangeLog changeLog = changeLogProvider.load(MUTATE_IN_INSERT_TEST_XML);
         ChangeSet changeSet = firstOf(changeLog.getChangeSets());
 
         assertThat(changeSet.getChanges())
                 .map(MutateInChange.class::cast)
                 .containsExactly(
                         changeWithId(asList(spec("user.age", "29", DataType.STRING, MutateInType.INSERT))),
-                        changeWithWhereClause(asList(spec("adoc", "{\"newDocumentField\": \"newDocumentValue\"}", DataType.JSON, MutateInType.REPLACE)))
+                        changeWithWhereClause(
+                                asList(spec("adoc", "{\"newDocumentField\": \"newDocumentValue\"}", DataType.JSON, MutateInType.REPLACE)))
                 );
     }
 
     @Test
     void Should_has_correct_confirm_msg() {
+        DatabaseChangeLog changeLog = changeLogProvider.load(MUTATE_IN_INSERT_TEST_XML);
         ChangeSet changeSet = firstOf(changeLog.getChangeSets());
         Change change = firstOf(changeSet.getChanges());
 
