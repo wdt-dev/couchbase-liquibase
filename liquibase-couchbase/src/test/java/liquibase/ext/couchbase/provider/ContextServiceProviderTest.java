@@ -72,10 +72,10 @@ class ContextServiceProviderTest {
     void setUp() {
         when(couchbaseLiquibaseDatabase.getConnection()).thenReturn(couchbaseConnection);
         when(couchbaseConnection.getCluster()).thenReturn(cluster);
-        when(bucket.collections()).thenReturn(collectionManager);
         when(cluster.queryIndexes()).thenReturn(queryIndexManager);
         when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
         when(bucket.scope(DEFAULT_SERVICE_SCOPE)).thenReturn(scope);
+        when(bucket.collections()).thenReturn(collectionManager);
         when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
         when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
     }
