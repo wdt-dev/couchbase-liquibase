@@ -76,7 +76,8 @@ class ContextServiceProviderTest {
         when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
 
-        assertThat(contextServiceProvider.getScopeOfCollection(collectionName)).isEqualTo(scope);
+        Scope result = contextServiceProvider.getScopeOfCollection(collectionName);
+        assertThat(result).isEqualTo(scope);
     }
 
     @Test
@@ -97,7 +98,8 @@ class ContextServiceProviderTest {
         when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
 
-        assertThat(contextServiceProvider.getServiceCollection(collectionName)).isEqualTo(collection);
+        Collection result = contextServiceProvider.getServiceCollection(collectionName);
+        assertThat(result).isEqualTo(collection);
 
         verify(bucket).scope(DEFAULT_SERVICE_SCOPE);
         verify(scope).collection(collectionName);
@@ -125,7 +127,8 @@ class ContextServiceProviderTest {
         when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
 
-        assertThat(contextServiceProvider.getServiceCollection(collectionName)).isEqualTo(collection);
+        Collection result = contextServiceProvider.getServiceCollection(collectionName);
+        assertThat(result).isEqualTo(collection);
 
         verify(cluster).bucket(SERVICE_BUCKET_NAME);
         verify(bucket).scope(DEFAULT_SERVICE_SCOPE);
@@ -167,7 +170,8 @@ class ContextServiceProviderTest {
             }
         });
 
-        assertThat(contextServiceProvider.getServiceCollection(collectionName)).isEqualTo(collection);
+        Collection result = contextServiceProvider.getServiceCollection(collectionName);
+        assertThat(result).isEqualTo(collection);
 
         verify(cluster).bucket(SERVICE_BUCKET_NAME);
         verify(bucket).scope(DEFAULT_SERVICE_SCOPE);
@@ -196,7 +200,8 @@ class ContextServiceProviderTest {
         when(collectionManager.getAllScopes()).thenReturn(new ArrayList<>());
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
 
-        assertThat(contextServiceProvider.getServiceCollection(collectionName)).isEqualTo(collection);
+        Collection result = contextServiceProvider.getServiceCollection(collectionName);
+        assertThat(result).isEqualTo(collection);
 
         verify(bucket).scope(DEFAULT_SERVICE_SCOPE);
         verify(scope).collection(collectionName);
@@ -225,7 +230,8 @@ class ContextServiceProviderTest {
         when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(new ArrayList<>());
 
-        assertThat(contextServiceProvider.getServiceCollection(collectionName)).isEqualTo(collection);
+        Collection result = contextServiceProvider.getServiceCollection(collectionName);
+        assertThat(result).isEqualTo(collection);
 
         verify(bucket).scope(DEFAULT_SERVICE_SCOPE);
         verify(scope).collection(collectionName);
