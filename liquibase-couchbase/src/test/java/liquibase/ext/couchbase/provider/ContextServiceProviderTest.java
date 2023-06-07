@@ -38,10 +38,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@MockitoSettings//(strictness = Strictness.LENIENT)
+@MockitoSettings
 class ContextServiceProviderTest {
 
     private static final String TEST_COLLECTION_NAME = "collection";
+
     @Mock
     private CouchbaseLiquibaseDatabase couchbaseLiquibaseDatabase;
     @Mock
@@ -75,8 +76,8 @@ class ContextServiceProviderTest {
         when(cluster.queryIndexes()).thenReturn(queryIndexManager);
         when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
         when(bucket.scope(DEFAULT_SERVICE_SCOPE)).thenReturn(scope);
-        // when(collection.bucketName()).thenReturn(SERVICE_BUCKET_NAME);
-        // when(collection.scopeName()).thenReturn(DEFAULT_SERVICE_SCOPE);
+        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
+        when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
     }
 
     @Test
@@ -85,8 +86,6 @@ class ContextServiceProviderTest {
         when(collection.bucketName()).thenReturn(SERVICE_BUCKET_NAME);
         when(collection.scopeName()).thenReturn(DEFAULT_SERVICE_SCOPE);
         when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
-        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
-        when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
 
         Scope result = contextServiceProvider.getScopeOfCollection(TEST_COLLECTION_NAME);
@@ -96,8 +95,6 @@ class ContextServiceProviderTest {
     @Test
     void Should_return_service_collection_if_bucket_and_scope_and_collection_exist() {
         when(couchbaseConnection.getDatabase()).thenReturn(bucket);
-        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
-        when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
 
         Collection result = contextServiceProvider.getServiceCollection(TEST_COLLECTION_NAME);
@@ -116,8 +113,6 @@ class ContextServiceProviderTest {
     void Should_return_service_collection_if_bucket_and_scope_and_collection_exist_but_database_missing() {
         when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
         when(cluster.buckets()).thenReturn(bucketManager);
-        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
-        when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
 
         Collection result = contextServiceProvider.getServiceCollection(TEST_COLLECTION_NAME);
@@ -136,8 +131,6 @@ class ContextServiceProviderTest {
     @Test
     void Should_return_service_collection_if_bucket_and_scope_and_collection_exist_but_bucket_does_not_exist() {
         when(cluster.buckets()).thenReturn(bucketManager);
-        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
-        when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
         when(bucketManager.getBucket(any())).thenThrow(new BucketNotFoundException(""));
         AtomicBoolean isCreated = new AtomicBoolean(false);
@@ -171,7 +164,6 @@ class ContextServiceProviderTest {
     @Test
     void Should_return_service_collection_if_bucket_exists_but_scope_and_collection_do_not_exist() {
         when(couchbaseConnection.getDatabase()).thenReturn(bucket);
-        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
         when(collectionManager.getAllScopes()).thenReturn(new ArrayList<>());
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
 
@@ -191,8 +183,6 @@ class ContextServiceProviderTest {
     @Test
     void Should_create_index_if_does_not_exist() {
         when(couchbaseConnection.getDatabase()).thenReturn(bucket);
-        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
-        when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(new ArrayList<>());
 
         Collection result = contextServiceProvider.getServiceCollection(TEST_COLLECTION_NAME);
