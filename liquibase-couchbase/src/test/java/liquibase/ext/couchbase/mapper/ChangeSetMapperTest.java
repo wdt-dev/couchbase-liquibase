@@ -15,11 +15,13 @@ import liquibase.ext.couchbase.changelog.CouchbaseChangeLog;
 import liquibase.util.LiquibaseUtil;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-public class ChangeSetMapperTest {
+@MockitoSettings
+class ChangeSetMapperTest {
 
     @Test
     void Should_map_to_ran_change_set() {

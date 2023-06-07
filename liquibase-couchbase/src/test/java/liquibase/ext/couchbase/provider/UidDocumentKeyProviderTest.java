@@ -2,14 +2,17 @@ package liquibase.ext.couchbase.provider;
 
 import liquibase.ext.couchbase.provider.generator.UidKeyGenerator;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@MockitoSettings
 class UidDocumentKeyProviderTest {
 
-    private final UidKeyGenerator uidKeyGenerator = mock(UidKeyGenerator.class);
+    @Mock
+    private UidKeyGenerator uidKeyGenerator;
 
     @Test
     void Should_call_generate() {

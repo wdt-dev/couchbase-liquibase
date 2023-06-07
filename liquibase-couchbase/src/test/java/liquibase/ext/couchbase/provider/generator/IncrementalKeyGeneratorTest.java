@@ -3,9 +3,11 @@ package liquibase.ext.couchbase.provider.generator;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@MockitoSettings
 class IncrementalKeyGeneratorTest {
 
     @Test

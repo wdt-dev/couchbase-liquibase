@@ -13,36 +13,38 @@ import liquibase.ext.couchbase.types.File;
 import liquibase.ext.couchbase.types.Value;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@MockitoSettings
 class LinesMapperTest {
 
-    private final DocumentKeyProviderFactory documentKeyProviderFactory = mock(DocumentKeyProviderFactory.class);
-    private final DocumentKeyProvider documentKeyProvider = mock(DocumentKeyProvider.class);
+    @Mock
+    private DocumentKeyProviderFactory documentKeyProviderFactory;
+    @Mock
+    private DocumentKeyProvider documentKeyProvider;
+    @Mock
+    private File file;
 
     private final AtomicLong keyHolder = new AtomicLong(1L);
-    private final LinesMapper linesMapper;
-
-    public LinesMapperTest() {
-        linesMapper = new LinesMapper(documentKeyProviderFactory);
-    }
+    private LinesMapper linesMapper;
 
     @BeforeEach
     public void setUp() {
-        when(documentKeyProviderFactory.getKeyProvider(any())).thenReturn(documentKeyProvider);
-        when(documentKeyProvider.getKey(any())).thenAnswer((args) -> String.valueOf(keyHolder.getAndIncrement()));
+        this.linesMapper = new LinesMapper(documentKeyProviderFactory);
     }
 
     @Test
     void Should_map_file_successfully() {
-        File file = mock(File.class);
         when(file.lines()).thenReturn(Stream.of("{}", "{}", "{}"));
+        when(documentKeyProviderFactory.getKeyProvider(any())).thenReturn(documentKeyProvider);
+        when(documentKeyProvider.getKey(any())).thenAnswer((args) -> String.valueOf(keyHolder.getAndIncrement()));
 
         List<Document> expected = new ArrayList<>();
         Document doc1 = new Document(String.valueOf(keyHolder.get()), new Value("{}", DataType.JSON));
