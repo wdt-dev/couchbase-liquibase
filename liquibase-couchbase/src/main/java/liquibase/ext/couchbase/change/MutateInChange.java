@@ -6,6 +6,7 @@ import com.couchbase.client.java.kv.StoreSemantics;
 import liquibase.change.ChangeMetaData;
 import liquibase.change.DatabaseChange;
 import liquibase.ext.couchbase.statement.MutateInQueryStatement;
+import liquibase.ext.couchbase.statement.MutateInSqlPlusPlusQueryStatement;
 import liquibase.ext.couchbase.statement.MutateInStatement;
 import liquibase.ext.couchbase.transformer.MutateInSpecTransformer;
 import liquibase.ext.couchbase.types.Keyspace;
@@ -49,6 +50,7 @@ public class MutateInChange extends CouchbaseChange {
 
     private String id;
     private String whereCondition;
+    private String sqlPlusPlusQuery;
     private String bucketName;
     private String scopeName;
     private String collectionName;
@@ -64,8 +66,10 @@ public class MutateInChange extends CouchbaseChange {
         MutateIn mutate = buildMutate(keyspace);
         MutateInOptions mutateInOptions = buildOptions(expiry, preserveExpiry, storeSemantics);
         return new SqlStatement[] {
-                id == null ? new MutateInQueryStatement(mutate, mutateInOptions, whereCondition) :
-                        new MutateInStatement(mutate, mutateInOptions)
+                id == null && whereCondition == null ?
+                        new MutateInSqlPlusPlusQueryStatement(mutate, mutateInOptions, sqlPlusPlusQuery) :
+                        (id == null ? new MutateInQueryStatement(mutate, mutateInOptions, whereCondition) :
+                                new MutateInStatement(mutate, mutateInOptions))
         };
     }
 
