@@ -15,6 +15,8 @@ import liquibase.ext.couchbase.database.CouchbaseConnection;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,77 +34,76 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@MockitoSettings//(strictness = Strictness.LENIENT)
 class ContextServiceProviderTest {
 
-    private final CouchbaseLiquibaseDatabase couchbaseLiquibaseDatabase = mock(CouchbaseLiquibaseDatabase.class);
-    private final CouchbaseConnection couchbaseConnection = mock(CouchbaseConnection.class);
-    private final Cluster cluster = mock(Cluster.class);
-    private final Bucket bucket = mock(Bucket.class);
-    private final Scope scope = mock(Scope.class);
-    private final Collection collection = mock(Collection.class);
-    private final BucketManager bucketManager = mock(BucketManager.class);
-    private final CollectionManager collectionManager = mock(CollectionManager.class);
-    private final QueryIndexManager queryIndexManager = mock(QueryIndexManager.class);
+    private static final String TEST_COLLECTION_NAME = "collection";
+    @Mock
+    private CouchbaseLiquibaseDatabase couchbaseLiquibaseDatabase;
+    @Mock
+    private CouchbaseConnection couchbaseConnection;
+    @Mock
+    private Cluster cluster;
+    @Mock
+    private Bucket bucket;
+    @Mock
+    private Scope scope;
+    @Mock
+    private Collection collection;
+    @Mock
+    private BucketManager bucketManager;
+    @Mock
+    private CollectionManager collectionManager;
+    @Mock
+    private QueryIndexManager queryIndexManager;
+
+    private final List<ScopeSpec> scopeSpecList = createScopeSpecs(DEFAULT_SERVICE_SCOPE);
+    private final List<QueryIndex> queryIndexList = createQueryIndexes(TEST_COLLECTION_NAME);
+    private ContextServiceProvider contextServiceProvider;
 
     @BeforeEach
     void setUp() {
+        this.contextServiceProvider = new ContextServiceProvider(couchbaseLiquibaseDatabase);
+
         when(couchbaseLiquibaseDatabase.getConnection()).thenReturn(couchbaseConnection);
         when(couchbaseConnection.getCluster()).thenReturn(cluster);
         when(bucket.collections()).thenReturn(collectionManager);
         when(cluster.queryIndexes()).thenReturn(queryIndexManager);
-        when(collection.bucketName()).thenReturn(SERVICE_BUCKET_NAME);
-        when(collection.scopeName()).thenReturn(DEFAULT_SERVICE_SCOPE);
+        when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
+        when(bucket.scope(DEFAULT_SERVICE_SCOPE)).thenReturn(scope);
+        // when(collection.bucketName()).thenReturn(SERVICE_BUCKET_NAME);
+        // when(collection.scopeName()).thenReturn(DEFAULT_SERVICE_SCOPE);
     }
 
     @Test
     void Should_return_scope_of_collection() {
-        ContextServiceProvider contextServiceProvider = new ContextServiceProvider(couchbaseLiquibaseDatabase);
-
-        String collectionName = "collection";
-
-        List<ScopeSpec> scopeSpecList = createScopeSpecs(collectionName, DEFAULT_SERVICE_SCOPE);
-
-        List<QueryIndex> queryIndexList = createQueryIndexes(collectionName);
         when(couchbaseConnection.getDatabase()).thenReturn(bucket);
-        when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
+        when(collection.bucketName()).thenReturn(SERVICE_BUCKET_NAME);
+        when(collection.scopeName()).thenReturn(DEFAULT_SERVICE_SCOPE);
         when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
-        when(cluster.buckets()).thenReturn(bucketManager);
-        when(bucket.scope(DEFAULT_SERVICE_SCOPE)).thenReturn(scope);
-        when(scope.collection(collectionName)).thenReturn(collection);
+        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
         when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
 
-        Scope result = contextServiceProvider.getScopeOfCollection(collectionName);
+        Scope result = contextServiceProvider.getScopeOfCollection(TEST_COLLECTION_NAME);
         assertThat(result).isEqualTo(scope);
     }
 
     @Test
     void Should_return_service_collection_if_bucket_and_scope_and_collection_exist() {
-        ContextServiceProvider contextServiceProvider = new ContextServiceProvider(couchbaseLiquibaseDatabase);
-
-        String collectionName = "collection";
-
-        List<ScopeSpec> scopeSpecList = createScopeSpecs(collectionName, DEFAULT_SERVICE_SCOPE);
-
-        List<QueryIndex> queryIndexList = createQueryIndexes(collectionName);
         when(couchbaseConnection.getDatabase()).thenReturn(bucket);
-        when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
-        when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
-        when(cluster.buckets()).thenReturn(bucketManager);
-        when(bucket.scope(DEFAULT_SERVICE_SCOPE)).thenReturn(scope);
-        when(scope.collection(collectionName)).thenReturn(collection);
+        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
         when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
 
-        Collection result = contextServiceProvider.getServiceCollection(collectionName);
+        Collection result = contextServiceProvider.getServiceCollection(TEST_COLLECTION_NAME);
         assertThat(result).isEqualTo(collection);
 
         verify(bucket).scope(DEFAULT_SERVICE_SCOPE);
-        verify(scope).collection(collectionName);
+        verify(scope).collection(TEST_COLLECTION_NAME);
 
         verify(bucketManager, never()).createBucket(any());
         verify(collectionManager, never()).createCollection(any());
@@ -112,27 +113,18 @@ class ContextServiceProviderTest {
 
     @Test
     void Should_return_service_collection_if_bucket_and_scope_and_collection_exist_but_database_missing() {
-        ContextServiceProvider contextServiceProvider = new ContextServiceProvider(couchbaseLiquibaseDatabase);
-
-        String collectionName = "collection";
-
-        List<ScopeSpec> scopeSpecList = createScopeSpecs(collectionName, DEFAULT_SERVICE_SCOPE);
-
-        List<QueryIndex> queryIndexList = createQueryIndexes(collectionName);
-        when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
         when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
         when(cluster.buckets()).thenReturn(bucketManager);
-        when(bucket.scope(DEFAULT_SERVICE_SCOPE)).thenReturn(scope);
-        when(scope.collection(collectionName)).thenReturn(collection);
+        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
         when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
 
-        Collection result = contextServiceProvider.getServiceCollection(collectionName);
+        Collection result = contextServiceProvider.getServiceCollection(TEST_COLLECTION_NAME);
         assertThat(result).isEqualTo(collection);
 
         verify(cluster).bucket(SERVICE_BUCKET_NAME);
         verify(bucket).scope(DEFAULT_SERVICE_SCOPE);
-        verify(scope).collection(collectionName);
+        verify(scope).collection(TEST_COLLECTION_NAME);
 
         verify(bucketManager, never()).createBucket(any());
         verify(collectionManager, never()).createCollection(any());
@@ -142,17 +134,8 @@ class ContextServiceProviderTest {
 
     @Test
     void Should_return_service_collection_if_bucket_and_scope_and_collection_exist_but_bucket_does_not_exist() {
-        ContextServiceProvider contextServiceProvider = new ContextServiceProvider(couchbaseLiquibaseDatabase);
-
-        String collectionName = "collection";
-
-        List<ScopeSpec> scopeSpecList = createScopeSpecs(collectionName, DEFAULT_SERVICE_SCOPE);
-
-        List<QueryIndex> queryIndexList = createQueryIndexes(collectionName);
-        when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
         when(cluster.buckets()).thenReturn(bucketManager);
-        when(bucket.scope(DEFAULT_SERVICE_SCOPE)).thenReturn(scope);
-        when(scope.collection(collectionName)).thenReturn(collection);
+        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
         when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
         when(bucketManager.getBucket(any())).thenThrow(new BucketNotFoundException(""));
@@ -170,12 +153,12 @@ class ContextServiceProviderTest {
             }
         });
 
-        Collection result = contextServiceProvider.getServiceCollection(collectionName);
+        Collection result = contextServiceProvider.getServiceCollection(TEST_COLLECTION_NAME);
         assertThat(result).isEqualTo(collection);
 
         verify(cluster).bucket(SERVICE_BUCKET_NAME);
         verify(bucket).scope(DEFAULT_SERVICE_SCOPE);
-        verify(scope).collection(collectionName);
+        verify(scope).collection(TEST_COLLECTION_NAME);
 
         verify(bucketManager).createBucket(argThat(it -> Objects.equals(it.name(), SERVICE_BUCKET_NAME)), any());
 
@@ -186,27 +169,18 @@ class ContextServiceProviderTest {
 
     @Test
     void Should_return_service_collection_if_bucket_exists_but_scope_and_collection_do_not_exist() {
-        ContextServiceProvider contextServiceProvider = new ContextServiceProvider(couchbaseLiquibaseDatabase);
-
-        String collectionName = "collection";
-
-        List<QueryIndex> queryIndexList = createQueryIndexes(collectionName);
         when(couchbaseConnection.getDatabase()).thenReturn(bucket);
-        when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
-        when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
-        when(cluster.buckets()).thenReturn(bucketManager);
-        when(bucket.scope(DEFAULT_SERVICE_SCOPE)).thenReturn(scope);
-        when(scope.collection(collectionName)).thenReturn(collection);
+        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
         when(collectionManager.getAllScopes()).thenReturn(new ArrayList<>());
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(queryIndexList);
 
-        Collection result = contextServiceProvider.getServiceCollection(collectionName);
+        Collection result = contextServiceProvider.getServiceCollection(TEST_COLLECTION_NAME);
         assertThat(result).isEqualTo(collection);
 
         verify(bucket).scope(DEFAULT_SERVICE_SCOPE);
-        verify(scope).collection(collectionName);
+        verify(scope).collection(TEST_COLLECTION_NAME);
 
-        verify(collectionManager).createCollection(argThat(it -> Objects.equals(it.name(), collectionName)));
+        verify(collectionManager).createCollection(argThat(it -> Objects.equals(it.name(), TEST_COLLECTION_NAME)));
         verify(collectionManager).createScope(DEFAULT_SERVICE_SCOPE);
 
         verify(bucketManager, never()).createBucket(any(), any());
@@ -215,26 +189,16 @@ class ContextServiceProviderTest {
 
     @Test
     void Should_create_index_if_does_not_exist() {
-        ContextServiceProvider contextServiceProvider = new ContextServiceProvider(couchbaseLiquibaseDatabase);
-
-        String collectionName = "collection";
-
-        List<ScopeSpec> scopeSpecList = createScopeSpecs(collectionName, DEFAULT_SERVICE_SCOPE);
-
         when(couchbaseConnection.getDatabase()).thenReturn(bucket);
-        when(bucket.name()).thenReturn(SERVICE_BUCKET_NAME);
-        when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
-        when(cluster.buckets()).thenReturn(bucketManager);
-        when(bucket.scope(DEFAULT_SERVICE_SCOPE)).thenReturn(scope);
-        when(scope.collection(collectionName)).thenReturn(collection);
+        when(scope.collection(TEST_COLLECTION_NAME)).thenReturn(collection);
         when(collectionManager.getAllScopes()).thenReturn(scopeSpecList);
         when(queryIndexManager.getAllIndexes(eq(SERVICE_BUCKET_NAME), any())).thenReturn(new ArrayList<>());
 
-        Collection result = contextServiceProvider.getServiceCollection(collectionName);
+        Collection result = contextServiceProvider.getServiceCollection(TEST_COLLECTION_NAME);
         assertThat(result).isEqualTo(collection);
 
         verify(bucket).scope(DEFAULT_SERVICE_SCOPE);
-        verify(scope).collection(collectionName);
+        verify(scope).collection(TEST_COLLECTION_NAME);
 
         verify(bucketManager, never()).createBucket(any());
         verify(collectionManager, never()).createCollection(any());
@@ -244,14 +208,14 @@ class ContextServiceProviderTest {
         verify(queryIndexManager).watchIndexes(eq(SERVICE_BUCKET_NAME), any(), any(), any());
     }
 
-    private List<ScopeSpec> createScopeSpecs(String collectionName, String... specNames) {
+    private List<ScopeSpec> createScopeSpecs(String... specNames) {
         List<ScopeSpec> scopeSpecList = new ArrayList<>();
         if (specNames != null) {
             for (String specName : specNames) {
                 ScopeSpec scopeSpec = mock(ScopeSpec.class);
                 scopeSpecList.add(scopeSpec);
 
-                Set<CollectionSpec> collectionSpecSet = createCollectionSpecs(specName, collectionName);
+                Set<CollectionSpec> collectionSpecSet = createCollectionSpecs(specName, TEST_COLLECTION_NAME);
 
                 when(scopeSpec.name()).thenReturn(specName);
                 when(scopeSpec.collections()).thenReturn(collectionSpecSet);
@@ -285,6 +249,5 @@ class ContextServiceProviderTest {
         }
         return queryIndexList;
     }
-
 
 }
