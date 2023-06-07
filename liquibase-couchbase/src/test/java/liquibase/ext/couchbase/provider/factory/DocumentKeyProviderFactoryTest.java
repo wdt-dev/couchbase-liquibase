@@ -28,21 +28,24 @@ class DocumentKeyProviderFactoryTest {
     void Should_return_default() {
         when(file.getKeyProviderType()).thenReturn(DEFAULT);
 
-        assertThat(documentKeyProviderFactory.getKeyProvider(file)).isInstanceOf(FieldDocumentKeyProvider.class);
+        assertThat(documentKeyProviderFactory.getKeyProvider(file)).isInstanceOf(
+                FieldDocumentKeyProvider.class);
     }
 
     @Test
     void Should_return_uid() {
         when(file.getKeyProviderType()).thenReturn(UID);
 
-        assertThat(documentKeyProviderFactory.getKeyProvider(file)).isInstanceOf(UidDocumentKeyProvider.class);
+        assertThat(documentKeyProviderFactory.getKeyProvider(file)).isInstanceOf(
+                UidDocumentKeyProvider.class);
     }
 
     @Test
     void Should_return_incremental() {
         when(file.getKeyProviderType()).thenReturn(INCREMENT);
 
-        assertThat(documentKeyProviderFactory.getKeyProvider(file)).isInstanceOf(IncrementalDocumentKeyProvider.class);
+        assertThat(documentKeyProviderFactory.getKeyProvider(file)).isInstanceOf(
+                IncrementalDocumentKeyProvider.class);
     }
 
     @Test
@@ -50,7 +53,8 @@ class DocumentKeyProviderFactoryTest {
         when(file.getKeyProviderType()).thenReturn(EXPRESSION);
         when(file.getKeyProviderExpression()).thenReturn("#a, #b");
 
-        assertThat(documentKeyProviderFactory.getKeyProvider(file)).isInstanceOf(ExpressionDocumentKeyProvider.class);
+        assertThat(documentKeyProviderFactory.getKeyProvider(file)).isInstanceOf(
+                ExpressionDocumentKeyProvider.class);
     }
 
 }

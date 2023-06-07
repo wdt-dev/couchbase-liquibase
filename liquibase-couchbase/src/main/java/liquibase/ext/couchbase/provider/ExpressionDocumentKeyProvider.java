@@ -1,11 +1,5 @@
 package liquibase.ext.couchbase.provider;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import com.couchbase.client.java.json.JsonObject;
 import com.google.common.collect.ImmutableMap;
 import liquibase.ext.couchbase.exception.ProvideKeyFailedException;
@@ -14,6 +8,12 @@ import liquibase.ext.couchbase.provider.generator.UidKeyGenerator;
 import liquibase.ext.couchbase.types.GeneratorType;
 import liquibase.ext.couchbase.types.TokenType;
 import lombok.Getter;
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import static liquibase.ext.couchbase.types.GeneratorType.MONO_INCR;
 import static liquibase.ext.couchbase.types.GeneratorType.UUID;
