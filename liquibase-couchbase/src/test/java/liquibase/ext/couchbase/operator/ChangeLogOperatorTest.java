@@ -39,6 +39,7 @@ import static liquibase.ext.couchbase.operator.ChangeLogOperator.SELECT_ALL_CHAN
 import static liquibase.ext.couchbase.operator.ChangeLogOperator.SELECT_LAST_CHANGE_SET_ID_N1QL;
 import static liquibase.ext.couchbase.operator.ChangeLogOperator.SELECT_LAST_ORDER_N1QL;
 import static liquibase.ext.couchbase.provider.ServiceProvider.CHANGE_LOG_COLLECTION;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -207,7 +208,7 @@ class ChangeLogOperatorTest {
 
     @Test
     void Should_create_changeLogOperator_when_databaseProvided() {
-        new ChangeLogOperator(database);
+        assertThatCode(() -> new ChangeLogOperator(database)).doesNotThrowAnyException();
     }
 
 }

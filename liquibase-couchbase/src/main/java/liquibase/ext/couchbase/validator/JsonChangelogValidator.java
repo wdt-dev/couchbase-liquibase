@@ -2,6 +2,7 @@ package liquibase.ext.couchbase.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
@@ -25,11 +26,11 @@ public class JsonChangelogValidator implements SingletonObject {
     private final JsonSchemaFactory schemaFactory;
 
     public JsonChangelogValidator() {
-        this.objectMapper = new ObjectMapper();
-        this.schemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
+        this(new ObjectMapper(), JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909));
     }
 
-    public JsonChangelogValidator(ObjectMapper objectMapper, JsonSchemaFactory schemaFactory) {
+    @VisibleForTesting
+    JsonChangelogValidator(ObjectMapper objectMapper, JsonSchemaFactory schemaFactory) {
         this.objectMapper = objectMapper;
         this.schemaFactory = schemaFactory;
     }

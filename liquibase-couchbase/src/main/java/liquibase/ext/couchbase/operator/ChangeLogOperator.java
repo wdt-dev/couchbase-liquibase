@@ -6,6 +6,7 @@ import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.manager.query.CreatePrimaryQueryIndexOptions;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryScanConsistency;
+import com.google.common.annotations.VisibleForTesting;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.RanChangeSet;
 import liquibase.ext.couchbase.changelog.CouchbaseChangeLog;
@@ -48,7 +49,8 @@ public class ChangeLogOperator {
         this(database, new ContextServiceProvider(database));
     }
 
-    public ChangeLogOperator(CouchbaseLiquibaseDatabase database, ServiceProvider serviceProvider) {
+    @VisibleForTesting
+    ChangeLogOperator(CouchbaseLiquibaseDatabase database, ServiceProvider serviceProvider) {
         this.database = database;
         this.serviceProvider = serviceProvider;
     }
