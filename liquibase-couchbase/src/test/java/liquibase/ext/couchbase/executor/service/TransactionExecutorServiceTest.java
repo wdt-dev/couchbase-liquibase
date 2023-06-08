@@ -1,13 +1,14 @@
 package liquibase.ext.couchbase.executor.service;
 
 import com.couchbase.client.java.Cluster;
+import liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoSettings;
 
-import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration.IS_REACTIVE_TRANSACTIONS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 @MockitoSettings
 class TransactionExecutorServiceTest {
@@ -16,12 +17,25 @@ class TransactionExecutorServiceTest {
     private Cluster cluster;
 
     @Test
-    void Should_return_PlainTransactionExecutorService_or_ReactiveTransactionExecutorService() {
-        TransactionExecutorService transactionExecutorService = TransactionExecutorService.getExecutor(cluster);
+    void Should_return_ReactiveTransactionExecutorService_if_reactive_is_enabled() {
+        try (MockedStatic<CouchbaseLiquibaseConfiguration> mockedConfiguration = Mockito.mockStatic(
+                CouchbaseLiquibaseConfiguration.class)) {
+            mockedConfiguration.when(CouchbaseLiquibaseConfiguration::isReactiveTransactions)
+                    .thenReturn(true);
 
-        if (IS_REACTIVE_TRANSACTIONS.getCurrentValue()) {
+            TransactionExecutorService transactionExecutorService = TransactionExecutorService.getExecutor(cluster);
             assertThat(transactionExecutorService).isInstanceOf(ReactiveTransactionExecutorService.class);
-        } else {
+        }
+    }
+
+    @Test
+    void Should_return_PlainTransactionExecutorService_if_reactive_is_disabled() {
+        try (MockedStatic<CouchbaseLiquibaseConfiguration> mockedConfiguration = Mockito.mockStatic(
+                CouchbaseLiquibaseConfiguration.class)) {
+            mockedConfiguration.when(CouchbaseLiquibaseConfiguration::isReactiveTransactions)
+                    .thenReturn(false);
+
+            TransactionExecutorService transactionExecutorService = TransactionExecutorService.getExecutor(cluster);
             assertThat(transactionExecutorService).isInstanceOf(PlainTransactionExecutorService.class);
         }
     }

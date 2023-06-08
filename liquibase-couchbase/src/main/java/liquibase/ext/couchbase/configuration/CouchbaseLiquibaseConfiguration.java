@@ -20,7 +20,7 @@ public class CouchbaseLiquibaseConfiguration implements AutoloadedConfigurations
     public static final ConfigurationDefinition<Duration> LOCK_TTL_PROLONGATION;
     public static final ConfigurationDefinition<Duration> TRANSACTION_TIMEOUT;
     public static final ConfigurationDefinition<Duration> MUTATE_IN_TIMEOUT;
-    public static final ConfigurationDefinition<Boolean> IS_REACTIVE_TRANSACTIONS;
+    private static final ConfigurationDefinition<Boolean> IS_REACTIVE_TRANSACTIONS;
     public static final ConfigurationDefinition<Integer> REACTIVE_TRANSACTION_PARALLEL_THREADS;
 
     static {
@@ -91,6 +91,10 @@ public class CouchbaseLiquibaseConfiguration implements AutoloadedConfigurations
                 .setDescription("Number of parallel threads for executing statements in reactive transaction")
                 .setDefaultValue(16)
                 .build();
+    }
+
+    public static boolean isReactiveTransactions() {
+        return IS_REACTIVE_TRANSACTIONS.getCurrentValue();
     }
 
     private static Duration durationExtract(Object value) {
