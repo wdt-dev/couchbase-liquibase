@@ -9,8 +9,10 @@ import static org.liquibase.ext.couchbase.plugin.common.TestContainerInitializer
 
 public class JavaMavenContainer extends GenericContainer<JavaMavenContainer> {
 
+    private static final String DOCKERFILE = "Dockerfile";
+
     public JavaMavenContainer() {
-        super(new ImageFromDockerfile().withFileFromPath("Dockerfile",
-                Paths.get(ROOT_WITH_TEST_PROJECT_TEST_RESOURCES + "Dockerfile")));
+        super(new ImageFromDockerfile().withFileFromPath(DOCKERFILE,
+                Paths.get(ROOT_WITH_TEST_PROJECT_TEST_RESOURCES + DOCKERFILE)));
     }
 }
