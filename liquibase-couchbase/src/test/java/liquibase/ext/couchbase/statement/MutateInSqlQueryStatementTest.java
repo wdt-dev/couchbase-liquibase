@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class MutateInSqlPlusPlusQueryStatementTest {
+class MutateInSqlQueryStatementTest {
 
     private final ClusterOperator clusterOperator = mock(ClusterOperator.class);
     private final BucketOperator bucketOperator = mock(BucketOperator.class);
@@ -32,7 +32,7 @@ class MutateInSqlPlusPlusQueryStatementTest {
                 .build();
         String query = "query";
         List<String> documentIds = Arrays.asList("docId1", "docId2");
-        MutateInSqlPlusPlusQueryStatement statement = new MutateInSqlPlusPlusQueryStatement(mutate, mutateInOptions, query);
+        MutateInSqlQueryStatement statement = new MutateInSqlQueryStatement(mutate, mutateInOptions, query);
 
         when(clusterOperator.getBucketOperator(TEST_KEYSPACE.getBucket())).thenReturn(bucketOperator);
         when(bucketOperator.getCollection(TEST_KEYSPACE.getCollection(), TEST_KEYSPACE.getScope())).thenReturn(

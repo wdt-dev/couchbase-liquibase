@@ -18,8 +18,8 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import liquibase.ext.couchbase.statement.MutateInQueryStatement;
-import liquibase.ext.couchbase.statement.MutateInSqlPlusPlusQueryStatement;
+
+import liquibase.ext.couchbase.statement.MutateInSqlQueryStatement;
 import liquibase.ext.couchbase.transformer.MutateInSpecTransformer;
 import liquibase.ext.couchbase.types.DataType;
 import liquibase.ext.couchbase.types.Document;
@@ -32,7 +32,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class MutateInSqlPlusPlusQueryStatementIT extends RandomizedScopeTestCase {
+class MutateInSqlQueryStatementIT extends RandomizedScopeTestCase {
 
     private static final String DOC_FIELD_NAME = "field1";
     private static final String DOC_FIELD_Value = "val1";
@@ -69,7 +69,7 @@ class MutateInSqlPlusPlusQueryStatementIT extends RandomizedScopeTestCase {
         List<MutateInSpec> specs = getInsertSpec(AGE_KEY, "30");
         MutateIn mutate = MutateIn.builder().keyspace(keyspace).specs(specs).build();
 
-        new MutateInSqlPlusPlusQueryStatement(mutate, mutateInOptions().timeout(Duration.ofSeconds(2)), format("SELECT meta().id FROM %s where field1=\"val1\"", keyspace.getFullPath())).execute(clusterOperator);
+        new MutateInSqlQueryStatement(mutate, mutateInOptions().timeout(Duration.ofSeconds(2)), format("SELECT meta().id FROM %s where field1=\"val1\"", keyspace.getFullPath())).execute(clusterOperator);
         Collection collection = collectionOperator.getCollection();
         assertThat(collection).extractingDocument(doc3.getId()).hasNoField(AGE_KEY);
         assertThat(collection).extractingDocument(doc1.getId()).hasField(AGE_KEY);
@@ -82,7 +82,7 @@ class MutateInSqlPlusPlusQueryStatementIT extends RandomizedScopeTestCase {
         MutateIn mutate = MutateIn.builder().keyspace(keyspace).specs(specs).build();
 
         assertThatExceptionOfType(PathExistsException.class).isThrownBy(
-                () -> new MutateInSqlPlusPlusQueryStatement(mutate, mutateInOptions().timeout(Duration.ofSeconds(2)), format("SELECT meta().id FROM %s where field1=\"val1\"", keyspace.getFullPath())).execute(
+                () -> new MutateInSqlQueryStatement(mutate, mutateInOptions().timeout(Duration.ofSeconds(2)), format("SELECT meta().id FROM %s where field1=\"val1\"", keyspace.getFullPath())).execute(
                         clusterOperator)).withMessageContaining(
                 "Path already exists in document");
     }

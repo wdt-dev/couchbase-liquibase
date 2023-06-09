@@ -10,10 +10,17 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+
+/**
+ * A statement to perform mutateIn by filtering ids of documents via sql++ query.
+ *
+ * @see MutateIn
+ * @see MutateInOptions
+ */
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class MutateInSqlPlusPlusQueryStatement extends CouchbaseStatement {
+public class MutateInSqlQueryStatement extends CouchbaseStatement {
 
     private final MutateIn mutate;
     private final MutateInOptions mutateInOptions;
