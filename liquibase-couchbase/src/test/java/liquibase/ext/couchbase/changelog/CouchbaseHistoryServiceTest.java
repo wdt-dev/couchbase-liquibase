@@ -323,10 +323,8 @@ class CouchbaseHistoryServiceTest {
         CollectionSpec collectionSpec = mock(CollectionSpec.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS));
         collectionSpecs.add(collectionSpec);
 
-        BucketManager bucketManager = connection.getCluster().buckets();
-
         when(database.getConnection()).thenReturn(connection);
-        when(bucketManager.getBucket(SERVICE_BUCKET_NAME)).thenReturn(mock(BucketSettings.class));
+        when(connection.getCluster().buckets().getBucket(SERVICE_BUCKET_NAME)).thenReturn(mock(BucketSettings.class));
         when(connection.getCluster().bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
         when(scopeSpec.collections()).thenReturn(collectionSpecs);
         when(bucket.collections().getAllScopes()).thenReturn(singletonList(scopeSpec));
