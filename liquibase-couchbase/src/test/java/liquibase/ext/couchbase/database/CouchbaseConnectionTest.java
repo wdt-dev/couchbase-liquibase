@@ -84,4 +84,13 @@ class CouchbaseConnectionTest {
                 .withMessage("Could not open connection to database: %s", DB_URL);
     }
 
+    @Test
+    void Should_support_correct_url() {
+        assertThat(connection.supports("couchbase://127.0.0.1")).isTrue();
+    }
+
+    @Test
+    void Should_not_support_incorrect_url() {
+        assertThat(connection.supports("MOCKED://127.0.0.1")).isFalse();
+    }
 }
