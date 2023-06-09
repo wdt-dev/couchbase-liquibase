@@ -8,6 +8,8 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.sql.Driver;
 import java.util.Properties;
@@ -17,8 +19,11 @@ import static liquibase.ext.couchbase.database.Constants.COUCHBASE_PRODUCT_NAME;
 import static liquibase.servicelocator.PrioritizedService.PRIORITY_DEFAULT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class CouchbaseConnectionTest {
@@ -61,6 +66,25 @@ class CouchbaseConnectionTest {
 
     @Test
     @SneakyThrows
+    void Should_open_connection_on_bucket() {
+        try (MockedStatic<Cluster> mockedStatic = Mockito.mockStatic(Cluster.class)) {
+            String bucketName = "bucket";
+
+            mockedStatic.when(() -> Cluster.connect(anyString(), any())).thenReturn(cluster);
+
+            Properties driverProperties = new Properties();
+            driverProperties.setProperty("user", "user");
+            driverProperties.setProperty("password", "password");
+            driverProperties.setProperty("bucket", bucketName);
+
+            connection.open(DB_URL, driver, driverProperties);
+
+            verify(cluster).bucket(bucketName);
+        }
+    }
+
+    @Test
+    @SneakyThrows
     void Should_close_connection_correctly() {
         Properties driverProperties = new Properties();
         driverProperties.setProperty("user", "user");
@@ -82,6 +106,24 @@ class CouchbaseConnectionTest {
         assertThatExceptionOfType(DatabaseException.class)
                 .isThrownBy(() -> connection.open(DB_URL, driver, driverProperties))
                 .withMessage("Could not open connection to database: %s", DB_URL);
+    }
+
+    @Test
+    @SneakyThrows
+    void Should_catch_and_wrap_exception_when_cluster_cant_connect() {
+        try (MockedStatic<Cluster> mockedStatic = Mockito.mockStatic(Cluster.class)) {
+            mockedStatic.when(() -> Cluster.connect(anyString(), any()))
+                    .thenThrow(new RuntimeException("Mocked"));
+            Properties driverProperties = new Properties();
+            driverProperties.setProperty("user", "user");
+            driverProperties.setProperty("password", "password");
+
+            assertThatExceptionOfType(DatabaseException.class)
+                    .isThrownBy(() -> connection.open(DB_URL, driver, driverProperties))
+                    .withMessage("Could not open connection to database: %s", DB_URL);
+
+            mockedStatic.verify(() -> Cluster.connect(anyString(), any()));
+        }
     }
 
     @Test
