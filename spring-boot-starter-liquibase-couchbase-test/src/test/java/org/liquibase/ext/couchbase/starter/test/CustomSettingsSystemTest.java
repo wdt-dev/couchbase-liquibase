@@ -9,8 +9,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import java.time.Duration;
 
 import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration.CHANGELOG_LOCK_COLLECTION_NAME;
-import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration.CHANGELOG_RECHECK_TIME;
-import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration.CHANGELOG_WAIT_TIME;
 import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration.IS_REACTIVE_TRANSACTIONS;
 import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration.LOCK_TTL;
 import static liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration.LOCK_TTL_PROLONGATION;
@@ -34,7 +32,7 @@ public class CustomSettingsSystemTest extends SpringBootCouchbaseContainerizedTe
 
     @Test
     public void Should_set_custom_settings() {
-        assertEquals(Duration.ofSeconds(61), CHANGELOG_RECHECK_TIME.getCurrentValue());
+        assertEquals(Duration.ofSeconds(61), CouchbaseLiquibaseConfiguration.getChangelogRecheckTime());
         assertEquals(Duration.ofSeconds(46), CouchbaseLiquibaseConfiguration.getChangelogWaitTime());
         assertEquals(Duration.ofSeconds(16), LOCK_TTL.getCurrentValue());
         assertEquals(Duration.ofSeconds(11), LOCK_TTL_PROLONGATION.getCurrentValue());
