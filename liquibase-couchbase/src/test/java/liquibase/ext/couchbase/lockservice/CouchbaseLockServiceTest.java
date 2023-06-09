@@ -92,7 +92,6 @@ public class CouchbaseLockServiceTest {
     void Should_list_empty_locks_array() {
         DatabaseChangeLogLock[] result = lockService.listLocks();
 
-        assertThat(result).isNotNull();
         assertThat(result).isEmpty();
     }
 
