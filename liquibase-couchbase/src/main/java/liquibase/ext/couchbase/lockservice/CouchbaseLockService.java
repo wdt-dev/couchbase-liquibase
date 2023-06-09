@@ -4,6 +4,7 @@ import com.couchbase.client.java.Collection;
 import liquibase.Scope;
 import liquibase.database.Database;
 import liquibase.exception.LockException;
+import liquibase.ext.couchbase.configuration.CouchbaseLiquibaseConfiguration;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.provider.ContextServiceProvider;
 import liquibase.ext.couchbase.provider.ServiceProvider;
@@ -61,7 +62,7 @@ public class CouchbaseLockService implements LockService {
      * Time to wait for the lock to be acquired, in milliseconds. Default value is 300 seconds.
      */
     @Setter(onMethod = @__( {@Override}))
-    private long changeLogLockWaitTime = CHANGELOG_WAIT_TIME.getCurrentValue().toMillis();
+    private long changeLogLockWaitTime = CouchbaseLiquibaseConfiguration.getChangelogWaitTime().toMillis();
 
     /**
      * Time to wait between rechecking the lock, in milliseconds. Default value is 10 seconds.
