@@ -15,6 +15,7 @@ import liquibase.ext.couchbase.database.CouchbaseConnection;
 import liquibase.ext.couchbase.database.CouchbaseLiquibaseDatabase;
 import liquibase.ext.couchbase.operator.ChangeLogOperator;
 import liquibase.ext.couchbase.provider.ServiceProvider;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,10 +38,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
 class CouchbaseHistoryServiceTest {
@@ -69,29 +72,7 @@ class CouchbaseHistoryServiceTest {
 
     @Test
     void Should_init_and_create_collection_when_not_initialized_and_collection_not_created() {
-        CouchbaseConnection connection = mock(CouchbaseConnection.class);
-        Cluster cluster = mock(Cluster.class);
-        BucketManager bucketManager = mock(BucketManager.class);
-        Bucket bucket = mock(Bucket.class);
-        CollectionManager collectionManager = mock(CollectionManager.class);
-        ScopeSpec scopeSpec = mock(ScopeSpec.class);
-        List<ScopeSpec> scopeSpecs = singletonList(scopeSpec);
-        CollectionSpec collectionSpec = mock(CollectionSpec.class);
-        Set<CollectionSpec> collectionSpecs = new HashSet<>();
-        collectionSpecs.add(collectionSpec);
-
-        when(database.getConnection()).thenReturn(connection);
-        when(connection.getCluster()).thenReturn(cluster);
-        when(cluster.buckets()).thenReturn(bucketManager);
-        when(bucketManager.getBucket(SERVICE_BUCKET_NAME)).thenReturn(mock(BucketSettings.class));
-        when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
-
-        when(bucket.collections()).thenReturn(collectionManager);
-        when(collectionManager.getAllScopes()).thenReturn(scopeSpecs);
-        when(scopeSpec.collections()).thenReturn(collectionSpecs);
-        when(collectionSpec.scopeName()).thenReturn(DEFAULT_SERVICE_SCOPE);
-        when(collectionSpec.name()).thenReturn("another collection");
-
+        mockChangeLogCollectionNotExists();
 
         couchbaseHistoryService.init();
 
@@ -101,29 +82,7 @@ class CouchbaseHistoryServiceTest {
 
     @Test
     void Should_init_when_not_initialized_and_collection_is_created() {
-        CouchbaseConnection connection = mock(CouchbaseConnection.class);
-        Cluster cluster = mock(Cluster.class);
-        BucketManager bucketManager = mock(BucketManager.class);
-        Bucket bucket = mock(Bucket.class);
-        CollectionManager collectionManager = mock(CollectionManager.class);
-        ScopeSpec scopeSpec = mock(ScopeSpec.class);
-        List<ScopeSpec> scopeSpecs = singletonList(scopeSpec);
-        CollectionSpec collectionSpec = mock(CollectionSpec.class);
-        Set<CollectionSpec> collectionSpecs = new HashSet<>();
-        collectionSpecs.add(collectionSpec);
-
-        when(database.getConnection()).thenReturn(connection);
-        when(connection.getCluster()).thenReturn(cluster);
-        when(cluster.buckets()).thenReturn(bucketManager);
-        when(bucketManager.getBucket(SERVICE_BUCKET_NAME)).thenReturn(mock(BucketSettings.class));
-        when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
-
-        when(bucket.collections()).thenReturn(collectionManager);
-        when(collectionManager.getAllScopes()).thenReturn(scopeSpecs);
-        when(scopeSpec.collections()).thenReturn(collectionSpecs);
-        when(collectionSpec.scopeName()).thenReturn(DEFAULT_SERVICE_SCOPE);
-        when(collectionSpec.name()).thenReturn(CHANGE_LOG_COLLECTION);
-
+        mockChangeLogCollectionExists();
 
         couchbaseHistoryService.init();
 
@@ -194,32 +153,11 @@ class CouchbaseHistoryServiceTest {
     @Test
     @SneakyThrows
     void Should_return_all_ran_changesets_when_collection_exists() {
-        CouchbaseConnection connection = mock(CouchbaseConnection.class);
-        Cluster cluster = mock(Cluster.class);
-        BucketManager bucketManager = mock(BucketManager.class);
-        Bucket bucket = mock(Bucket.class);
-        CollectionManager collectionManager = mock(CollectionManager.class);
-        ScopeSpec scopeSpec = mock(ScopeSpec.class);
-        List<ScopeSpec> scopeSpecs = singletonList(scopeSpec);
-        CollectionSpec collectionSpec = mock(CollectionSpec.class);
-        Set<CollectionSpec> collectionSpecs = new HashSet<>();
-        collectionSpecs.add(collectionSpec);
-
         ChangeSet changeSet = prepareChangeSet();
         RanChangeSet ranChangeSet = new RanChangeSet(changeSet, ChangeSet.ExecType.EXECUTED, null, null);
         List<RanChangeSet> expectedRanChangeSets = singletonList(ranChangeSet);
 
-        when(database.getConnection()).thenReturn(connection);
-        when(connection.getCluster()).thenReturn(cluster);
-        when(cluster.buckets()).thenReturn(bucketManager);
-        when(bucketManager.getBucket(SERVICE_BUCKET_NAME)).thenReturn(mock(BucketSettings.class));
-        when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
-
-        when(bucket.collections()).thenReturn(collectionManager);
-        when(collectionManager.getAllScopes()).thenReturn(scopeSpecs);
-        when(scopeSpec.collections()).thenReturn(collectionSpecs);
-        when(collectionSpec.scopeName()).thenReturn(DEFAULT_SERVICE_SCOPE);
-        when(collectionSpec.name()).thenReturn(CHANGE_LOG_COLLECTION);
+        mockChangeLogCollectionExists();
 
         when(changeLogOperator.getAllChangeLogs()).thenReturn(expectedRanChangeSets);
 
@@ -231,28 +169,7 @@ class CouchbaseHistoryServiceTest {
     @Test
     @SneakyThrows
     void Should_return_empty_ran_changesets_when_collection_not_exists() {
-        CouchbaseConnection connection = mock(CouchbaseConnection.class);
-        Cluster cluster = mock(Cluster.class);
-        BucketManager bucketManager = mock(BucketManager.class);
-        Bucket bucket = mock(Bucket.class);
-        CollectionManager collectionManager = mock(CollectionManager.class);
-        ScopeSpec scopeSpec = mock(ScopeSpec.class);
-        List<ScopeSpec> scopeSpecs = singletonList(scopeSpec);
-        CollectionSpec collectionSpec = mock(CollectionSpec.class);
-        Set<CollectionSpec> collectionSpecs = new HashSet<>();
-        collectionSpecs.add(collectionSpec);
-
-        when(database.getConnection()).thenReturn(connection);
-        when(connection.getCluster()).thenReturn(cluster);
-        when(cluster.buckets()).thenReturn(bucketManager);
-        when(bucketManager.getBucket(SERVICE_BUCKET_NAME)).thenReturn(mock(BucketSettings.class));
-        when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
-
-        when(bucket.collections()).thenReturn(collectionManager);
-        when(collectionManager.getAllScopes()).thenReturn(scopeSpecs);
-        when(scopeSpec.collections()).thenReturn(collectionSpecs);
-        when(collectionSpec.scopeName()).thenReturn(DEFAULT_SERVICE_SCOPE);
-        when(collectionSpec.name()).thenReturn("another collection");
+        mockChangeLogCollectionNotExists();
 
         List<RanChangeSet> returnedChangeLogs = couchbaseHistoryService.getRanChangeSets();
 
@@ -282,29 +199,7 @@ class CouchbaseHistoryServiceTest {
         List<RanChangeSet> expectedRanChangeSets = singletonList(expectedRanChangeSet);
         couchbaseHistoryService.setRanChangeSetList(expectedRanChangeSets);
 
-        CouchbaseConnection connection = mock(CouchbaseConnection.class);
-        Cluster cluster = mock(Cluster.class);
-        BucketManager bucketManager = mock(BucketManager.class);
-        Bucket bucket = mock(Bucket.class);
-        CollectionManager collectionManager = mock(CollectionManager.class);
-        ScopeSpec scopeSpec = mock(ScopeSpec.class);
-        List<ScopeSpec> scopeSpecs = singletonList(scopeSpec);
-        CollectionSpec collectionSpec = mock(CollectionSpec.class);
-        Set<CollectionSpec> collectionSpecs = new HashSet<>();
-        collectionSpecs.add(collectionSpec);
-
-        when(database.getConnection()).thenReturn(connection);
-        when(connection.getCluster()).thenReturn(cluster);
-        when(cluster.buckets()).thenReturn(bucketManager);
-        when(bucketManager.getBucket(SERVICE_BUCKET_NAME)).thenReturn(mock(BucketSettings.class));
-        when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
-
-        when(bucket.collections()).thenReturn(collectionManager);
-        when(collectionManager.getAllScopes()).thenReturn(scopeSpecs);
-        when(scopeSpec.collections()).thenReturn(collectionSpecs);
-        when(collectionSpec.scopeName()).thenReturn(DEFAULT_SERVICE_SCOPE);
-        when(collectionSpec.name()).thenReturn(CHANGE_LOG_COLLECTION);
-
+        mockChangeLogCollectionExists();
 
         RanChangeSet returnedRanChangeset = couchbaseHistoryService.getRanChangeSet(changeSet);
 
@@ -316,28 +211,7 @@ class CouchbaseHistoryServiceTest {
     void Should_return_null_when_collection_not_exists() {
         ChangeSet changeSet = prepareChangeSet();
 
-        CouchbaseConnection connection = mock(CouchbaseConnection.class);
-        Cluster cluster = mock(Cluster.class);
-        BucketManager bucketManager = mock(BucketManager.class);
-        Bucket bucket = mock(Bucket.class);
-        CollectionManager collectionManager = mock(CollectionManager.class);
-        ScopeSpec scopeSpec = mock(ScopeSpec.class);
-        List<ScopeSpec> scopeSpecs = singletonList(scopeSpec);
-        CollectionSpec collectionSpec = mock(CollectionSpec.class);
-        Set<CollectionSpec> collectionSpecs = new HashSet<>();
-        collectionSpecs.add(collectionSpec);
-
-        when(database.getConnection()).thenReturn(connection);
-        when(connection.getCluster()).thenReturn(cluster);
-        when(cluster.buckets()).thenReturn(bucketManager);
-        when(bucketManager.getBucket(SERVICE_BUCKET_NAME)).thenReturn(mock(BucketSettings.class));
-        when(cluster.bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
-
-        when(bucket.collections()).thenReturn(collectionManager);
-        when(collectionManager.getAllScopes()).thenReturn(scopeSpecs);
-        when(scopeSpec.collections()).thenReturn(collectionSpecs);
-        when(collectionSpec.scopeName()).thenReturn(DEFAULT_SERVICE_SCOPE);
-        when(collectionSpec.name()).thenReturn("another collection");
+        mockChangeLogCollectionNotExists();
 
         RanChangeSet returnedRanChangeset = couchbaseHistoryService.getRanChangeSet(changeSet);
 
@@ -415,8 +289,6 @@ class CouchbaseHistoryServiceTest {
         assertFalse(couchbaseHistoryService.supports(database));
     }
 
-
-
     private ChangeSet prepareChangeSet() {
         ChangeSet changeSet = new ChangeSet(
                 "id",
@@ -432,5 +304,35 @@ class CouchbaseHistoryServiceTest {
         return changeSet;
     }
 
+    private void mockChangeLogCollectionNotExists() {
+         CollectionSpec collectionSpec = mockScopeExists();
+         when(collectionSpec.name()).thenReturn("another collection");
+    }
+
+    private void mockChangeLogCollectionExists() {
+        CollectionSpec collectionSpec = mockScopeExists();
+        when(collectionSpec.name()).thenReturn(CHANGE_LOG_COLLECTION);
+    }
+
+    @NonNull
+    private CollectionSpec mockScopeExists() {
+        CouchbaseConnection connection = mock(CouchbaseConnection.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS));
+        Bucket bucket = mock(Bucket.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS));
+        ScopeSpec scopeSpec = mock(ScopeSpec.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS));
+        Set<CollectionSpec> collectionSpecs = new HashSet<>();
+        CollectionSpec collectionSpec = mock(CollectionSpec.class, withSettings().defaultAnswer(RETURNS_DEEP_STUBS));
+        collectionSpecs.add(collectionSpec);
+
+        BucketManager bucketManager = connection.getCluster().buckets();
+
+        when(database.getConnection()).thenReturn(connection);
+        when(bucketManager.getBucket(SERVICE_BUCKET_NAME)).thenReturn(mock(BucketSettings.class));
+        when(connection.getCluster().bucket(SERVICE_BUCKET_NAME)).thenReturn(bucket);
+        when(scopeSpec.collections()).thenReturn(collectionSpecs);
+        when(bucket.collections().getAllScopes()).thenReturn(singletonList(scopeSpec));
+        when(scopeSpec.collections()).thenReturn(collectionSpecs);
+        when(collectionSpec.scopeName()).thenReturn(DEFAULT_SERVICE_SCOPE);
+        return collectionSpec;
+    }
 
 }
