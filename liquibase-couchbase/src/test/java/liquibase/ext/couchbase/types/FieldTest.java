@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static liquibase.serializer.LiquibaseSerializable.STANDARD_CHANGELOG_NAMESPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class FieldTest {
+class FieldTest {
 
     private final Field field = new Field();
 

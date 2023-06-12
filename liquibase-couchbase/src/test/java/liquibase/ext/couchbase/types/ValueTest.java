@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static liquibase.serializer.LiquibaseSerializable.STANDARD_CHANGELOG_NAMESPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ValueTest {
+class ValueTest {
 
     @Test
     void Should_map_to_long() {

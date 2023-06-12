@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import static liquibase.serializer.LiquibaseSerializable.STANDARD_CHANGELOG_NAMESPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BucketScopeTest {
+class BucketScopeTest {
 
     private final BucketScope bucketScope = BucketScope.bucketScope("bucket", "scope");
 

@@ -9,7 +9,7 @@ import java.util.List;
 import static liquibase.serializer.LiquibaseSerializable.STANDARD_CHANGELOG_NAMESPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DocumentTest {
+class DocumentTest {
 
     private final String id = "id";
     private final Value value = new Value("{\"value\": 1}", DataType.JSON);

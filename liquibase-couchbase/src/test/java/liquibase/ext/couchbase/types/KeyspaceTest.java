@@ -7,7 +7,7 @@ import static com.couchbase.client.core.io.CollectionIdentifier.DEFAULT_SCOPE;
 import static liquibase.serializer.LiquibaseSerializable.STANDARD_CHANGELOG_NAMESPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class KeyspaceTest {
+class KeyspaceTest {
 
     private static final String BUCKET_NAME = "bucket";
 
