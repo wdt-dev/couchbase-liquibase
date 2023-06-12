@@ -7,6 +7,7 @@ import liquibase.change.Change;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.DatabaseChangeLog;
 import liquibase.ext.couchbase.statement.MutateInQueryStatement;
+import liquibase.ext.couchbase.statement.MutateInSqlQueryStatement;
 import liquibase.ext.couchbase.statement.MutateInStatement;
 import liquibase.ext.couchbase.types.DataType;
 import liquibase.ext.couchbase.types.Value;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static common.constants.ChangeLogSampleFilePaths.MUTATE_IN_INSERT_TEST_XML;
@@ -27,7 +29,6 @@ import static common.constants.TestConstants.TEST_COLLECTION;
 import static common.constants.TestConstants.TEST_COLLECTION_3;
 import static common.constants.TestConstants.TEST_ID;
 import static common.constants.TestConstants.TEST_SCOPE;
-import static java.util.Arrays.asList;
 import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.internal.util.collections.Iterables.firstOf;
@@ -46,9 +47,10 @@ public class MutateInChangeTest {
         assertThat(changeSet.getChanges())
                 .map(MutateInChange.class::cast)
                 .containsExactly(
-                        changeWithId(asList(spec("user.age", "29", DataType.STRING, MutateInType.INSERT))),
-                        changeWithWhereClause(asList(spec("adoc", "{\"newDocumentField\": \"newDocumentValue\"}", DataType.JSON, MutateInType.REPLACE))),
-                        changeWithSqlPlusPlusQuery(asList(spec("user.age", "50", DataType.STRING, MutateInType.INSERT)))
+                        changeWithId(Collections.singletonList(spec("user.age", "29", DataType.STRING, MutateInType.INSERT))),
+                        changeWithWhereClause(Collections.singletonList(
+                                spec("adoc", "{\"newDocumentField\": \"newDocumentValue\"}", DataType.JSON, MutateInType.REPLACE))),
+                        changeWithSqlPlusPlusQuery(Collections.singletonList(spec("user.age", "50", DataType.STRING, MutateInType.INSERT)))
                 );
     }
 
@@ -60,6 +62,23 @@ public class MutateInChangeTest {
 
         assertThat(change.getConfirmationMessage())
                 .isEqualTo("MutateIn %s operations has been successfully executed", 1);
+    }
+
+    @Test
+    void Should_generate_statement_correctly() {
+        MutateInChange change = change(Lists.newArrayList(
+                new LiquibaseMutateInSpec("test", Lists.newArrayList(new Value("data", DataType.STRING)), MutateInType.INSERT)));
+
+        SqlStatement[] statements = change.generateStatements();
+
+        assertThat(statements).hasSize(1);
+        assertThat(statements[0]).isInstanceOf(MutateInSqlQueryStatement.class);
+
+        MutateInSqlQueryStatement actualStatement = (MutateInSqlQueryStatement) statements[0];
+        assertThat(actualStatement.getMutate().getId()).isNull();
+        assertThat(actualStatement.getMutate().getKeyspace()).isEqualTo(
+                keyspace(change.getBucketName(), change.getScopeName(), change.getCollectionName()));
+        assertThat(actualStatement.getSqlPlusPlusQuery()).isEqualTo(change.getSqlPlusPlusQuery());
     }
 
     @Test
@@ -97,7 +116,22 @@ public class MutateInChangeTest {
     }
 
     private LiquibaseMutateInSpec spec(String path, String value, DataType dataType, MutateInType type) {
-        return new LiquibaseMutateInSpec(path, Arrays.asList(new Value(value, dataType)), type);
+        return new LiquibaseMutateInSpec(path, Collections.singletonList(new Value(value, dataType)), type);
+    }
+
+    private MutateInChange change(List<LiquibaseMutateInSpec> specs) {
+        return new MutateInChange(
+                null,
+                null,
+                "sqlPlusPlusQuery",
+                TEST_BUCKET,
+                TEST_SCOPE,
+                TEST_COLLECTION,
+                "PT1H",
+                true,
+                StoreSemantics.INSERT,
+                specs
+        );
     }
 
     private MutateInChange changeWithId(List<LiquibaseMutateInSpec> specs) {
