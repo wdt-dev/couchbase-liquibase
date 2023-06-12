@@ -2,14 +2,13 @@ package liquibase.ext.couchbase.types;
 
 import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
+import liquibase.serializer.LiquibaseSerializable;
 import org.junit.jupiter.api.Test;
 
 import static liquibase.serializer.LiquibaseSerializable.STANDARD_CHANGELOG_NAMESPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ValueTest {
-
-    private static final String BUCKET_NAME = "bucket";
 
     @Test
     void Should_map_to_long() {
@@ -67,5 +66,12 @@ public class ValueTest {
         Value value = new Value();
 
         assertThat(value.getSerializedObjectNamespace()).isEqualTo(STANDARD_CHANGELOG_NAMESPACE);
+    }
+
+    @Test
+    void Should_return_expected_serialized_field_type() {
+        Value value = new Value();
+
+        assertThat(value.getSerializableFieldType(null)).isEqualTo(LiquibaseSerializable.SerializationType.DIRECT_VALUE);
     }
 }
