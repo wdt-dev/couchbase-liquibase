@@ -11,6 +11,7 @@ import liquibase.ext.couchbase.statement.MutateInStatement;
 import liquibase.ext.couchbase.types.DataType;
 import liquibase.ext.couchbase.types.Value;
 import liquibase.ext.couchbase.types.subdoc.LiquibaseMutateInSpec;
+import liquibase.ext.couchbase.types.subdoc.MutateIn;
 import liquibase.ext.couchbase.types.subdoc.MutateInType;
 import liquibase.statement.SqlStatement;
 import org.junit.jupiter.api.Test;
@@ -73,9 +74,9 @@ public class MutateInChangeTest {
         assertThat(statements[0]).isInstanceOf(MutateInSqlQueryStatement.class);
 
         MutateInSqlQueryStatement actualStatement = (MutateInSqlQueryStatement) statements[0];
-        assertThat(actualStatement.getMutate().getId()).isNull();
-        assertThat(actualStatement.getMutate().getKeyspace()).isEqualTo(
-                keyspace(change.getBucketName(), change.getScopeName(), change.getCollectionName()));
+        MutateIn mutateIn = actualStatement.getMutate();
+        assertThat(mutateIn.getId()).isNull();
+        assertThat(mutateIn.getKeyspace()).isEqualTo(keyspace(change.getBucketName(), change.getScopeName(), change.getCollectionName()));
         assertThat(actualStatement.getSqlPlusPlusQuery()).isEqualTo(change.getSqlPlusPlusQuery());
     }
 
@@ -90,9 +91,9 @@ public class MutateInChangeTest {
         assertThat(statements[0]).isInstanceOf(MutateInStatement.class);
 
         MutateInStatement actualStatement = (MutateInStatement) statements[0];
-        assertThat(actualStatement.getMutate().getId()).isEqualTo(change.getId());
-        assertThat(actualStatement.getMutate().getKeyspace()).isEqualTo(
-                keyspace(change.getBucketName(), change.getScopeName(), change.getCollectionName()));
+        MutateIn mutateIn = actualStatement.getMutate();
+        assertThat(mutateIn.getId()).isEqualTo(change.getId());
+        assertThat(mutateIn.getKeyspace()).isEqualTo(keyspace(change.getBucketName(), change.getScopeName(), change.getCollectionName()));
     }
 
     @Test
@@ -106,11 +107,10 @@ public class MutateInChangeTest {
         assertThat(statements[0]).isInstanceOf(MutateInQueryStatement.class);
 
         MutateInQueryStatement actualStatement = (MutateInQueryStatement) statements[0];
-
+        MutateIn mutateIn = actualStatement.getMutate();
         assertThat(actualStatement.getWhereClause()).isEqualTo(change.getWhereCondition());
-        assertThat(actualStatement.getMutate().getId()).isEqualTo(change.getId());
-        assertThat(actualStatement.getMutate().getKeyspace()).isEqualTo(
-                keyspace(change.getBucketName(), change.getScopeName(), change.getCollectionName()));
+        assertThat(mutateIn.getId()).isEqualTo(change.getId());
+        assertThat(mutateIn.getKeyspace()).isEqualTo(keyspace(change.getBucketName(), change.getScopeName(), change.getCollectionName()));
     }
 
     private LiquibaseMutateInSpec spec(String path, String value, DataType dataType, MutateInType type) {
