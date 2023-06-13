@@ -1,12 +1,12 @@
 package liquibase.ext.couchbase.types;
 
-import liquibase.serializer.LiquibaseSerializable;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static liquibase.serializer.LiquibaseSerializable.STANDARD_CHANGELOG_NAMESPACE;
+import static liquibase.serializer.LiquibaseSerializable.SerializationType.DIRECT_VALUE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DocumentTest {
@@ -35,6 +35,6 @@ class DocumentTest {
 
     @Test
     void Should_return_expected_serialized_field_type() {
-        assertThat(document.getSerializableFieldType(null)).isEqualTo(LiquibaseSerializable.SerializationType.DIRECT_VALUE);
+        assertThat(document.getSerializableFieldType(null)).isEqualTo(DIRECT_VALUE);
     }
 }

@@ -3,7 +3,6 @@ package liquibase.ext.couchbase.types;
 import com.couchbase.client.core.deps.com.fasterxml.jackson.databind.ObjectMapper;
 import com.couchbase.client.core.deps.com.fasterxml.jackson.databind.ObjectReader;
 import liquibase.ext.couchbase.exception.IncorrectFileException;
-import liquibase.serializer.LiquibaseSerializable;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -23,6 +22,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static liquibase.serializer.LiquibaseSerializable.STANDARD_CHANGELOG_NAMESPACE;
+import static liquibase.serializer.LiquibaseSerializable.SerializationType.DIRECT_VALUE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -55,7 +55,7 @@ class FileTest {
 
     @Test
     void Should_return_expected_serialized_field_type() {
-        assertThat(file.getSerializableFieldType(null)).isEqualTo(LiquibaseSerializable.SerializationType.DIRECT_VALUE);
+        assertThat(file.getSerializableFieldType(null)).isEqualTo(DIRECT_VALUE);
     }
 
     @Test

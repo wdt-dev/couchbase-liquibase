@@ -1,9 +1,9 @@
 package liquibase.ext.couchbase.types;
 
-import liquibase.serializer.LiquibaseSerializable;
 import org.junit.jupiter.api.Test;
 
 import static liquibase.serializer.LiquibaseSerializable.STANDARD_CHANGELOG_NAMESPACE;
+import static liquibase.serializer.LiquibaseSerializable.SerializationType.DIRECT_VALUE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FieldTest {
@@ -22,6 +22,6 @@ class FieldTest {
 
     @Test
     void Should_return_expected_serialized_field_type() {
-        assertThat(field.getSerializableFieldType(null)).isEqualTo(LiquibaseSerializable.SerializationType.DIRECT_VALUE);
+        assertThat(field.getSerializableFieldType(null)).isEqualTo(DIRECT_VALUE);
     }
 }
