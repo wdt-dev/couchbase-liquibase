@@ -131,13 +131,13 @@ class RemoveDocumentsChangeTest {
     private RemoveDocumentsChange createRemoveDocumentChange() {
         return RemoveDocumentsChange.builder().bucketName(TEST_BUCKET)
                 .scopeName(TEST_SCOPE).collectionName(TEST_COLLECTION)
-                .ids(Sets.newHashSet(new Id("id1"), new Id("id2"))).build();
+                .ids(Sets.newHashSet(ID_1, ID_2)).build();
     }
 
     private RemoveDocumentsChange createRemoveDocumentChangeWithWhereClause() {
         return RemoveDocumentsChange.builder().bucketName(TEST_BUCKET)
                 .scopeName(TEST_SCOPE).collectionName(TEST_COLLECTION)
-                .ids(Sets.newHashSet(new Id("id1"), new Id("id2")))
+                .ids(Sets.newHashSet(ID_1, ID_2))
                 .whereCondition("whereClause")
                 .build();
     }

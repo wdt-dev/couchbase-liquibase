@@ -19,8 +19,6 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static common.constants.ChangeLogSampleFilePaths.MUTATE_IN_INSERT_TEST_XML;
@@ -29,6 +27,7 @@ import static common.constants.TestConstants.TEST_COLLECTION;
 import static common.constants.TestConstants.TEST_COLLECTION_3;
 import static common.constants.TestConstants.TEST_ID;
 import static common.constants.TestConstants.TEST_SCOPE;
+import static java.util.Collections.singletonList;
 import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.internal.util.collections.Iterables.firstOf;
@@ -47,10 +46,10 @@ public class MutateInChangeTest {
         assertThat(changeSet.getChanges())
                 .map(MutateInChange.class::cast)
                 .containsExactly(
-                        changeWithId(Collections.singletonList(spec("user.age", "29", DataType.STRING, MutateInType.INSERT))),
-                        changeWithWhereClause(Collections.singletonList(
+                        changeWithId(singletonList(spec("user.age", "29", DataType.STRING, MutateInType.INSERT))),
+                        changeWithWhereClause(singletonList(
                                 spec("adoc", "{\"newDocumentField\": \"newDocumentValue\"}", DataType.JSON, MutateInType.REPLACE))),
-                        changeWithSqlPlusPlusQuery(Collections.singletonList(spec("user.age", "50", DataType.STRING, MutateInType.INSERT)))
+                        changeWithSqlPlusPlusQuery(singletonList(spec("user.age", "50", DataType.STRING, MutateInType.INSERT)))
                 );
     }
 
@@ -116,7 +115,7 @@ public class MutateInChangeTest {
     }
 
     private LiquibaseMutateInSpec spec(String path, String value, DataType dataType, MutateInType type) {
-        return new LiquibaseMutateInSpec(path, Collections.singletonList(new Value(value, dataType)), type);
+        return new LiquibaseMutateInSpec(path, singletonList(new Value(value, dataType)), type);
     }
 
     private MutateInChange changeWithQuery(List<LiquibaseMutateInSpec> specs) {
