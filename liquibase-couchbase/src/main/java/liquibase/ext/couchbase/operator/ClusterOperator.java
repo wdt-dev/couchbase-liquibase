@@ -90,8 +90,8 @@ public class ClusterOperator {
                 .collect(toList());
     }
 
-    public List<String> retrieveDocumentIdsBySqlPlusPlusQuery(String sqlPlusPlusQuery) {
-        QueryResult documentIdsResult = executeSingleSql(sqlPlusPlusQuery);
+    public List<String> retrieveDocumentIdsBySqlPlusPlusQuery(String query) {
+        QueryResult documentIdsResult = executeSingleSql(query);
         return documentIdsResult.rowsAsObject()
                 .stream()
                 .map(jsonObject -> jsonObject.getString("id"))

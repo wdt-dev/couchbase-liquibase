@@ -6,7 +6,7 @@ import com.couchbase.client.java.manager.query.CreatePrimaryQueryIndexOptions;
 import com.google.common.collect.Sets;
 import common.TransactionStatementTest;
 import common.operators.TestCollectionOperator;
-import liquibase.ext.couchbase.statement.RemoveDocumentsSqlPlusPlusQueryStatement;
+import liquibase.ext.couchbase.statement.RemoveDocumentsSqlQueryStatement;
 import liquibase.ext.couchbase.types.Document;
 import liquibase.ext.couchbase.types.Id;
 import liquibase.ext.couchbase.types.Keyspace;
@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static common.constants.TestConstants.INDEX;
@@ -27,12 +26,12 @@ import static common.matchers.CouchbaseCollectionAssert.assertThat;
 import static java.lang.String.format;
 import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 
-class RemoveDocumentsSqlPlusPlusQueryStatementIT extends TransactionStatementTest {
+class RemoveDocumentsSqlQueryStatementIT extends TransactionStatementTest {
 
     private static final String DOC_FIELD_NAME = "field";
     private static final String DOC_FIELD_VALUE = "val";
-    private static final String testCollection = UUID.randomUUID().toString();
-    private static final String testScope = UUID.randomUUID().toString();
+    private static final String testScope = bucketOperator.createTestScope();
+    private static final String testCollection = bucketOperator.createTestCollection(testScope);
     private static TestCollectionOperator collectionOperator;
     private static Collection collection;
 
@@ -45,10 +44,6 @@ class RemoveDocumentsSqlPlusPlusQueryStatementIT extends TransactionStatementTes
     @BeforeAll
     @SneakyThrows
     static void beforeClass() {
-        bucketOperator.createScope(testScope);
-        TimeUnit.SECONDS.sleep(2L);
-        bucketOperator.createCollection(testCollection, testScope);
-        TimeUnit.SECONDS.sleep(2L);
         collectionOperator = bucketOperator.getCollectionOperator(testCollection, testScope);
         collectionOperator.createPrimaryIndex(CreatePrimaryQueryIndexOptions
                 .createPrimaryQueryIndexOptions()
@@ -92,7 +87,7 @@ class RemoveDocumentsSqlPlusPlusQueryStatementIT extends TransactionStatementTes
 
     @Test
     void Should_remove_docks_by_where_condition() {
-        RemoveDocumentsSqlPlusPlusQueryStatement statement = new RemoveDocumentsSqlPlusPlusQueryStatement(keyspace, ids,
+        RemoveDocumentsSqlQueryStatement statement = new RemoveDocumentsSqlQueryStatement(keyspace, ids,
                 format("SELECT meta().id FROM %s where field=\"val\"", keyspace.getFullPath()));
 
         doInTransaction(statement.asTransactionAction(clusterOperator));
@@ -102,7 +97,7 @@ class RemoveDocumentsSqlPlusPlusQueryStatementIT extends TransactionStatementTes
 
     @Test
     void Should_remove_docks_by_where_condition_like() {
-        RemoveDocumentsSqlPlusPlusQueryStatement statement = new RemoveDocumentsSqlPlusPlusQueryStatement(keyspace, new HashSet<>(),
+        RemoveDocumentsSqlQueryStatement statement = new RemoveDocumentsSqlQueryStatement(keyspace, new HashSet<>(),
                 format("SELECT meta().id FROM %s where field LIKE ", keyspace.getFullPath()) + "\"%val%\"");
 
         doInTransaction(statement.asTransactionAction(clusterOperator));
