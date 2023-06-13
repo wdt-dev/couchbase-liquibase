@@ -66,7 +66,7 @@ public class MutateInChangeTest {
 
     @Test
     void Should_generate_statement_correctly() {
-        MutateInChange change = change(Lists.newArrayList(
+        MutateInChange change = changeWithQuery(Lists.newArrayList(
                 new LiquibaseMutateInSpec("test", Lists.newArrayList(new Value("data", DataType.STRING)), MutateInType.INSERT)));
 
         SqlStatement[] statements = change.generateStatements();
@@ -119,7 +119,7 @@ public class MutateInChangeTest {
         return new LiquibaseMutateInSpec(path, Collections.singletonList(new Value(value, dataType)), type);
     }
 
-    private MutateInChange change(List<LiquibaseMutateInSpec> specs) {
+    private MutateInChange changeWithQuery(List<LiquibaseMutateInSpec> specs) {
         return new MutateInChange(
                 null,
                 null,
