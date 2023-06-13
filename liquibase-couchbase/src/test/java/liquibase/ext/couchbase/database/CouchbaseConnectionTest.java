@@ -4,6 +4,7 @@ import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import liquibase.database.Database;
 import liquibase.exception.DatabaseException;
+import liquibase.ext.couchbase.executor.service.TransactionExecutorService;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -126,6 +127,58 @@ class CouchbaseConnectionTest {
     @Test
     void Should_not_support_incorrect_url() {
         assertThat(connection.supports("NOT_COUCHBASE://127.0.0.1")).isFalse();
+    }
+
+    @Test
+    @SneakyThrows
+    void Should_rollback_transaction_using_transaction_executor() {
+        try (MockedStatic<Cluster> mockedCluster = Mockito.mockStatic(Cluster.class)) {
+            try (MockedStatic<TransactionExecutorService> mockedTransactionExecutorService = Mockito.mockStatic(
+                    TransactionExecutorService.class)) {
+                TransactionExecutorService transactionExecutorService = mock(TransactionExecutorService.class);
+
+                String bucketName = "bucket";
+
+                mockedCluster.when(() -> Cluster.connect(anyString(), any())).thenReturn(cluster);
+                mockedTransactionExecutorService.when(() -> TransactionExecutorService.getExecutor(cluster)).thenReturn(
+                        transactionExecutorService);
+
+                Properties driverProperties = buildDriverProperties();
+                driverProperties.setProperty("bucket", bucketName);
+
+                connection.open(DB_URL, driver, driverProperties);
+
+                connection.rollback();
+
+                verify(transactionExecutorService).clearStatementsQueue();
+            }
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void Should_commit_transaction_using_transaction_executor() {
+        try (MockedStatic<Cluster> mockedCluster = Mockito.mockStatic(Cluster.class)) {
+            try (MockedStatic<TransactionExecutorService> mockedTransactionExecutorService = Mockito.mockStatic(
+                    TransactionExecutorService.class)) {
+                TransactionExecutorService transactionExecutorService = mock(TransactionExecutorService.class);
+
+                String bucketName = "bucket";
+
+                mockedCluster.when(() -> Cluster.connect(anyString(), any())).thenReturn(cluster);
+                mockedTransactionExecutorService.when(() -> TransactionExecutorService.getExecutor(cluster)).thenReturn(
+                        transactionExecutorService);
+
+                Properties driverProperties = buildDriverProperties();
+                driverProperties.setProperty("bucket", bucketName);
+
+                connection.open(DB_URL, driver, driverProperties);
+
+                connection.commit();
+
+                verify(transactionExecutorService).executeStatementsInTransaction();
+            }
+        }
     }
 
     private Properties buildDriverProperties() {
