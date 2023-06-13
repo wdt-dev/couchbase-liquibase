@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static liquibase.serializer.LiquibaseSerializable.STANDARD_CHANGELOG_NAMESPACE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -74,7 +74,7 @@ class FileTest {
 
                 assertThat(result).isNotNull();
 
-                List<String> resultList = result.collect(Collectors.toList());
+                List<String> resultList = result.collect(toList());
 
                 assertThat(resultList).isEqualTo(expected);
 
