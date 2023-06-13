@@ -102,10 +102,10 @@ class CouchbaseExecutorTest {
     void Should_send_comment_to_log() {
         try (MockedStatic<Scope> mockedStatic = Mockito.mockStatic(Scope.class)) {
             String comment = "comment";
-            Scope scope = mock(Scope.class);
+            Scope currentScope = mock(Scope.class);
             try (Logger logger = mock(Logger.class)) {
-                mockedStatic.when(Scope::getCurrentScope).thenReturn(scope);
-                when(scope.getLog(any())).thenReturn(logger);
+                mockedStatic.when(Scope::getCurrentScope).thenReturn(currentScope);
+                when(currentScope.getLog(any())).thenReturn(logger);
                 couchbaseExecutor = new CouchbaseExecutor();
                 couchbaseExecutor.setDatabase(database);
 

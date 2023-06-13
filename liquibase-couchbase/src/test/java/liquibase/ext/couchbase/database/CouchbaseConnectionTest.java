@@ -45,9 +45,7 @@ class CouchbaseConnectionTest {
     @Test
     @SneakyThrows
     void Should_open_connection_correctly() {
-        Properties driverProperties = new Properties();
-        driverProperties.setProperty("user", "user");
-        driverProperties.setProperty("password", "password");
+        Properties driverProperties = buildDriverProperties();
 
         connection.open(DB_URL, driver, driverProperties);
 
@@ -72,9 +70,7 @@ class CouchbaseConnectionTest {
 
             mockedStatic.when(() -> Cluster.connect(anyString(), any())).thenReturn(cluster);
 
-            Properties driverProperties = new Properties();
-            driverProperties.setProperty("user", "user");
-            driverProperties.setProperty("password", "password");
+            Properties driverProperties = buildDriverProperties();
             driverProperties.setProperty("bucket", bucketName);
 
             connection.open(DB_URL, driver, driverProperties);
@@ -86,9 +82,7 @@ class CouchbaseConnectionTest {
     @Test
     @SneakyThrows
     void Should_close_connection_correctly() {
-        Properties driverProperties = new Properties();
-        driverProperties.setProperty("user", "user");
-        driverProperties.setProperty("password", "password");
+        Properties driverProperties = buildDriverProperties();
 
         connection.open(DB_URL, driver, driverProperties);
 
@@ -114,9 +108,7 @@ class CouchbaseConnectionTest {
         try (MockedStatic<Cluster> mockedStatic = Mockito.mockStatic(Cluster.class)) {
             mockedStatic.when(() -> Cluster.connect(anyString(), any()))
                     .thenThrow(new RuntimeException("Mocked"));
-            Properties driverProperties = new Properties();
-            driverProperties.setProperty("user", "user");
-            driverProperties.setProperty("password", "password");
+            Properties driverProperties = buildDriverProperties();
 
             assertThatExceptionOfType(DatabaseException.class)
                     .isThrownBy(() -> connection.open(DB_URL, driver, driverProperties))
@@ -133,6 +125,13 @@ class CouchbaseConnectionTest {
 
     @Test
     void Should_not_support_incorrect_url() {
-        assertThat(connection.supports("MOCKED://127.0.0.1")).isFalse();
+        assertThat(connection.supports("NOT_COUCHBASE://127.0.0.1")).isFalse();
+    }
+
+    private Properties buildDriverProperties() {
+        Properties driverProperties = new Properties();
+        driverProperties.setProperty("user", "user");
+        driverProperties.setProperty("password", "password");
+        return driverProperties;
     }
 }
