@@ -65,8 +65,12 @@ public class ChangeLogSampleFilePaths {
     public static final String CHANGELOG_TAG_TEST_XML = rootPrefix + "/changelog/changelog.tag-test.xml";
     public static final String CHANGELOG_CONTEXT_LABEL_COMMENT_XML = rootPrefix + "/changelog/changelog.context-label-comment-test.xml";
     public static final String CREATE_BUCKET_TEST_XML = rootPrefix + "/bucket/changelog.create-bucket.test.xml";
+    public static final String CREATE_BUCKET_CHANGE_TEST_XML = rootPrefix + "/bucket/changelog.create-bucket-change.test.xml";
+    public static final String CREATE_SCOPE_TEST_XML = rootPrefix + "/scope/changelog.create-scope-change.test.xml";
+    public static final String DROP_SCOPE_CHANGE_TEST_XML = rootPrefix + "/scope/changelog.drop-scope-change.test.xml";
     public static final String CREATE_DUPLICATE_BUCKET_TEST_XML = rootPrefix + "/bucket/changelog.create-duplicate-bucket.test.xml";
     public static final String EXECUTE_QUERY_TEST_XML = rootPrefix + "/bucket/changelog.execute-query.test.xml";
+    public static final String EXECUTE_QUERY_CHANGE_TEST_XML = rootPrefix + "/bucket/changelog.execute-query-change.test.xml";
     public static final String MUTATE_IN_INSERT_TEST_XML = rootPrefix + "/mutatein/changelog.mutate-in-insert.test.xml";
     public static final String MUTATE_IN_ARRAY_CREATE_TEST_XML = rootPrefix + "/mutatein/changelog.create-array.test.xml";
     public static final String MUTATE_IN_ARRAY_APPEND_TEST_XML = rootPrefix + "/mutatein/changelog.array-append-value.test.xml";
@@ -81,6 +85,7 @@ public class ChangeLogSampleFilePaths {
             ".mutate-in-upsert-replace-remove.test.xml";
     public static final String MUTATE_IN_REPLACE_DOCUMENT_TEST_XML = rootPrefix + "/mutatein/changelog.mutate-in-replace-document.test.xml";
     public static final String MUTATE_QUERY_FILTER_IN_REPLACE_DOCUMENT_TEST_XML = rootPrefix + "/mutatein/changelog.mutate-in-replace-document-query-filter.test.xml";
+    public static final String MUTATE_IN_SQL_PLUS_PLUS_FILTER_REPLACE_DOCUMENT_TEST_XML = rootPrefix + "/mutatein/changelog.mutate-in-replace-document-sql++-filter.test.xml";
     public static final String MUTATE_QUERY_FILTER_IN_REPLACE_DOCUMENTS_TEST_XML = rootPrefix + "/mutatein/changelog.mutate-in-replace-documents-query-filter.test.xml";
     public static final String MUTATE_IN_REMOVE_DOCUMENT_TEST_XML = rootPrefix + "/mutatein/changelog.mutate-in-remove-document.test.xml";
     public static final String MUTATE_IN_INSERT_NO_PATH_ERROR_TEST_XML = rootPrefix + "/mutatein/changelog.mutate-insert-no-path-error" +
