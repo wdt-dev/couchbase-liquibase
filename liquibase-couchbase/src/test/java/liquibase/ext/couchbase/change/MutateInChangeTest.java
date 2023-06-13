@@ -1,7 +1,6 @@
 package liquibase.ext.couchbase.change;
 
 import com.couchbase.client.java.kv.StoreSemantics;
-import com.google.common.collect.Lists;
 import common.TestChangeLogProvider;
 import liquibase.change.Change;
 import liquibase.changelog.ChangeSet;
@@ -65,8 +64,8 @@ public class MutateInChangeTest {
 
     @Test
     void Should_generate_statement_correctly() {
-        MutateInChange change = changeWithQuery(Lists.newArrayList(
-                new LiquibaseMutateInSpec("test", Lists.newArrayList(new Value("data", DataType.STRING)), MutateInType.INSERT)));
+        MutateInChange change = changeWithQuery(singletonList(
+                new LiquibaseMutateInSpec("test", singletonList(new Value("data", DataType.STRING)), MutateInType.INSERT)));
 
         SqlStatement[] statements = change.generateStatements();
 
@@ -82,8 +81,8 @@ public class MutateInChangeTest {
 
     @Test
     void Should_generate_statement_correctly_with_id() {
-        MutateInChange change = changeWithId(Lists.newArrayList(
-                new LiquibaseMutateInSpec("test", Lists.newArrayList(new Value("data", DataType.STRING)), MutateInType.INSERT)));
+        MutateInChange change = changeWithId(singletonList(
+                new LiquibaseMutateInSpec("test", singletonList(new Value("data", DataType.STRING)), MutateInType.INSERT)));
 
         SqlStatement[] statements = change.generateStatements();
 
@@ -98,8 +97,8 @@ public class MutateInChangeTest {
 
     @Test
     void Should_generate_statement_correctly_with_where() {
-        MutateInChange change = changeWithWhereClause(Lists.newArrayList(
-                new LiquibaseMutateInSpec("test", Lists.newArrayList(new Value("data", DataType.STRING)), MutateInType.INSERT)));
+        MutateInChange change = changeWithWhereClause(
+                singletonList(new LiquibaseMutateInSpec("test", singletonList(new Value("data", DataType.STRING)), MutateInType.INSERT)));
 
         SqlStatement[] statements = change.generateStatements();
 
