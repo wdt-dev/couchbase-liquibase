@@ -47,7 +47,7 @@ public class File extends AbstractLiquibaseSerializable {
     public Resource getAsResource(String changeSetPath) {
         try {
             ResourceAccessor resourceAccessor = getCurrentScope().getResourceAccessor();
-            return relative
+            return (relative != null && relative)
                     ? resourceAccessor.get(changeSetPath).resolveSibling(getFilePath())
                     : resourceAccessor.get(getFilePath());
         } catch (IOException ex) {
