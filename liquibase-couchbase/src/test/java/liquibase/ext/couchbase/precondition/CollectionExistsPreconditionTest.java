@@ -1,5 +1,7 @@
 package liquibase.ext.couchbase.precondition;
 
+import com.couchbase.client.core.deps.com.google.common.collect.Lists;
+import com.couchbase.client.core.deps.com.google.common.collect.Sets;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.manager.bucket.BucketManager;
@@ -7,8 +9,6 @@ import com.couchbase.client.java.manager.bucket.BucketSettings;
 import com.couchbase.client.java.manager.collection.CollectionManager;
 import com.couchbase.client.java.manager.collection.CollectionSpec;
 import com.couchbase.client.java.manager.collection.ScopeSpec;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import liquibase.database.Database;
 import liquibase.ext.couchbase.database.CouchbaseConnection;
 import liquibase.ext.couchbase.exception.precondition.CollectionNotExistsPreconditionException;
@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Test;
 import static common.constants.TestConstants.NEW_TEST_BUCKET;
 import static common.constants.TestConstants.TEST_COLLECTION;
 import static common.constants.TestConstants.TEST_SCOPE;
+import static liquibase.serializer.LiquibaseSerializable.GENERIC_CHANGELOG_EXTENSION_NAMESPACE;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -71,5 +73,19 @@ class CollectionExistsPreconditionTest {
                 .isThrownBy(() -> precondition.check(database, null, null, null))
                 .withMessage("Collection %s does not exist in bucket %s in scope %s",
                         precondition.getCollectionName(), precondition.getBucketName(), precondition.getScopeName());
+    }
+
+    @Test
+    void Should_return_expected_name() {
+        CollectionExistsPrecondition precondition = new CollectionExistsPrecondition();
+
+        assertThat(precondition.getName()).isEqualTo("collectionExists");
+    }
+
+    @Test
+    void Should_return_expected_serialized_object_namespace() {
+        CollectionExistsPrecondition precondition = new CollectionExistsPrecondition();
+
+        assertThat(precondition.getSerializedObjectNamespace()).isEqualTo(GENERIC_CHANGELOG_EXTENSION_NAMESPACE);
     }
 }

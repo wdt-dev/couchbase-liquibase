@@ -603,6 +603,9 @@
         "whereCondition": {
           "type": "string"
         },
+        "sqlPlusPlusQuery": {
+          "type": "string"
+        },
         "mutateInSpecs": {
           "$ref": "#/$defs/mutateInSpecs"
         }
