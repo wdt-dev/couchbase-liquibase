@@ -25,7 +25,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-couchbase-ext.xsd">
 
     <changeSet id="1" author="tigran">
-        <ext:sqlFile relative="false" path="liquibase/ext/couchbase/insert/sql/insert-document-rollback.sql" transactional="true"/>
+        <ext:executeQueryFile relative="false" path="liquibase/ext/couchbase/insert/sql/insert-document-rollback.sql" transactional="true"/>
     </changeSet>
 
 </databaseChangeLog>
