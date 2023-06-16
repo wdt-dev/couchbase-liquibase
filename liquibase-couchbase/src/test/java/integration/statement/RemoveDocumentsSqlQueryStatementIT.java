@@ -41,6 +41,7 @@ class RemoveDocumentsSqlQueryStatementIT extends TransactionStatementTest {
     @BeforeAll
     @SneakyThrows
     static void beforeClass() {
+        TimeUnit.SECONDS.sleep(1L);
         collectionOperator = bucketOperator.getCollectionOperator(testCollection, testScope);
         collectionOperator.createPrimaryIndex(CreatePrimaryQueryIndexOptions
                 .createPrimaryQueryIndexOptions()
