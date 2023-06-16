@@ -74,15 +74,7 @@ class RemoveDocumentsSqlQueryStatementIT extends TransactionStatementTest {
 
     @AfterEach
     void cleanUp() {
-        if (collectionOperator.docExists(doc1.getId())) {
-            collectionOperator.removeDoc(doc1);
-        }
-        if (collectionOperator.docExists(doc2.getId())) {
-            collectionOperator.removeDoc(doc2);
-        }
-        if (collectionOperator.docExists(doc3.getId())) {
-            collectionOperator.removeDoc(doc3);
-        }
+        collectionOperator.removeDocsIfExist(doc1, doc2, doc3);
     }
 
     @Test

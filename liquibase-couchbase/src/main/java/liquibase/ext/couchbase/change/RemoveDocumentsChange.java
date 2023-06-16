@@ -57,11 +57,17 @@ public class RemoveDocumentsChange extends CouchbaseChange {
     @Override
     public SqlStatement[] generateStatements() {
         Keyspace keyspace = keyspace(bucketName, scopeName, collectionName);
-        return new SqlStatement[] {
-                isNotBlank(sqlPlusPlusQuery) ? new RemoveDocumentsSqlQueryStatement(keyspace, ids, sqlPlusPlusQuery) :
-                isNotBlank(whereCondition) ? new RemoveDocumentsQueryStatement(keyspace, ids, whereCondition) :
-                        new RemoveDocumentsStatement(keyspace, ids)
-        };
+        return new SqlStatement[] {createStatement(keyspace)};
+    }
+
+    private SqlStatement createStatement(Keyspace keyspace) {
+        if (isNotBlank(sqlPlusPlusQuery)) {
+            return new RemoveDocumentsSqlQueryStatement(keyspace, ids, sqlPlusPlusQuery);
+        }
+        if (isNotBlank(whereCondition)) {
+            return new RemoveDocumentsQueryStatement(keyspace, ids, whereCondition);
+        }
+        return new RemoveDocumentsStatement(keyspace, ids);
     }
 
 }
