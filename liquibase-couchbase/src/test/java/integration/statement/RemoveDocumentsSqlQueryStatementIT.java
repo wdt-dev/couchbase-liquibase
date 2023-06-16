@@ -3,7 +3,6 @@ package integration.statement;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.manager.query.CreatePrimaryQueryIndexOptions;
-import com.google.common.collect.Sets;
 import common.TransactionStatementTest;
 import common.operators.TestCollectionOperator;
 import liquibase.ext.couchbase.statement.RemoveDocumentsSqlQueryStatement;
@@ -24,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import static common.constants.TestConstants.INDEX;
 import static common.matchers.CouchbaseCollectionAssert.assertThat;
 import static java.lang.String.format;
+import static java.util.Collections.singleton;
 import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 
 class RemoveDocumentsSqlQueryStatementIT extends TransactionStatementTest {
@@ -67,7 +67,7 @@ class RemoveDocumentsSqlQueryStatementIT extends TransactionStatementTest {
         doc1 = collectionOperator.generateTestDocByBody(JsonObject.create().put(DOC_FIELD_NAME, DOC_FIELD_VALUE));
         doc2 = collectionOperator.generateTestDocByBody(JsonObject.create().put(DOC_FIELD_NAME, DOC_FIELD_VALUE));
         doc3 = collectionOperator.generateTestDocByBody(JsonObject.create().put(DOC_FIELD_NAME, "val5"));
-        ids = Sets.newHashSet(new Id(doc3.getId()));
+        ids = singleton(new Id(doc3.getId()));
         collectionOperator.insertDocs(doc1, doc2, doc3);
         TimeUnit.SECONDS.sleep(3L);
     }

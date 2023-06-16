@@ -3,7 +3,6 @@ package liquibase.ext.couchbase.statement;
 import com.couchbase.client.java.transactions.ReactiveTransactionAttemptContext;
 import com.couchbase.client.java.transactions.TransactionAttemptContext;
 import com.couchbase.client.java.transactions.TransactionGetResult;
-import com.google.common.collect.Sets;
 import liquibase.ext.couchbase.operator.BucketOperator;
 import liquibase.ext.couchbase.operator.ClusterOperator;
 import liquibase.ext.couchbase.operator.CollectionOperator;
@@ -19,6 +18,7 @@ import reactor.core.publisher.Flux;
 import java.util.Set;
 
 import static common.constants.TestConstants.TEST_KEYSPACE;
+import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 @MockitoSettings(strictness = Strictness.WARN)
 class RemoveDocumentsSqlQueryStatementTest {
 
-    private final Set<Id> ids = Sets.newHashSet(new Id("id"));
+    private final Set<Id> ids = singleton(new Id("id"));
     private static final String SQL_PLUS_PLUS_QUERY = "sqlPlusPlusQuery";
 
     @Mock
