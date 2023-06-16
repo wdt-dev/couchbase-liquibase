@@ -1,6 +1,5 @@
 package integration.statement;
 
-import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.manager.query.CreatePrimaryQueryIndexOptions;
 import common.TransactionStatementTest;
@@ -23,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 import static common.constants.TestConstants.INDEX;
 import static common.matchers.CouchbaseCollectionAssert.assertThat;
 import static java.lang.String.format;
-import static java.util.Collections.singleton;
 import static liquibase.ext.couchbase.types.Keyspace.keyspace;
 
 class RemoveDocumentsSqlQueryStatementIT extends TransactionStatementTest {
@@ -33,7 +31,6 @@ class RemoveDocumentsSqlQueryStatementIT extends TransactionStatementTest {
     private static final String testScope = bucketOperator.createTestScope();
     private static final String testCollection = bucketOperator.createTestCollection(testScope);
     private static TestCollectionOperator collectionOperator;
-    private static Collection collection;
 
     private Set<Id> ids;
     private Document doc1;
@@ -49,7 +46,7 @@ class RemoveDocumentsSqlQueryStatementIT extends TransactionStatementTest {
                 .createPrimaryQueryIndexOptions()
                 .indexName(INDEX));
         TimeUnit.SECONDS.sleep(2L);
-        collection = bucketOperator.getCollection(testCollection, testScope);
+        //collection = bucketOperator.getCollection(testCollection, testScope);
     }
 
     @AfterAll
@@ -67,7 +64,8 @@ class RemoveDocumentsSqlQueryStatementIT extends TransactionStatementTest {
         doc1 = collectionOperator.generateTestDocByBody(JsonObject.create().put(DOC_FIELD_NAME, DOC_FIELD_VALUE));
         doc2 = collectionOperator.generateTestDocByBody(JsonObject.create().put(DOC_FIELD_NAME, DOC_FIELD_VALUE));
         doc3 = collectionOperator.generateTestDocByBody(JsonObject.create().put(DOC_FIELD_NAME, "val5"));
-        ids = singleton(new Id(doc3.getId()));
+        ids = new HashSet<>();
+        ids.add(new Id(doc3.getId()));
         collectionOperator.insertDocs(doc1, doc2, doc3);
         TimeUnit.SECONDS.sleep(3L);
     }
@@ -78,23 +76,23 @@ class RemoveDocumentsSqlQueryStatementIT extends TransactionStatementTest {
     }
 
     @Test
-    void Should_remove_docks_by_where_condition() {
+    void Should_remove_docs_by_where_condition() {
         RemoveDocumentsSqlQueryStatement statement = new RemoveDocumentsSqlQueryStatement(keyspace, ids,
                 format("SELECT meta().id FROM %s where field=\"val\"", keyspace.getFullPath()));
 
         doInTransaction(statement.asTransactionAction(clusterOperator));
 
-        assertThat(collection).doesNotContainIds(doc1.getId(), doc2.getId(), doc3.getId());
+        assertThat(collectionOperator.getCollection()).doesNotContainIds(doc1.getId(), doc2.getId(), doc3.getId());
     }
 
     @Test
-    void Should_remove_docks_by_where_condition_like() {
+    void Should_remove_docs_by_where_condition_like() {
         RemoveDocumentsSqlQueryStatement statement = new RemoveDocumentsSqlQueryStatement(keyspace, new HashSet<>(),
                 format("SELECT meta().id FROM %s where field LIKE ", keyspace.getFullPath()) + "\"%val%\"");
 
         doInTransaction(statement.asTransactionAction(clusterOperator));
 
-        assertThat(collection).doesNotContainIds(doc1.getId(), doc2.getId(), doc3.getId());
+        assertThat(collectionOperator.getCollection()).doesNotContainIds(doc1.getId(), doc2.getId(), doc3.getId());
     }
 
 }
