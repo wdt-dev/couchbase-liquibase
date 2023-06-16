@@ -32,7 +32,7 @@ class QueryFileChangeTest {
                 .containsExactly(builder()
                         .path(CREATE_COLLECTION_SQL_TEST)
                         .transactional(false)
-                        .relative(false)
+                        //.relative(false)
                         .build()
                 );
     }

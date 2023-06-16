@@ -22,20 +22,15 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
-        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-couchbase-ext.xsd">
 
-    <changeSet id="1" author="konstantin.umanets">
-        <ext:insertDocuments>
+    <changeSet id="1" author="tigran">
+
+        <ext:removeDocuments>
             <ext:bucketName>testBucket</ext:bucketName>
             <ext:scopeName>testScope</ext:scopeName>
             <ext:collectionName>testCollection</ext:collectionName>
-            <ext:importFile>
-                <ext:file>
-                    <ext:filePath>src/test/resources/liquibase/ext/couchbase/insert/testUidKey.json</ext:filePath>
-                </ext:file>
-                <ext:importType>LINES</ext:importType>
-                <ext:keyProviderType>INCREMENT</ext:keyProviderType>
-            </ext:importFile>
-        </ext:insertDocuments>
+            <ext:sqlPlusPlusQuery>SELECT meta().id FROM `testBucket`.`testScope`.`testCollection` where field1="val1"</ext:sqlPlusPlusQuery>
+        </ext:removeDocuments>
     </changeSet>
 </databaseChangeLog>
