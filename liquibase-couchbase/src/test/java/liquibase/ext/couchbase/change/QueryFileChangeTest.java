@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.internal.util.collections.Iterables.firstOf;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class QueryFileChangeTest {
+class QueryFileChangeTest {
 
     @InjectMocks
     private TestChangeLogProvider changeLogProvider;
