@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.liquibase.ext</groupId>
             <artifactId>liquibase-couchbase</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>0.1.2-ER</version>
         </dependency>
 
         <!-- test dependencies -->
@@ -89,7 +89,7 @@
                     <dependency>
                         <groupId>org.liquibase.ext</groupId>
                         <artifactId>liquibase-couchbase</artifactId>
-                        <version>0.1.0-SNAPSHOT</version>
+                        <version>0.1.2-ER</version>
                     </dependency>
                 </dependencies>
             </plugin>
